@@ -521,7 +521,7 @@ function renderAll(){
         <div class="notes-display">${notesH}</div>
         <div class="edit-area" style="display:none"><textarea class="edit-textarea" placeholder="Add notes…"></textarea><div style="display:flex;gap:0.4rem;margin-top:0.4rem"><button class="save-btn">Save</button><button class="cancel-edit-btn">Cancel</button></div></div>
         <div class="appt-card-actions">
-          ${(a.phone) ? `<button class="edit-btn" onclick="sendManualReminder('${escAttr(a.id)}','${escAttr(a.phone)}','${escAttr(a.patient||a.title)}','${escAttr(a.dateRaw)}','${escAttr(a.time||'')}')">📱 Remind</button>` : ""}
+          ${(a.phone) ? `<button class="remind-btn" onclick="event.stopPropagation();sendManualReminder('${escAttr(a.id)}','${escAttr(a.phone)}','${escAttr(a.patient||a.title)}','${escAttr(a.dateRaw)}','${escAttr(a.time||'')}')">📱 Remind</button>` : ""}
           <button class="edit-btn">✏️ Edit Notes</button>
         </div>      
       </div>`;
