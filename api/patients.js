@@ -41,25 +41,12 @@ function getSheets() {
 
 
 // ─── Generate next reference number ──────────────────────────────────────────
+// Uses a Postgres function (get_next_reference) that runs atomically,
+// preventing duplicate references when two patients register simultaneously.
 async function getNextReference(supabase) {
-  const year = new Date().getFullYear().toString().slice(-2);
-  const prefix = `RDC/${year}/`;
-
-  // Get the highest sequence number for this year
-  const { data } = await supabase
-    .from("patients")
-    .select("reference_number")
-    .like("reference_number", `${prefix}%`)
-    .order("reference_number", { ascending: false })
-    .limit(1);
-
-  let nextSeq = 2044;
-  if (data && data.length > 0) {
-    const parts = data[0].reference_number.split("/");
-    nextSeq = parseInt(parts[2]) + 1;
-  }
-
-  return `${prefix}${nextSeq}`;
+  const { data, error } = await supabase.rpc("get_next_reference");
+  if (error) throw new Error("Failed to generate reference number: " + error.message);
+  return data;
 }
 
 // ─── Sync patient row to Google Sheets ───────────────────────────────────────
@@ -68,6 +55,7 @@ async function syncToSheets(patient, isNew) {
   try {
     const sheets   = getSheets();
     const sheetId  = process.env.GOOGLE_SHEET_ID;
+    const range    = "Patient_data!A:O";
 
     // Build the row values in sheet column order
     // Sheet columns: Timestamp | Reference | Name | Gender | Age Category |
@@ -75,7 +63,7 @@ async function syncToSheets(patient, isNew) {
     //                Company | Profession | Emergency Name | Emergency Relation | Emergency Phone
     const now = new Date().toISOString();
     const row = [
-      isNew ? now : "",                                           // Timestamp (only for new rows)
+      isNew ? now : "",                                          // Timestamp (only for new rows)
       patient.reference_number                        || "",
       patient.name                                    || "",
       patient.gender !== null && patient.gender !== undefined
@@ -161,6 +149,12 @@ async function deleteFromSheets(reference_number) {
     const sheets  = getSheets();
     const sheetId = process.env.GOOGLE_SHEET_ID;
 
+   
+    if (!tab) {
+      console.error("[patients] Patient_data tab not found in spreadsheet");
+      return;
+    }
+
     // Find the row index by scanning column B
     const existing = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
@@ -193,7 +187,7 @@ async function deleteFromSheets(reference_number) {
         requests: [{
           deleteDimension: {
             range: {
-              sheetId:    gridId,
+              sheetId:    gridId,     // ← real grid ID, not hardcoded 0       // ← use the real grid ID
               dimension:  "ROWS",
               startIndex: rowIndex - 1,
               endIndex:   rowIndex,
@@ -210,13 +204,17 @@ async function deleteFromSheets(reference_number) {
 }
 
 module.exports = async function handler(req, res) {
-  const allowedOrigins = ["https://rivershub.vercel.app", "http://localhost:3000"];
+  const allowedOrigins = [
+    process.env.RENDER_EXTERNAL_URL,
+    "https://riversdashboard.onrender.com",
+    "http://localhost:3000",
+  ].filter(Boolean);
   const origin = req.headers.origin;
   if (!origin || allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin || "*");
   }
   res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   if (req.method === "OPTIONS") return res.status(200).end();
 
@@ -253,14 +251,13 @@ module.exports = async function handler(req, res) {
 
     // List with search and pagination
     const page   = parseInt(req.query.page  || "1");
-    const limit  = Math.min(parseInt(req.query.limit || "20"), 50);
+    const limit = Math.min(parseInt(req.query.limit || "20"), 50);
     const search = req.query.search || "";
     const offset = (page - 1) * limit;
 
     let query = supabase
       .from("patients")
-      .select("reference_number,name,phone,gender,age_category,created_at", { count: "exact" })
-      .order("created_at", { ascending: false })
+      .select("reference_number,name,phone,gender,age_category,created_at", { count: "exact" })      .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (search) {
