@@ -130,7 +130,7 @@ module.exports = async function handler(req, res) {
       if (!to)          return res.status(400).json({ error: "to (email address) is required" });
       if (!invoiceHtml) return res.status(400).json({ error: "invoiceHtml is required" });
 
-      const subject = `Invoice ${invoiceNumber ? `#${invoiceNumber}` : ""} - Rivers Dental Clinic`;
+      const subject = `Invoice ${invoiceNumber ? `#${invoiceNumber}` : ""}, Rivers Dental Clinic`;
       console.log(`[invoices] 📧 Sending invoice email to ${to} via Gmail API`);
 
       try {
