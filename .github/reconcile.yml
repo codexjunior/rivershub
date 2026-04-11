@@ -1,0 +1,26 @@
+name: Nightly Patient Reconciliation
+
+on:
+  schedule:
+    # 02:00 UTC = 2AM Ghana time (Ghana is UTC+0 year-round)
+    - cron: "0 2 * * *"
+  # Allow manual trigger for testing
+  workflow_dispatch:
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run patient reconciliation
+        run: |
+          curl --fail --silent --show-error \
+            --max-time 60 \
+            -X POST "${{ secrets.VERCEL_URL }}/api/sync-reconcile" \
+            -H "Content-Type: application/json" \
+            -d "{\"sync_token\":\"${{ secrets.SYNC_TOKEN }}\",\"dry_run\":false}" \
+            | tee /dev/stderr \
+            | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          print(f'Action: {data.get(\"action\")}, Deleted from Sheets: {data.get(\"deleted_from_sheets\", 0)}, Added to Sheets: {data.get(\"added_to_sheets\", 0)}')
+          "
