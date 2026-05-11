@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Staff Dashboard — Rivers Dental Clinic</title>
+<title>Staff Dashboard - Rivers Dental Clinic</title>
 <link rel="apple-touch-icon" href="/imgs/rivers_dental_logo.png">
 <link rel="icon" type="image/png" href="/imgs/rivers_dental_logo.png">
 <link rel="manifest" href="/manifest.json">
@@ -71,8 +71,8 @@
       <button class="drawer-close" id="drawerClose">✕</button>
     </div>
     <div class="drawer-nav">
-      <button class="drawer-link active" data-page="appointments">📅 Appointments</button>
-      <button class="drawer-link" data-page="patients">👤 Patients</button>
+      <button class="drawer-link active" data-page="appointments">Appointments</button>
+      <button class="drawer-link" data-page="patients">Patients</button>
     </div>
     <div class="drawer-footer">
       <button class="drawer-logout" id="drawerLogout">Sign Out</button>
@@ -82,11 +82,11 @@
   <!-- ═══ APPOINTMENTS PAGE ═══ -->
   <div class="page active" id="page-appointments">
     <div class="stats-bar">
-      <div class="stat"><span class="stat-val" id="statTotal">—</span><span class="stat-label">Upcoming</span></div>
+      <div class="stat"><span class="stat-val" id="statTotal">-</span><span class="stat-label">Upcoming</span></div>
       <div class="stats-divider"></div>
-      <div class="stat"><span class="stat-val" id="statToday">—</span><span class="stat-label">Today</span></div>
+      <div class="stat"><span class="stat-val" id="statToday">-</span><span class="stat-label">Today</span></div>
       <div class="stats-divider"></div>
-      <div class="stat"><span class="stat-val" id="statWeek">—</span><span class="stat-label">This Week</span></div>
+      <div class="stat"><span class="stat-val" id="statWeek">-</span><span class="stat-label">This Week</span></div>
     </div>
     <div class="controls">
       <div class="search-wrap">
@@ -194,7 +194,7 @@
         <div class="inv-patient-name-display" id="invPatientDisplay">PATIENT NAME</div>
         <div class="inv-number-chip">
           <div class="inv-number-chip-label">Invoice No.</div>
-          <div class="inv-number-chip-val" id="invNumberDisplay">—</div>
+          <div class="inv-number-chip-val" id="invNumberDisplay">-</div>
         </div>
       </div>
     </div>
@@ -260,8 +260,8 @@
     <!-- Footer actions -->
     <div class="inv-modal-footer">
       <div style="display:flex;gap:0.5rem">
-        <button class="btn-ghost" onclick="invPrint()" style="font-size:0.8rem;color:var(--blue);border-color:var(--blue)">🖨 Print</button>
-        <button class="btn-ghost" onclick="invEmail()" style="font-size:0.8rem;color:var(--teal);border-color:var(--teal)">📧 Email</button>      </div>
+        <button class="btn-ghost" onclick="invPrint()" style="font-size:0.8rem;color:var(--blue);border-color:var(--blue)">Print</button>
+        <button class="btn-ghost" onclick="invEmail()" style="font-size:0.8rem;color:var(--teal);border-color:var(--teal)">Email</button>      </div>
       <button class="btn-primary" id="submitInvoice" style="font-size:0.82rem;padding:0.6rem 1.5rem">Save Invoice</button>
     </div>
 
@@ -273,7 +273,7 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-//  MEDICAL ACTS — loaded from database on login
+//  MEDICAL ACTS - loaded from database on login
 // ═══════════════════════════════════════════════════════════════
 let ACT_PRICES = {};   // name → price, populated after login
 let ACTS       = [];   // sorted names array, populated after login
@@ -296,11 +296,11 @@ async function loadMedicalActs(){
 const API_TOKEN = "rivers-dental-staff-rct";
 const API_BASE  = "";
 
-// Build Authorization header — keeps credentials out of query params and logs
+// Build Authorization header - keeps credentials out of query params and logs
 function authHeader() {
   return { "Authorization": `Bearer ${API_TOKEN}:${currentPassword}` };
 }
-// Build auth query string (kept for login check only — before currentPassword is set)
+// Build auth query string (kept for login check only - before currentPassword is set)
 function authQuery(pw) {
   return `token=${API_TOKEN}&password=${encodeURIComponent(pw || currentPassword)}`;
 }
@@ -418,9 +418,9 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){document.getElement
 //  APPOINTMENTS
 // ═══════════════════════════════════════════════════════════════
 document.getElementById("refreshBtn").addEventListener("click",async()=>{
-  document.getElementById("refreshBtn").textContent="↻ Loading…";
+  document.getElementById("refreshBtn").textContent="…";
   try{const r=await fetch(`${API_BASE}/api/appointments`,{headers:authHeader()});const d=await r.json();allAppointments=d.appointments;renderAll();}catch{}
-  document.getElementById("refreshBtn").textContent="↻ Refresh";
+  document.getElementById("refreshBtn").textContent="↻";
 });
 document.getElementById("searchInput").addEventListener("input",()=>{currentPage=1;renderAll();});
 
@@ -507,11 +507,11 @@ function renderAll(){
   const allByDate={};filtered.forEach(a=>{const k=a.dateRaw.split("T")[0];allByDate[k]=(allByDate[k]||0)+1;});
   let html="";
   Object.entries(byDate).forEach(([dk,appts])=>{
-    const isT=dk===todayStr;const cnt=allByDate[dk]||appts.length;const lbl=isT?`📅 Today — ${appts[0].date}`:appts[0].date;
+    const isT=dk===todayStr;const cnt=allByDate[dk]||appts.length;const lbl=isT?`📅 Today - ${appts[0].date}`:appts[0].date;
     html+=`<div class="date-group-header">${lbl}<span class="day-count">${cnt} appt${cnt!==1?"s":""}</span></div><div class="appt-list">`;
     appts.forEach(a=>{
       const tr=a.timeEnd&&a.timeEnd!==a.time?`${a.time} – ${a.timeEnd}`:a.time;
-      const src=a.isWebBooking?`<span class="source-badge web">🌐 Website</span>`:`<span class="source-badge manual">📝 Manual</span>`;
+      const src=a.isWebBooking?`<span class="source-badge web">Website</span>`:`<span class="source-badge manual">Manual</span>`;
       const notesH=(a.notes||"").trim()?`<div class="appt-notes">${escHtml(a.notes)}</div>`:`<div class="appt-no-notes">No notes</div>`;
       const hasDet=a.patient||a.phone||a.email||a.service;
       const det=hasDet?`<div class="appt-details">
@@ -521,12 +521,12 @@ function renderAll(){
         ${a.email?`<div class="appt-detail"><span class="detail-label">Email</span><span class="detail-value"><a href="mailto:${escHtml(a.email)}">${escHtml(a.email)}</a></span></div>`:""}
       </div>`:"";
       html+=`<div class="appt-card${isT?" today-card":""}" id="card-${a.id}" data-id="${a.id}">
-        <div class="appt-top"><div><div class="appt-title">${escHtml(a.title)}</div>${src}</div><span class="appt-time${isT?" today-time":""}">🕐 ${tr}</span></div>
+        <div class="appt-top"><div><div class="appt-title">${escHtml(a.title)}</div>${src}</div><span class="appt-time${isT?" today-time":""}">${tr}</span></div>
         ${det}
         <div class="notes-display">${notesH}</div>
         <div class="edit-area" style="display:none"><textarea class="edit-textarea" placeholder="Add notes…"></textarea><div style="display:flex;gap:0.4rem;margin-top:0.4rem"><button class="save-btn">Save</button><button class="cancel-edit-btn">Cancel</button></div></div>
         <div class="appt-card-actions">
-          ${(a.phone) ? `<button class="remind-btn" onclick="event.stopPropagation();sendManualReminder('${escAttr(a.id)}','${escAttr(a.phone)}','${escAttr(a.patient||a.title)}','${escAttr(a.dateRaw)}','${escAttr(a.time||'')}')">📱 Remind</button>` : ""}
+          ${(a.phone) ? `<button class="remind-btn" onclick="event.stopPropagation();sendManualReminder('${escAttr(a.id)}','${escAttr(a.phone)}','${escAttr(a.patient||a.title)}','${escAttr(a.dateRaw)}','${escAttr(a.time||'')}')">Remind</button>` : ""}
           <button class="edit-btn">✏️ Edit Notes</button>
         </div>      
       </div>`;
@@ -584,7 +584,7 @@ function renderPatientList(){
       <div class="pt-row-info">
         <div class="pt-row-name">${escHtml(p.name||"No name")}</div>
         <div class="pt-row-ref">${escHtml(p.reference_number)}</div>
-        <div class="pt-row-sub">${escHtml([p.phone,p.profession].filter(Boolean).join(" · ")||"—")}</div>
+        <div class="pt-row-sub">${escHtml([p.phone,p.profession].filter(Boolean).join(" · ")||"-")}</div>
       </div>
     </div>`;
   });
@@ -621,7 +621,7 @@ async function viewPatient(ref){
     const [pRes,iRes]=await Promise.all([fetch(`${API_BASE}/api/patients?${params}`),fetch(`${API_BASE}/api/invoices?${params}`)]);
     const pData=await pRes.json();const iData=await iRes.json();
     const p=pData.patient;
-    const f=(lbl,val)=>`<div class="info-item"><span class="info-item-label">${lbl}</span><span class="info-item-value${!val?" empty":""}">${escHtml(val||"—")}</span></div>`;
+    const f=(lbl,val)=>`<div class="info-item"><span class="info-item-label">${lbl}</span><span class="info-item-value${!val?" empty":""}">${escHtml(val||"-")}</span></div>`;
     rp.innerHTML=`
     <div class="detail-pane">
       <div class="detail-pane-header">
@@ -631,8 +631,8 @@ async function viewPatient(ref){
         </div>
         <div class="detail-pane-actions">
           <button class="btn-primary" onclick="openInvoiceModal('${escAttr(ref)}','${escAttr(p.name||ref)}','${escAttr(ref)}')">+ Invoice</button>
-          <button class="btn-ghost" onclick="openEditPatientPane(null,'${escAttr(ref)}')">✏️ Edit</button>
-          <button class="btn-ghost" style="padding: 0.28rem 0.8rem; color:var(--red);border-color:var(--red)" onclick="deletePatient('${escAttr(ref)}','${escAttr(p.name||ref)}')">🗑</button>
+          <button class="btn-ghost" onclick="openEditPatientPane(null,'${escAttr(ref)}')">Edit</button>
+          <button class="btn-ghost" style="padding: 0.28rem 0.8rem; color:var(--red);border-color:var(--red)" onclick="deletePatient('${escAttr(ref)}','${escAttr(p.name||ref)}')">Delete</button>
         </div>
       </div>
 
@@ -737,7 +737,7 @@ async function openEditPatientPane(patient,refOverride){
       <div class="form-field"><label>Full Name *</label><input type="text" id="pName" value="${escAttr(p?.name||"")}" placeholder="e.g. Kofi Mensah"></div>
       <div class="form-row">
         <div class="form-field"><label>Reference Number</label><input type="text" id="pRef" value="${escAttr(refVal)}" readonly></div>
-        <div class="form-field"><label>Gender</label><select id="pGender"><option value="">— Select —</option><option value="0"${p?.gender===0?" selected":""}>Male</option><option value="1"${p?.gender===1?" selected":""}>Female</option></select></div>
+        <div class="form-field"><label>Gender</label><select id="pGender"><option value="">- Select -</option><option value="0"${p?.gender===0?" selected":""}>Male</option><option value="1"${p?.gender===1?" selected":""}>Female</option></select></div>
       </div>
       <div class="form-row">
         <div class="form-field"><label>Phone Number</label><input type="tel" id="pPhone" value="${escAttr(p?.phone||"")}" placeholder="e.g. 0244 123 456"></div>
@@ -748,7 +748,7 @@ async function openEditPatientPane(patient,refOverride){
         <div class="form-field"><label>Date of Birth</label><input type="date" id="pBirthdate" value="${escAttr(p?.birthdate||"")}"></div>
       </div>
       <div class="form-row">
-        <div class="form-field"><label>Age Category</label><select id="pAgeCategory"><option value="">— Select —</option><option value="0"${p?.age_category===0?" selected":""}>Child</option><option value="1"${p?.age_category===1?" selected":""}>Teenager</option><option value="2"${p?.age_category===2?" selected":""}>Adult</option><option value="3"${p?.age_category===3?" selected":""}>Senior</option></select></div>
+        <div class="form-field"><label>Age Category</label><select id="pAgeCategory"><option value="">- Select -</option><option value="0"${p?.age_category===0?" selected":""}>Child</option><option value="1"${p?.age_category===1?" selected":""}>Teenager</option><option value="2"${p?.age_category===2?" selected":""}>Adult</option><option value="3"${p?.age_category===3?" selected":""}>Senior</option></select></div>
         <div class="form-field"><label>City</label><input type="text" id="pCity" value="${escAttr(p?.city||"")}" placeholder="e.g. Accra"></div>
       </div>
       <div class="form-row">
@@ -785,7 +785,7 @@ document.getElementById("newPatientBtn").addEventListener("click",()=>{viewingPa
 
 // ── Delete patient ────────────────────────────────────────────────────────────
 async function deletePatient(ref, name) {
-  if (!confirm(`⚠️ Permanently delete patient ${name} (${ref})?\n\nThis will also remove them from Google Sheets.\nAll invoices will also be deleted.\n\nThis cannot be undone.`)) return;
+  if (!confirm(`Permanently delete patient ${name} (${ref})?\n\nAll invoices will also be deleted.\nThis cannot be undone.`)) return;
   try {
     const res = await fetch(`${API_BASE}/api/patients`, {
       method: "DELETE",
@@ -858,14 +858,14 @@ function renderInvoiceList(invoices,total,unpaid){
   if(invoices.length===0)return`<div style="padding:1.25rem;font-size:0.84rem;color:#b0bec8;font-style:italic">No invoices yet.</div>`;
   let html=`<div style="overflow-x:auto"><table class="inv-list-table"><thead><tr><th>Date</th><th>No.</th><th>Procedures</th><th>Total</th><th>Remaining</th><th>Status</th><th></th><th></th></tr></thead><tbody>`;
   invoices.forEach(inv=>{
-    const procs=inv.invoice_items&&inv.invoice_items.length>0?inv.invoice_items.map(i=>escHtml(i.procedure)).join(", "):escHtml(inv.procedure||"—");
+    const procs=inv.invoice_items&&inv.invoice_items.length>0?inv.invoice_items.map(i=>escHtml(i.procedure)).join(", "):escHtml(inv.procedure||"-");
     const remaining=parseFloat(inv.amount_remaining||0);
     const actionBtn=inv.paid
       ? `<span style="font-size:0.69rem;color:var(--muted);font-style:italic">Complete</span>`
       : `<button class="inv-action-btn toggle" onclick="markInvoiceFullyPaid('${inv.id}')">Mark Paid</button>`;
     html+=`<tr>
       <td style="white-space:nowrap">${escHtml(inv.date)}</td>
-      <td style="white-space:nowrap;font-size:0.75rem;color:var(--muted)">${escHtml(inv.invoice_number||"—")}</td>
+      <td style="white-space:nowrap;font-size:0.75rem;color:var(--muted)">${escHtml(inv.invoice_number||"-")}</td>
       <td style="max-width:200px;white-space:normal;font-size:0.79rem;line-height:1.5">${procs}</td>
       <td style="white-space:nowrap;font-weight:600">GHS ${parseFloat(inv.grand_total||inv.amount||0).toFixed(2)}</td>
       <td style="white-space:nowrap;font-weight:600;color:${remaining>0.005?"var(--red)":"var(--green)"}">GHS ${remaining.toFixed(2)}</td>
@@ -922,12 +922,12 @@ async function viewInvoiceHistory(invoiceId, invoiceLabel){
     });
   }
 
-  // Reuse the existing modal overlay — create a temporary history panel
+  // Reuse the existing modal overlay - create a temporary history panel
   const historyHtml=`
     <div class="modal-overlay open" id="historyOverlay" style="z-index:500">
       <div class="modal-panel" style="max-width:680px">
         <div class="modal-header">
-          <h2>Invoice History — ${escHtml(invoiceLabel)}</h2>
+          <h2>Invoice History - ${escHtml(invoiceLabel)}</h2>
           <button class="modal-close" onclick="document.getElementById('historyOverlay').remove()">✕</button>
         </div>
         <div style="overflow-x:auto">
@@ -946,11 +946,11 @@ async function viewInvoiceHistory(invoiceId, invoiceLabel){
 }
 
 // Mark invoice fully paid: sets amount_paid = grand_total, amount_remaining = 0, paid = true.
-// Uses PATCH so the real payment figures are written to the database — not just a flag flip.
+// Uses PATCH so the real payment figures are written to the database - not just a flag flip.
 async function markInvoiceFullyPaid(id){
   if(!viewingPatient)return;
   // Confirm with staff before settling
-  if(!confirm("Mark this invoice as fully paid?\n\nThis will record the full outstanding balance as received and cannot be undone here."))return;
+  if(!confirm("Mark this invoice as fully paid?\nThis will record the full outstanding balance as received and cannot be undone here."))return;
 
   // Fetch fresh invoice data so we have the exact grand_total and items
   const params=new URLSearchParams({ref:viewingPatient});
@@ -1008,7 +1008,7 @@ async function refreshInvoiceList(){
   if(el)el.innerHTML=renderInvoiceList(data.invoices||[],data.total||0,data.unpaid||0);
 }
 
-// Edit invoice — load existing data into modal
+// Edit invoice - load existing data into modal
 async function editInvoice(id){
   // fetch all invoices for this patient and find by id
   if(!viewingPatient)return;
@@ -1027,7 +1027,7 @@ async function editInvoice(id){
 let invRowCount=0;
 
 function buildActOptions(sel){
-  return`<option value="">— Select procedure —</option>`+ACTS.map(a=>`<option value="${escHtml(a)}"${a===sel?" selected":""}>${escHtml(a)}</option>`).join("");
+  return`<option value="">- Select procedure -</option>`+ACTS.map(a=>`<option value="${escHtml(a)}"${a===sel?" selected":""}>${escHtml(a)}</option>`).join("");
 }
 
 function invAddActRow(procedure="",qty=1,unitPrice=""){
@@ -1081,13 +1081,13 @@ function invRecalcTotals(){
 function invUpdateHeader(){
   const num=document.getElementById("invNumber").value.trim();
   const date=document.getElementById("invDate").value;
-  document.getElementById("invNumberDisplay").textContent=num||"—";
+  document.getElementById("invNumberDisplay").textContent=num||"-";
   if(date){const d=new Date(date);document.getElementById("invDateDisplay").textContent=d.toLocaleDateString("en-GH",{day:"numeric",month:"long",year:"numeric"});}
   else document.getElementById("invDateDisplay").textContent="";
 }
 
 
-// OPEN INVOICE MODAL — also accepts existing invoice for editing
+// OPEN INVOICE MODAL - also accepts existing invoice for editing
 function openInvoiceModal(ref, patientName, invoiceNumber, existingInv){
   document.getElementById("invoicePatientRef").value=ref;
   document.getElementById("editingInvoiceId").value=existingInv?existingInv.id:"";
@@ -1164,7 +1164,7 @@ document.getElementById("submitInvoice").addEventListener("click",async()=>{
 // ── Print invoice (clean A4 with PAID stamp + watermark) ───────
 function invPrint(){
   const pName=document.getElementById("invPatientName").value;
-  const invNum=document.getElementById("invNumber").value||"—";
+  const invNum=document.getElementById("invNumber").value||"-";
   const date=document.getElementById("invDate").value;
   const dateStr=date?new Date(date).toLocaleDateString("en-GH",{day:"numeric",month:"long",year:"numeric"}):"";
   const discAmt=parseFloat(document.getElementById("invDiscountAmt").value)||0;
@@ -1183,7 +1183,7 @@ function invPrint(){
   const grand=Math.max(0,totalMed-discAmt);const rem=grand-amtPaid;
   const isFullyPaid=rem<=0.005;
 
-  // Watermark logo — centered, 30% opacity
+  // Watermark logo - centered, 30% opacity
   const watermark=`
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
       width:380pt;height:380pt;z-index:0;pointer-events:none;display:flex;align-items:center;justify-content:center;">
@@ -1273,7 +1273,7 @@ async function invEmail() {
 
   // Reuse the same HTML that invPrint() builds
   const pName    = document.getElementById("invPatientName").value;
-  const invNum   = document.getElementById("invNumber").value || "—";
+  const invNum   = document.getElementById("invNumber").value || "-";
   const date     = document.getElementById("invDate").value;
   const dateStr  = date ? new Date(date).toLocaleDateString("en-GH", { day:"numeric", month:"long", year:"numeric" }) : "";
   const discAmt  = parseFloat(document.getElementById("invDiscountAmt").value) || 0;
@@ -1373,7 +1373,7 @@ async function invEmail() {
     showToast("Network error sending email", true);
   }
 
-  if (btn) { btn.disabled = false; btn.textContent = "📧 Email"; }
+  if (btn) { btn.disabled = false; btn.textContent = "Email"; }
 }
 
 // ═══════════════════════════════════════════════════════════════
