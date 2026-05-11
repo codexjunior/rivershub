@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Dashboard — Rivers Dental Clinic</title>
+<link rel="apple-touch-icon" href="/imgs/rivers_dental_logo.png">
+<link rel="icon" type="image/png" href="/imgs/rivers_dental_logo.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="RDC Staff">
+<meta name="theme-color" content="#0A3A63">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ LOGIN ═══ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="/imgs/rivers_dental_logo.png" alt="Rivers Dental">
+      <div>
+        <div class="login-logo-name">Rivers Dental Clinic</div>
+        <span class="login-logo-sub">Staff Portal</span>
+      </div>
+    </div>
+    <h1>Staff Dashboard</h1>
+    <p>Enter your password to access the patient management portal.</p>
+    <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="passwordInput" placeholder="Enter dashboard password">
+    </div>
+    <button class="login-btn" id="loginBtn">Access Dashboard</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ APP ═══ -->
+<div class="app" id="app">
+
+  <!-- TOPNAV -->
+  <nav class="nav">
+    <div class="nav-brand">
+      <img src="/imgs/rivers_dental_logo.png" alt="RDC">
+      <div>
+        <div class="nav-brand-text">Rivers Dental</div>
+        <span class="nav-brand-sub">Staff Portal</span>
+      </div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-link active" data-page="appointments">Appointments</button>
+      <button class="nav-link" data-page="patients">Patients</button>
+      <div class="nav-divider"></div>
+      <button class="logout-btn" id="logoutBtn">Sign Out</button>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE DRAWER -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div>
+        <div style="font-size:0.92rem;font-weight:700;color:white">Rivers Dental</div>
+        <div style="font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45)">Staff Portal</div>
+      </div>
+      <button class="drawer-close" id="drawerClose">✕</button>
+    </div>
+    <div class="drawer-nav">
+      <button class="drawer-link active" data-page="appointments">📅 Appointments</button>
+      <button class="drawer-link" data-page="patients">👤 Patients</button>
+    </div>
+    <div class="drawer-footer">
+      <button class="drawer-logout" id="drawerLogout">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- ═══ APPOINTMENTS PAGE ═══ -->
+  <div class="page active" id="page-appointments">
+    <div class="stats-bar">
+      <div class="stat"><span class="stat-val" id="statTotal">—</span><span class="stat-label">Upcoming</span></div>
+      <div class="stats-divider"></div>
+      <div class="stat"><span class="stat-val" id="statToday">—</span><span class="stat-label">Today</span></div>
+      <div class="stats-divider"></div>
+      <div class="stat"><span class="stat-val" id="statWeek">—</span><span class="stat-label">This Week</span></div>
+    </div>
+    <div class="controls">
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Search by patient name…">
+      </div>
+      <span class="result-count" id="resultCount"></span>
+      <button class="btn-ghost" id="refreshBtn" style="padding: 0.48rem 0.8rem;">↻</button>
+      <button class="btn-primary" id="newApptBtn">+ New Appointment</button>
+    </div>
+    <div class="page-content" id="apptContent">
+      <div class="state-msg"><div class="icon">📅</div><p>Loading appointments…</p></div>
+    </div>
+  </div>
+
+  <!-- ═══ PATIENTS SPLIT PAGE ═══ -->
+  <div class="page" id="page-patients">
+    <div class="patients-split">
+
+      <!-- LEFT: list panel -->
+      <div class="patients-left">
+        <div class="patients-left-header">
+          <div class="patients-left-controls">
+            <div class="patient-search-wrap" style="flex:1">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="patientSearch" placeholder="Search patients…">
+            </div>
+            <button class="btn-ghost btn-sm" id="refreshPatientsBtn" title="Refresh">↻</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span class="result-count" id="patientCount"></span>
+            <button class="btn-primary btn-sm" id="newPatientBtn">+ New</button>
+          </div>
+        </div>
+        <div class="patients-list-scroll" id="patientListScroll">
+          <div class="state-msg" style="padding:2rem 1rem"><div class="icon" style="font-size:1.8rem">👤</div><p style="font-size:0.8rem">Loading…</p></div>
+        </div>
+        <!-- left pagination -->
+        <div id="patientListPagination" style="padding:0.5rem 0.6rem;border-top:1px solid var(--border);background:white"></div>
+      </div>
+
+      <!-- DRAG HANDLE (mobile only) -->
+      <div class="split-drag-handle" id="splitDragHandle">
+        <div class="split-drag-bar"></div>
+      </div>
+
+      <!-- RIGHT: detail/edit panel -->
+      <div class="patients-right" id="patientsRight">
+        <div class="right-empty">
+          <div class="empty-icon">👤</div>
+          <h3>No patient selected</h3>
+          <p>Click a patient from the list on the left to view their details.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end .app -->
+
+<!-- ═══ PRINT INVOICE AREA (hidden, shown only on print) ═══ -->
+<div id="printInvoiceArea"></div>
+
+<!-- ═══ NEW APPOINTMENT MODAL ═══ -->
+<div class="modal-overlay" id="newApptModal">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <h2>New Appointment</h2>
+      <button class="modal-close" id="closeNewAppt">✕</button>
+    </div>
+    <div class="form-error" id="apptFormError"></div>
+    <div class="form-row">
+      <div class="form-field"><label>Patient Name *</label><input type="text" id="apptName" placeholder="e.g. Kofi Mensah"></div>
+      <div class="form-field"><label>Phone Number *</label><input type="tel" id="apptPhone" placeholder="e.g. 0244 123 456"></div>
+    </div>
+    <div class="form-field"><label>Email Address</label><input type="email" id="apptEmail" placeholder="kofi@example.com"></div>
+    <div class="form-row">
+      <div class="form-field"><label>Date *</label><input type="date" id="apptDate"></div>
+      <div class="form-field"><label>Time *</label><input type="time" id="apptTime"></div>
+      <div class="form-field"><label>Duration</label><input type="text" id="apptDuration" placeholder="e.g. 30, 1:30"></div>
+    </div>
+    <div class="form-field"><label>Notes / Description</label><textarea id="apptDescription" placeholder="Procedure details, special instructions…"></textarea></div>
+    <button class="modal-submit" id="submitNewAppt">Create Appointment</button>
+  </div>
+</div>
+
+<!-- ═══ INVOICE MODAL ═══ -->
+<div class="modal-overlay" id="invoiceModal">
+  <div class="modal-panel inv-modal-panel">
+
+    <!-- Header strip -->
+    <div class="inv-header-strip">
+      <div>
+        <div class="inv-clinic-logo-row">
+          <img src="/imgs/rivers_dental_logo.png" alt="RDC">
+          <div>
+            <div class="inv-clinic-name">Rivers Dental Clinic</div>
+            <span class="inv-clinic-loc">Taifa, Accra</span>
+          </div>
+        </div>
+        <div class="inv-clinic-details">riversdentalghana@gmail.com<br>0302 448742<br>Tantra Street, Accra</div>
+      </div>
+      <div class="inv-meta-right">
+        <div class="inv-date-chip" id="invDateDisplay"></div>
+        <div class="inv-patient-name-display" id="invPatientDisplay">PATIENT NAME</div>
+        <div class="inv-number-chip">
+          <div class="inv-number-chip-label">Invoice No.</div>
+          <div class="inv-number-chip-val" id="invNumberDisplay">—</div>
+        </div>
+      </div>
+    </div>
+
+    <input type="hidden" id="invoicePatientRef">
+    <input type="hidden" id="editingInvoiceId">
+
+    <!-- Details row -->
+    <div class="inv-sec-title">Invoice Details</div>
+    <div class="inv-details-grid">
+      <div class="form-field" style="margin-bottom:0"><label>Patient</label><input type="text" id="invPatientName" readonly style="background:var(--bg);color:var(--muted)"></div>
+      <div class="form-field" style="margin-bottom:0"><label>Invoice Number</label><input type="text" id="invNumber" placeholder="Auto-filled from ref" readonly style="background:var(--bg);color:var(--muted)"></div>
+      <div class="form-field" style="margin-bottom:0"><label>Date *</label><input type="date" id="invDate" oninput="invUpdateHeader()"></div>
+    </div>
+
+    <!-- Acts -->
+    <div class="inv-sec-title" style="margin-top:1.25rem">
+      Medical Acts
+      <span style="font-size:0.7rem;color:var(--teal);font-weight:700" id="invActCount">0 items</span>
+    </div>
+    <div class="acts-wrap">
+      <table class="acts-table">
+        <thead>
+          <tr>
+            <th style="min-width:200px">Procedure</th>
+            <th style="min-width:52px">Qty</th>
+            <th style="min-width:90px">Unit Price (GHS)</th>
+            <th style="min-width:82px">Total (GHS)</th>
+            <th style="min-width:82px">Patient Share</th>
+            <th style="width:28px"></th>
+          </tr>
+        </thead>
+        <tbody id="invActsBody"></tbody>
+      </table>
+    </div>
+    <button class="add-act-btn" id="addActBtn">+ Add a medical act</button>
+
+    <!-- Discount -->
+    <div class="inv-discount-row">
+      <label>Discount</label>
+      <input type="number" id="invDiscountAmt" value="0" min="0" step="0.01" oninput="invRecalcTotals()">
+    </div>
+
+    <!-- Totals -->
+    <div class="inv-totals-grid">
+      <div>
+        <div class="inv-sec-title">Summary</div>
+        <table class="inv-summary-table">
+          <tr><td>Total medical acts</td><td id="invTotMedActs">GHS 0.00</td></tr>
+          <tr><td>Discount</td><td id="invTotDiscount">GHS 0.00</td></tr>
+          <tr><td>Grand Total</td><td id="invTotGrand">GHS 0.00</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="inv-sec-title">Payment</div>
+        <table class="inv-payment-table">
+          <tr><td>Amount paid (GHS)</td><td><input type="number" id="invAmountPaid" value="0" min="0" step="0.01" oninput="invRecalcTotals()" placeholder="0.00"></td></tr>
+          <tr><td>Remaining balance</td><td id="invRemaining" style="font-weight:700;color:var(--red)">GHS 0.00</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer actions -->
+    <div class="inv-modal-footer">
+      <div style="display:flex;gap:0.5rem">
+        <button class="btn-ghost" onclick="invPrint()" style="font-size:0.8rem;color:var(--blue);border-color:var(--blue)">🖨 Print</button>
+        <button class="btn-ghost" onclick="invEmail()" style="font-size:0.8rem;color:var(--teal);border-color:var(--teal)">📧 Email</button>      </div>
+      <button class="btn-primary" id="submitInvoice" style="font-size:0.82rem;padding:0.6rem 1.5rem">Save Invoice</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ═══════════════════════════════════════════════════════════════
+//  MEDICAL ACTS — loaded from database on login
+// ═══════════════════════════════════════════════════════════════
+let ACT_PRICES = {};   // name → price, populated after login
+let ACTS       = [];   // sorted names array, populated after login
+
+async function loadMedicalActs(){
+  try{
+    const res=await fetch(`${API_BASE}/api/acts`,{headers:authHeader()});
+    const data=await res.json();
+    ACT_PRICES={};
+    (data.acts||[]).forEach(a=>{ACT_PRICES[a.name]=parseFloat(a.price)||0;});
+    ACTS=Object.keys(ACT_PRICES).sort();
+  }catch(e){
+    console.error("Could not load medical acts",e);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CORE CONFIG
+// ═══════════════════════════════════════════════════════════════
+const API_TOKEN = "rivers-dental-staff-rct";
+const API_BASE  = "";
+
+// Build Authorization header — keeps credentials out of query params and logs
+function authHeader() {
+  return { "Authorization": `Bearer ${API_TOKEN}:${currentPassword}` };
+}
+// Build auth query string (kept for login check only — before currentPassword is set)
+function authQuery(pw) {
+  return `token=${API_TOKEN}&password=${encodeURIComponent(pw || currentPassword)}`;
+}
+const PAGE_SIZE = 10;
+let allAppointments = [];
+let currentPassword = "";
+let currentPage = 1;
+
+// ── helpers ──
+function escHtml(s){if(!s)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+function escAttr(s){if(!s)return"";return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/\n/g,"&#10;").replace(/\r/g,"")}
+const genderLabel = v => v===0?"Male":v===1?"Female":null;
+const ageCatLabel = v => v===0?"Child":v===1?"Teenager":v===2?"Adult":v===3?"Senior":null;
+const dateLabel   = v => v?new Date(v).toLocaleDateString("en-GH",{day:"2-digit",month:"short",year:"2-digit",timeZone:"Africa/Accra"}):null;
+
+async function sendManualReminder(eventId, phone, patientName, dateRaw, timeStr){
+  const apptDate = new Date(dateRaw).toLocaleDateString("en-GH",{
+    weekday:"long", day:"numeric", month:"long", year:"numeric", timeZone:"Africa/Accra",
+  });
+  const displayTime = timeStr || new Date(dateRaw).toLocaleTimeString("en-GH",{
+    hour:"2-digit", minute:"2-digit", hour12:true, timeZone:"Africa/Accra",
+  });
+  const message =
+    `Hello ${patientName}, this is a reminder that your appointment is scheduled for ${apptDate} at ${displayTime}.` +
+    `Please call 030 244 8742 if you would like to reschedule. Thank you!`;
+
+  if(!confirm(`Send SMS reminder?\n\nTo: ${patientName} (${phone})\n\nMessage:\n"${message}"`)) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/sms`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeader() },
+      body: JSON.stringify({ phone, message }),
+    });
+    const data = await res.json();
+    if (res.ok) showToast(`✅ Reminder sent to ${patientName}`);
+    else showToast(data.error || "Failed to send reminder", true);
+  } catch {
+    showToast("Network error sending reminder", true);
+  }
+}
+
+function showToast(msg,isError=false){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.className="toast"+(isError?" error":"");
+  t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3500);
+}
+function getAccraToday(){return new Date().toLocaleDateString("en-CA",{timeZone:"Africa/Accra"})}
+
+// ═══════════════════════════════════════════════════════════════
+//  LOGIN / LOGOUT
+// ═══════════════════════════════════════════════════════════════
+const savedPw = localStorage.getItem("rdDashPassword");
+if(savedPw){document.getElementById("passwordInput").value=savedPw;attemptLogin();}
+document.getElementById("loginBtn").addEventListener("click",attemptLogin);
+document.getElementById("passwordInput").addEventListener("keydown",e=>{if(e.key==="Enter")attemptLogin();});
+
+async function attemptLogin(){
+  const pw=document.getElementById("passwordInput").value.trim();
+  if(!pw)return;
+  document.getElementById("loginBtn").textContent="Checking…";
+  document.getElementById("loginError").style.display="none";
+  try{
+    const res=await fetch(`${API_BASE}/api/appointments?token=${API_TOKEN}&password=${encodeURIComponent(pw)}`);
+    if(res.ok){
+      currentPassword=pw;localStorage.setItem("rdDashPassword",pw);
+      const d=await res.json();allAppointments=d.appointments;
+      await loadMedicalActs();
+      document.getElementById("loginScreen").style.display="none";
+      const app=document.getElementById("app");app.style.display="flex";app.style.flexDirection="column";
+      renderAll();
+    }else{document.getElementById("loginError").style.display="block";document.getElementById("loginBtn").textContent="Access Dashboard";}
+  }catch{
+    document.getElementById("loginError").textContent="Could not connect. Please try again.";
+    document.getElementById("loginError").style.display="block";
+    document.getElementById("loginBtn").textContent="Access Dashboard";
+  }
+}
+function doLogout(){
+  localStorage.removeItem("rdDashPassword");currentPassword="";allAppointments=[];
+  document.getElementById("passwordInput").value="";
+  document.getElementById("app").style.display="none";
+  document.getElementById("loginScreen").style.display="flex";
+}
+document.getElementById("logoutBtn").addEventListener("click",doLogout);
+document.getElementById("drawerLogout").addEventListener("click",doLogout);
+
+// ═══════════════════════════════════════════════════════════════
+//  PAGE NAV
+// ═══════════════════════════════════════════════════════════════
+function showPage(pageId){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-link,.drawer-link").forEach(b=>b.classList.remove("active"));
+  document.getElementById("page-"+pageId)?.classList.add("active");
+  const navKey=pageId.startsWith("patient")?"patients":pageId;
+  document.querySelectorAll(`[data-page="${navKey}"]`).forEach(b=>b.classList.add("active"));
+  closeDrawer();
+}
+document.querySelectorAll("[data-page]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const p=btn.dataset.page;showPage(p);
+    if(p==="patients"&&allPatients.length===0)loadPatients();
+  });
+});
+
+// ── Drawer ──
+function openDrawer(){document.getElementById("drawer").classList.add("open");document.getElementById("drawerOverlay").style.display="block";requestAnimationFrame(()=>document.getElementById("drawerOverlay").classList.add("open"));}
+function closeDrawer(){document.getElementById("drawer").classList.remove("open");document.getElementById("drawerOverlay").classList.remove("open");setTimeout(()=>document.getElementById("drawerOverlay").style.display="none",250);}
+document.getElementById("hamburger").addEventListener("click",openDrawer);
+document.getElementById("drawerClose").addEventListener("click",closeDrawer);
+document.getElementById("drawerOverlay").addEventListener("click",closeDrawer);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){document.getElementById("newApptModal").classList.remove("open");document.getElementById("invoiceModal").classList.remove("open");}});
+
+// ═══════════════════════════════════════════════════════════════
+//  APPOINTMENTS
+// ═══════════════════════════════════════════════════════════════
+document.getElementById("refreshBtn").addEventListener("click",async()=>{
+  document.getElementById("refreshBtn").textContent="↻ Loading…";
+  try{const r=await fetch(`${API_BASE}/api/appointments`,{headers:authHeader()});const d=await r.json();allAppointments=d.appointments;renderAll();}catch{}
+  document.getElementById("refreshBtn").textContent="↻ Refresh";
+});
+document.getElementById("searchInput").addEventListener("input",()=>{currentPage=1;renderAll();});
+
+// New Appointment Modal
+const newApptModal=document.getElementById("newApptModal");
+document.getElementById("newApptBtn").addEventListener("click",()=>{
+  ["apptName","apptPhone","apptEmail","apptDate","apptTime","apptDuration","apptDescription"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("apptFormError").style.display="none";newApptModal.classList.add("open");
+});
+document.getElementById("closeNewAppt").addEventListener("click",()=>newApptModal.classList.remove("open"));
+newApptModal.addEventListener("click",e=>{if(e.target===newApptModal)newApptModal.classList.remove("open");});
+
+document.getElementById("submitNewAppt").addEventListener("click",async()=>{
+  const name=document.getElementById("apptName").value.trim();
+  const phone=document.getElementById("apptPhone").value.trim();
+  const email=document.getElementById("apptEmail").value.trim();
+  const date=document.getElementById("apptDate").value;
+  const time=document.getElementById("apptTime").value;
+  const desc=document.getElementById("apptDescription").value.trim();
+  const errEl=document.getElementById("apptFormError");
+  if(!name){errEl.textContent="Patient name is required.";errEl.style.display="block";return;}
+  if(!phone){errEl.textContent="Phone number is required.";errEl.style.display="block";return;}
+  if(!date){errEl.textContent="Please select a date.";errEl.style.display="block";return;}
+  if(!time){errEl.textContent="Please select a time.";errEl.style.display="block";return;}
+  errEl.style.display="none";
+  const btn=document.getElementById("submitNewAppt");btn.disabled=true;btn.textContent="Creating…";
+  try{
+    const duration=document.getElementById("apptDuration").value.trim();
+    const res=await fetch(`${API_BASE}/api/manage`,{method:"POST",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({name,phone,email,date,time,duration,description:desc})});
+    const data=await res.json();
+    if(res.ok&&data.success){newApptModal.classList.remove("open");showToast("✅ Appointment created");const r2=await fetch(`${API_BASE}/api/appointments`,{headers:authHeader()});const d2=await r2.json();allAppointments=d2.appointments;renderAll();}
+    else{errEl.textContent=data.error||"Failed.";errEl.style.display="block";}
+  }catch{errEl.textContent="Network error.";errEl.style.display="block";}
+  btn.disabled=false;btn.textContent="Create Appointment";
+});
+
+// Edit notes delegation
+document.getElementById("apptContent").addEventListener("click",async function(e){
+  const card=e.target.closest(".appt-card");if(!card)return;
+  const eventId=card.dataset.id;const appt=allAppointments.find(a=>a.id===eventId);
+  if(e.target.closest(".edit-btn")){
+    card.querySelector(".notes-display").style.display="none";
+    card.querySelector(".edit-area").style.display="block";
+    card.querySelector(".edit-textarea").value=appt?.notes||"";
+    card.querySelector(".edit-textarea").focus();return;
+  }
+  if(e.target.closest(".cancel-edit-btn")){
+    card.querySelector(".notes-display").style.display="block";
+    card.querySelector(".edit-area").style.display="none";
+    const notes=appt?.notes||"";
+    card.querySelector(".notes-display").innerHTML=notes.trim()?`<div class="appt-notes">${escHtml(notes)}</div>`:`<div class="appt-no-notes">No notes</div>`;return;
+  }
+  if(e.target.closest(".save-btn")){
+    const sb=card.querySelector(".save-btn");const newNotes=card.querySelector(".edit-textarea").value.trim();
+    sb.textContent="Saving…";sb.disabled=true;
+    try{
+      const res=await fetch(`${API_BASE}/api/manage`,{method:"PUT",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({eventId,description:newNotes})});
+      const data=await res.json();
+      if(res.ok&&data.success){
+        if(appt)appt.notes=newNotes;
+        card.querySelector(".edit-area").style.display="none";
+        const nd=card.querySelector(".notes-display");nd.style.display="block";
+        nd.innerHTML=newNotes?`<div class="appt-notes">${escHtml(newNotes)}</div>`:`<div class="appt-no-notes">No notes</div>`;
+        showToast("✅ Notes updated");
+      }else{showToast("Failed to save",true);sb.textContent="Save";sb.disabled=false;}
+    }catch{showToast("Network error",true);sb.textContent="Save";sb.disabled=false;}
+  }
+});
+
+function renderAll(){
+  const search=document.getElementById("searchInput").value.toLowerCase().trim();
+  const filtered=search?allAppointments.filter(a=>a.title.toLowerCase().includes(search)):allAppointments;
+  const todayStr=getAccraToday();
+  const weekEnd=new Date(new Date(todayStr+"T00:00:00").getTime()+7*86400000);
+  document.getElementById("statTotal").textContent=allAppointments.length;
+  document.getElementById("statToday").textContent=allAppointments.filter(a=>a.dateRaw.startsWith(todayStr)).length;
+  document.getElementById("statWeek").textContent=allAppointments.filter(a=>new Date(a.dateRaw)<=weekEnd).length;
+  const totalPages=Math.ceil(filtered.length/PAGE_SIZE);
+  if(currentPage>totalPages)currentPage=1;
+  const paginated=filtered.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);
+  document.getElementById("resultCount").textContent=search?`${filtered.length} result${filtered.length!==1?"s":""}`:`${filtered.length} appt${filtered.length!==1?"s":""}`;
+  if(filtered.length===0){document.getElementById("apptContent").innerHTML=`<div class="state-msg"><div class="icon">🦷</div><p>${search?"No appointments found.":"No upcoming appointments."}</p></div>`;return;}
+  const byDate={};paginated.forEach(a=>{const k=a.dateRaw.split("T")[0];if(!byDate[k])byDate[k]=[];byDate[k].push(a);});
+  const allByDate={};filtered.forEach(a=>{const k=a.dateRaw.split("T")[0];allByDate[k]=(allByDate[k]||0)+1;});
+  let html="";
+  Object.entries(byDate).forEach(([dk,appts])=>{
+    const isT=dk===todayStr;const cnt=allByDate[dk]||appts.length;const lbl=isT?`📅 Today — ${appts[0].date}`:appts[0].date;
+    html+=`<div class="date-group-header">${lbl}<span class="day-count">${cnt} appt${cnt!==1?"s":""}</span></div><div class="appt-list">`;
+    appts.forEach(a=>{
+      const tr=a.timeEnd&&a.timeEnd!==a.time?`${a.time} – ${a.timeEnd}`:a.time;
+      const src=a.isWebBooking?`<span class="source-badge web">🌐 Website</span>`:`<span class="source-badge manual">📝 Manual</span>`;
+      const notesH=(a.notes||"").trim()?`<div class="appt-notes">${escHtml(a.notes)}</div>`:`<div class="appt-no-notes">No notes</div>`;
+      const hasDet=a.patient||a.phone||a.email||a.service;
+      const det=hasDet?`<div class="appt-details">
+        ${a.patient?`<div class="appt-detail"><span class="detail-label">Patient</span><span class="detail-value">${escHtml(a.patient)}</span></div>`:""}
+        ${a.service?`<div class="appt-detail"><span class="detail-label">Service</span><span class="detail-value service-badge">${escHtml(a.service)}</span></div>`:""}
+        ${a.phone?`<div class="appt-detail"><span class="detail-label">Phone</span><span class="detail-value"><a href="tel:${a.phone.replace(/\s/g,"")}">${escHtml(a.phone)}</a></span></div>`:""}
+        ${a.email?`<div class="appt-detail"><span class="detail-label">Email</span><span class="detail-value"><a href="mailto:${escHtml(a.email)}">${escHtml(a.email)}</a></span></div>`:""}
+      </div>`:"";
+      html+=`<div class="appt-card${isT?" today-card":""}" id="card-${a.id}" data-id="${a.id}">
+        <div class="appt-top"><div><div class="appt-title">${escHtml(a.title)}</div>${src}</div><span class="appt-time${isT?" today-time":""}">🕐 ${tr}</span></div>
+        ${det}
+        <div class="notes-display">${notesH}</div>
+        <div class="edit-area" style="display:none"><textarea class="edit-textarea" placeholder="Add notes…"></textarea><div style="display:flex;gap:0.4rem;margin-top:0.4rem"><button class="save-btn">Save</button><button class="cancel-edit-btn">Cancel</button></div></div>
+        <div class="appt-card-actions">
+          ${(a.phone) ? `<button class="remind-btn" onclick="event.stopPropagation();sendManualReminder('${escAttr(a.id)}','${escAttr(a.phone)}','${escAttr(a.patient||a.title)}','${escAttr(a.dateRaw)}','${escAttr(a.time||'')}')">📱 Remind</button>` : ""}
+          <button class="edit-btn">✏️ Edit Notes</button>
+        </div>      
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  if(totalPages>1){
+    html+=`<div class="pagination"><button class="page-btn" onclick="changePage(${currentPage-1})" ${currentPage===1?"disabled":""}>← Prev</button>`;
+    for(let i=1;i<=totalPages;i++){if(i===1||i===totalPages||Math.abs(i-currentPage)<=1)html+=`<button class="page-btn${i===currentPage?" active":""}" onclick="changePage(${i})">${i}</button>`;else if(Math.abs(i-currentPage)===2)html+=`<span class="page-ellipsis">…</span>`;}
+    html+=`<button class="page-btn" onclick="changePage(${currentPage+1})" ${currentPage===totalPages?"disabled":""}>Next →</button></div>`;
+  }
+  document.getElementById("apptContent").innerHTML=html;
+}
+function changePage(p){
+  const s=document.getElementById("searchInput").value.toLowerCase().trim();
+  const f=s?allAppointments.filter(a=>a.title.toLowerCase().includes(s)):allAppointments;
+  const tot=Math.ceil(f.length/PAGE_SIZE);
+  if(p<1||p>tot)return;currentPage=p;renderAll();
+  document.getElementById("apptContent").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PATIENTS
+// ═══════════════════════════════════════════════════════════════
+let allPatients=[],patientPage=1,patientTotal=0;
+let viewingPatient=null,editingPatient=null;
+const PATIENT_LIMIT=20;
+
+async function loadPatients(page=1,search=""){
+  document.getElementById("patientListScroll").innerHTML=`<div class="state-msg" style="padding:2rem 1rem"><div class="icon" style="font-size:1.8rem">👤</div><p style="font-size:0.8rem">Loading…</p></div>`;
+  try{
+    const params=new URLSearchParams({page,limit:PATIENT_LIMIT,search});
+    const res=await fetch(`${API_BASE}/api/patients?${params}`,{headers:authHeader()});
+    const data=await res.json();
+    allPatients=data.patients||[];patientTotal=data.total||0;patientPage=page;
+    renderPatientList();
+  }catch{document.getElementById("patientListScroll").innerHTML=`<div class="state-msg" style="padding:2rem 1rem"><div class="icon">⚠️</div><p style="font-size:0.8rem">Failed to load.</p></div>`;}
+}
+
+function renderPatientList(){
+  const search=document.getElementById("patientSearch").value.trim();
+  const totalPages=Math.ceil(patientTotal/PATIENT_LIMIT);
+  document.getElementById("patientCount").textContent=`${patientTotal} patient${patientTotal!==1?"s":""}`;
+  if(allPatients.length===0){
+    document.getElementById("patientListScroll").innerHTML=`<div class="state-msg" style="padding:2rem 1rem"><div class="icon" style="font-size:1.8rem">👤</div><p style="font-size:0.8rem">${search?"No patients found.":"No patients yet."}</p></div>`;
+    document.getElementById("patientListPagination").innerHTML="";return;
+  }
+  let html="";
+  allPatients.forEach(p=>{
+    const initials=(p.name||p.reference_number||"?").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+    const gCls=p.gender===0?"male":p.gender===1?"female":"";
+    const isActive=viewingPatient===p.reference_number;
+    html+=`<div class="pt-row${isActive?" active":""}" onclick="viewPatient('${escAttr(p.reference_number)}')">
+      <div class="pt-avatar ${gCls}">${initials}</div>
+      <div class="pt-row-info">
+        <div class="pt-row-name">${escHtml(p.name||"No name")}</div>
+        <div class="pt-row-ref">${escHtml(p.reference_number)}</div>
+        <div class="pt-row-sub">${escHtml([p.phone,p.profession].filter(Boolean).join(" · ")||"—")}</div>
+      </div>
+    </div>`;
+  });
+  document.getElementById("patientListScroll").innerHTML=html;
+
+  // pagination in left panel
+  let pgHtml="";
+  if(totalPages>1){
+    pgHtml=`<div style="display:flex;gap:0.25rem;justify-content:center;flex-wrap:wrap">`;
+    pgHtml+=`<button class="page-btn" style="padding:0.28rem 0.55rem;font-size:0.72rem" onclick="loadPatients(${patientPage-1},document.getElementById('patientSearch').value)" ${patientPage===1?"disabled":""}>←</button>`;
+    for(let i=1;i<=totalPages;i++){
+      if(i===1||i===totalPages||Math.abs(i-patientPage)<=1)pgHtml+=`<button class="page-btn${i===patientPage?" active":""}" style="padding:0.28rem 0.55rem;font-size:0.72rem" onclick="loadPatients(${i},document.getElementById('patientSearch').value)">${i}</button>`;
+      else if(Math.abs(i-patientPage)===2)pgHtml+=`<span class="page-ellipsis" style="font-size:0.72rem">…</span>`;
+    }
+    pgHtml+=`<button class="page-btn" style="padding:0.28rem 0.55rem;font-size:0.72rem" onclick="loadPatients(${patientPage+1},document.getElementById('patientSearch').value)" ${patientPage===totalPages?"disabled":""}>→</button></div>`;
+  }
+  document.getElementById("patientListPagination").innerHTML=pgHtml;
+}
+
+// ── View patient (right pane) ──────────────────────────────────
+async function viewPatient(ref){
+  viewingPatient=ref;
+  // highlight in list
+  document.querySelectorAll(".pt-row").forEach(r=>{r.classList.toggle("active",r.onclick&&r.getAttribute("onclick")?.includes(escAttr(ref)));});
+  // mark active properly
+  document.querySelectorAll(".pt-row").forEach(r=>{
+    r.classList.remove("active");
+    if(r.getAttribute("onclick")&&r.getAttribute("onclick").includes(`'${escAttr(ref)}'`))r.classList.add("active");
+  });
+  const rp=document.getElementById("patientsRight");
+  rp.innerHTML=`<div class="right-empty"><div class="empty-icon" style="font-size:1.75rem;background:white">⏳</div><h3>Loading…</h3></div>`;
+  try{
+    const params=new URLSearchParams({token:API_TOKEN,password:currentPassword,ref});
+    const [pRes,iRes]=await Promise.all([fetch(`${API_BASE}/api/patients?${params}`),fetch(`${API_BASE}/api/invoices?${params}`)]);
+    const pData=await pRes.json();const iData=await iRes.json();
+    const p=pData.patient;
+    const f=(lbl,val)=>`<div class="info-item"><span class="info-item-label">${lbl}</span><span class="info-item-value${!val?" empty":""}">${escHtml(val||"—")}</span></div>`;
+    rp.innerHTML=`
+    <div class="detail-pane">
+      <div class="detail-pane-header">
+        <div>
+          <div class="detail-pane-name">${escHtml(p.name||p.reference_number)}</div>
+          <div class="detail-pane-ref">${escHtml(p.reference_number)}</div>
+        </div>
+        <div class="detail-pane-actions">
+          <button class="btn-primary" onclick="openInvoiceModal('${escAttr(ref)}','${escAttr(p.name||ref)}','${escAttr(ref)}')">+ Invoice</button>
+          <button class="btn-ghost" onclick="openEditPatientPane(null,'${escAttr(ref)}')">✏️ Edit</button>
+          <button class="btn-ghost" style="padding: 0.28rem 0.8rem; color:var(--red);border-color:var(--red)" onclick="deletePatient('${escAttr(ref)}','${escAttr(p.name||ref)}')">🗑</button>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-header"><span class="info-card-title">Basic Information</span></div>
+        <div class="info-card-body">
+          <div class="info-grid">
+            ${f("Reference",p.reference_number)}${f("Gender",genderLabel(p.gender))}${f("Age Category",ageCatLabel(p.age_category))}
+            ${f("Date of Birth",dateLabel(p.birthdate))}${f("Phone",p.phone)}${f("WhatsApp",p.whatsapp)}
+            ${f("Email",p.email)}${f("City",p.city)}${f("Company",p.company)}${f("Profession",p.profession)}
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-header"><span class="info-card-title">Emergency Contact</span></div>
+        <div class="info-card-body">
+          <div class="info-grid">${f("Name",p.emergency_contact_name)}${f("Relationship",p.emergency_contact_relation)}${f("Phone",p.emergency_contact_phone)}</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-header"><span class="info-card-title">Medical Notes</span></div>
+        <div class="info-card-body">
+          <div class="info-grid">${f("Allergies",p.allergies)}</div>
+          ${p.notes?`<div class="info-notes-box">${escHtml(p.notes)}</div>`:""}
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-header">
+          <span class="info-card-title">Invoices</span>
+          <button class="btn-primary btn-sm" onclick="openInvoiceModal('${escAttr(ref)}','${escAttr(p.name||ref)}','${escAttr(ref)}')">+ New Invoice</button>
+        </div>
+        <div id="invoiceList">
+          ${renderInvoiceList(iData.invoices||[],iData.total||0,iData.unpaid||0)}
+        </div>
+      </div>
+      
+      <div class="info-card">
+        <div class="info-card-header" style="cursor:pointer" onclick="toggleActsManager()">
+          <span class="info-card-title">⚙️ Manage Medical Acts</span>
+          <span id="actsManagerToggle" style="font-size:0.75rem;color:var(--teal);font-weight:600">Show ▾</span>
+        </div>
+        <div id="actsManagerBody" style="display:none">
+          <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;gap:0.65rem;flex-wrap:wrap;align-items:flex-end">
+            <div class="form-field" style="margin-bottom:0;flex:1;min-width:160px">
+              <label>Procedure Name</label>
+              <input type="text" id="newActName" placeholder="e.g. NEW PROCEDURE" style="text-transform:uppercase">
+            </div>
+            <div class="form-field" style="margin-bottom:0;width:110px">
+              <label>Price (GHS)</label>
+              <input type="number" id="newActPrice" placeholder="0.00" min="0" step="0.01">
+            </div>
+            <button class="btn-primary btn-sm" onclick="saveNewAct()">+ Add Act</button>
+          </div>
+          <div id="actsList" style="max-height:320px;overflow-y:auto">
+            <div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+    </div>`;
+  }catch(err){
+    rp.innerHTML=`<div class="right-empty"><div class="empty-icon">⚠️</div><h3>Failed to load</h3><p>Could not load patient details. Please try again.</p></div>`;
+  }
+}
+
+// ── Edit patient pane ──────────────────────────────────────────
+async function openEditPatientPane(patient,refOverride){
+  let p=patient;
+  if(!p&&refOverride){
+    try{
+      const params=new URLSearchParams({ref:refOverride});
+      const res=await fetch(`${API_BASE}/api/patients?${params}`,{headers:authHeader()});
+      const data=await res.json();p=data.patient;
+    }catch{showToast("Could not load patient",true);return;}
+  }
+  editingPatient=p?p.reference_number:null;
+  const rp=document.getElementById("patientsRight");
+
+  // generate ref if new
+  let refVal="";
+  if(p){refVal=p.reference_number;}
+  else{
+    try{
+      const params=new URLSearchParams({action:"next-ref"});
+      const r=await fetch(`${API_BASE}/api/patients?${params}`,{headers:authHeader()});const d=await r.json();refVal=d.reference||"";
+    }catch{refVal="";}
+  }
+
+  rp.innerHTML=`
+  <div class="edit-pane">
+    <div class="edit-pane-header">
+      ${viewingPatient?`<button class="btn-ghost btn-sm" onclick="viewPatient('${escAttr(viewingPatient||editingPatient||"")}')">← Cancel</button>`:"<span></span>"}
+      <div class="edit-pane-title">${p?"Edit Patient":"New Patient"}</div>
+    </div>
+    <div class="form-error" id="patientFormError"></div>
+
+    <div class="form-card">
+      <div class="form-section-label">Basic Information</div>
+      <div class="form-field"><label>Full Name *</label><input type="text" id="pName" value="${escAttr(p?.name||"")}" placeholder="e.g. Kofi Mensah"></div>
+      <div class="form-row">
+        <div class="form-field"><label>Reference Number</label><input type="text" id="pRef" value="${escAttr(refVal)}" readonly></div>
+        <div class="form-field"><label>Gender</label><select id="pGender"><option value="">— Select —</option><option value="0"${p?.gender===0?" selected":""}>Male</option><option value="1"${p?.gender===1?" selected":""}>Female</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Phone Number</label><input type="tel" id="pPhone" value="${escAttr(p?.phone||"")}" placeholder="e.g. 0244 123 456"></div>
+        <div class="form-field"><label>WhatsApp Number</label><input type="tel" id="pWhatsapp" value="${escAttr(p?.whatsapp||"")}" placeholder="e.g. 0244 123 456"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Email Address</label><input type="email" id="pEmail" value="${escAttr(p?.email||"")}" placeholder="kofi@example.com"></div>
+        <div class="form-field"><label>Date of Birth</label><input type="date" id="pBirthdate" value="${escAttr(p?.birthdate||"")}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Age Category</label><select id="pAgeCategory"><option value="">— Select —</option><option value="0"${p?.age_category===0?" selected":""}>Child</option><option value="1"${p?.age_category===1?" selected":""}>Teenager</option><option value="2"${p?.age_category===2?" selected":""}>Adult</option><option value="3"${p?.age_category===3?" selected":""}>Senior</option></select></div>
+        <div class="form-field"><label>City</label><input type="text" id="pCity" value="${escAttr(p?.city||"")}" placeholder="e.g. Accra"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Company</label><input type="text" id="pCompany" value="${escAttr(p?.company||"")}" placeholder="e.g. Ghana Revenue Authority"></div>
+        <div class="form-field"><label>Profession</label><input type="text" id="pProfession" value="${escAttr(p?.profession||"")}" placeholder="e.g. Teacher"></div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-section-label">Emergency Contact</div>
+      <div class="form-row">
+        <div class="form-field"><label>Contact Name</label><input type="text" id="pEmergencyName" value="${escAttr(p?.emergency_contact_name||"")}" placeholder="e.g. Ama Mensah"></div>
+        <div class="form-field"><label>Relationship</label><input type="text" id="pEmergencyRelation" value="${escAttr(p?.emergency_contact_relation||"")}" placeholder="e.g. Spouse"></div>
+      </div>
+      <div class="form-field"><label>Contact Phone</label><input type="tel" id="pEmergencyPhone" value="${escAttr(p?.emergency_contact_phone||"")}" placeholder="e.g. 0244 987 654"></div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-section-label">Medical Notes</div>
+      <div class="form-field"><label>Allergies</label><input type="text" id="pAllergies" value="${escAttr(p?.allergies||"")}" placeholder="e.g. Penicillin, Latex"></div>
+      <div class="form-field"><label>Notes / Medical History</label><textarea id="pNotes" placeholder="Any relevant medical history…">${escHtml(p?.notes||"")}</textarea></div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-primary" id="submitPatient" style="padding:0.75rem 2rem;border-radius:100px;font-size:0.88rem">Save Patient</button>
+      ${viewingPatient?`<button class="btn-ghost" onclick="viewPatient('${escAttr(viewingPatient)}')">Cancel</button>`:""}
+    </div>
+  </div>`;
+
+  document.getElementById("submitPatient").addEventListener("click",submitPatientForm);
+}
+
+document.getElementById("newPatientBtn").addEventListener("click",()=>{viewingPatient=null;openEditPatientPane(null,null);});
+
+// ── Delete patient ────────────────────────────────────────────────────────────
+async function deletePatient(ref, name) {
+  if (!confirm(`⚠️ Permanently delete patient ${name} (${ref})?\n\nThis will also remove them from Google Sheets.\nAll invoices will also be deleted.\n\nThis cannot be undone.`)) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/patients`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", ...authHeader() },
+      body: JSON.stringify({ reference_number: ref }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast("✅ Patient deleted");
+      // Clear detail pane and reload list
+      document.getElementById("patientsRight").innerHTML = `<div class="right-empty"><div class="empty-icon">👤</div><h3>Select a patient</h3><p>Choose a patient from the list to view their details.</p></div>`;
+      viewingPatient = null;
+      loadPatients(patientPage, document.getElementById("patientSearch").value.trim());
+    } else {
+      showToast(data.error || "Failed to delete patient", true);
+    }
+  } catch {
+    showToast("Network error deleting patient", true);
+  }
+}
+
+async function submitPatientForm(){
+  const ref=document.getElementById("pRef").value.trim();
+  const errEl=document.getElementById("patientFormError");
+  if(!ref||ref==="Generating…"){errEl.textContent="Please wait for reference to generate.";errEl.style.display="block";return;}
+  errEl.style.display="none";
+  const btn=document.getElementById("submitPatient");btn.disabled=true;btn.textContent="Saving…";
+  document.querySelectorAll("#patientsRight input[type='text'],#patientsRight input[type='email']").forEach(el=>{el.value=el.value.toUpperCase();});
+  const body={
+    reference_number:ref,
+    name:document.getElementById("pName").value.trim()||null,
+    gender:document.getElementById("pGender").value!==""?parseInt(document.getElementById("pGender").value):null,
+    phone:document.getElementById("pPhone").value.trim()||null,
+    whatsapp:document.getElementById("pWhatsapp").value.trim()||null,
+    email:document.getElementById("pEmail").value.trim()||null,
+    birthdate:document.getElementById("pBirthdate").value||null,
+    age_category:document.getElementById("pAgeCategory").value!==""?parseInt(document.getElementById("pAgeCategory").value):null,
+    city:document.getElementById("pCity").value.trim()||null,
+    company:document.getElementById("pCompany").value.trim()||null,
+    profession:document.getElementById("pProfession").value.trim()||null,
+    emergency_contact_name:document.getElementById("pEmergencyName").value.trim()||null,
+    emergency_contact_relation:document.getElementById("pEmergencyRelation").value.trim()||null,
+    emergency_contact_phone:document.getElementById("pEmergencyPhone").value.trim()||null,
+    allergies:document.getElementById("pAllergies").value.trim()||null,
+    notes:document.getElementById("pNotes").value.trim()||null,
+  };
+  try{
+    const res=await fetch(`${API_BASE}/api/patients`,{method:editingPatient?"PUT":"POST",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify(body)});
+    const data=await res.json();
+    if(res.ok){
+      showToast(editingPatient?"✅ Patient updated":"✅ Patient added");
+      loadPatients(patientPage,document.getElementById("patientSearch").value);
+      if(editingPatient){viewingPatient=editingPatient;viewPatient(editingPatient);}
+    }else{errEl.textContent=data.error||"Failed.";errEl.style.display="block";}
+  }catch{errEl.textContent="Network error.";errEl.style.display="block";}
+  if(document.getElementById("submitPatient")){document.getElementById("submitPatient").disabled=false;document.getElementById("submitPatient").textContent="Save Patient";}
+}
+
+// ── Patient search & refresh ──
+let ptSearchTimer;
+document.getElementById("patientSearch").addEventListener("input",()=>{
+  clearTimeout(ptSearchTimer);ptSearchTimer=setTimeout(()=>loadPatients(1,document.getElementById("patientSearch").value.trim()),400);
+});
+document.getElementById("refreshPatientsBtn").addEventListener("click",()=>loadPatients(patientPage,document.getElementById("patientSearch").value.trim()));
+
+// ═══════════════════════════════════════════════════════════════
+//  INVOICE TABLE RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderInvoiceList(invoices,total,unpaid){
+  if(invoices.length===0)return`<div style="padding:1.25rem;font-size:0.84rem;color:#b0bec8;font-style:italic">No invoices yet.</div>`;
+  let html=`<div style="overflow-x:auto"><table class="inv-list-table"><thead><tr><th>Date</th><th>No.</th><th>Procedures</th><th>Total</th><th>Remaining</th><th>Status</th><th></th><th></th></tr></thead><tbody>`;
+  invoices.forEach(inv=>{
+    const procs=inv.invoice_items&&inv.invoice_items.length>0?inv.invoice_items.map(i=>escHtml(i.procedure)).join(", "):escHtml(inv.procedure||"—");
+    const remaining=parseFloat(inv.amount_remaining||0);
+    const actionBtn=inv.paid
+      ? `<span style="font-size:0.69rem;color:var(--muted);font-style:italic">Complete</span>`
+      : `<button class="inv-action-btn toggle" onclick="markInvoiceFullyPaid('${inv.id}')">Mark Paid</button>`;
+    html+=`<tr>
+      <td style="white-space:nowrap">${escHtml(inv.date)}</td>
+      <td style="white-space:nowrap;font-size:0.75rem;color:var(--muted)">${escHtml(inv.invoice_number||"—")}</td>
+      <td style="max-width:200px;white-space:normal;font-size:0.79rem;line-height:1.5">${procs}</td>
+      <td style="white-space:nowrap;font-weight:600">GHS ${parseFloat(inv.grand_total||inv.amount||0).toFixed(2)}</td>
+      <td style="white-space:nowrap;font-weight:600;color:${remaining>0.005?"var(--red)":"var(--green)"}">GHS ${remaining.toFixed(2)}</td>
+      <td><span class="paid-badge ${inv.paid?"paid":"unpaid"}">${inv.paid?"Paid":"Unpaid"}</span></td>
+      <td>
+        <div class="inv-actions-cell">
+          ${actionBtn}
+          <button class="inv-action-btn edit" onclick="editInvoice('${inv.id}')">Edit</button>
+          <button class="inv-action-btn history" onclick="viewInvoiceHistory('${inv.id}','${escAttr(inv.invoice_number||inv.date)}')">History</button>
+        </div>
+      </td>
+      <td>
+        <div class="inv-actions-cell">
+          <button class="inv-action-btn del" onclick="deleteInvoice('${inv.id}')">✕</button>
+        </div>
+      </td>    
+    </tr>`;
+  });
+  html+=`</tbody></table></div>
+    <div class="inv-footer-row">
+      <div><span class="inv-footer-total">GHS ${parseFloat(total).toFixed(2)}</span> <span style="font-size:0.75rem;color:var(--muted);margin-left:0.35rem">total billed</span></div>
+      <span class="inv-footer-unpaid">GHS ${parseFloat(unpaid).toFixed(2)} outstanding</span>
+    </div>`;
+  return html;
+}
+
+// View invoice history: shows a timeline of all changes to this invoice (creation, edits, payment updates) with snapshots of amounts and notes at each change.
+async function viewInvoiceHistory(invoiceId, invoiceLabel){
+  // Build and open a simple overlay showing the history entries
+  const params=new URLSearchParams({history:invoiceId});
+  let entries=[];
+  try{
+    const res=await fetch(`${API_BASE}/api/invoices?${params}`,{headers:authHeader()});
+    const data=await res.json();
+    entries=data.history||[];
+  }catch{showToast("Could not load history",true);return;}
+
+  let rows="";
+  if(entries.length===0){
+    rows=`<tr><td colspan="5" style="text-align:center;color:#b0bec8;font-style:italic;padding:1.25rem">No history recorded yet.</td></tr>`;
+  }else{
+    entries.forEach(h=>{
+      const d=new Date(h.changed_at);
+      const dateStr=d.toLocaleDateString("en-GH",{day:"2-digit",month:"short",year:"numeric"});
+      const timeStr=d.toLocaleTimeString("en-GH",{hour:"2-digit",minute:"2-digit"});
+      const rem=parseFloat(h.amount_remaining||0);
+      rows+=`<tr>
+        <td style="white-space:nowrap;font-size:0.78rem">${dateStr}<br><span style="color:var(--muted);font-size:0.7rem">${timeStr}</span></td>
+        <td style="font-weight:600">GHS ${parseFloat(h.grand_total||0).toFixed(2)}</td>
+        <td style="font-weight:600">GHS ${parseFloat(h.amount_paid||0).toFixed(2)}</td>
+        <td style="font-weight:600;color:${rem>0.005?"var(--red)":"var(--green)"}">GHS ${rem.toFixed(2)}</td>
+        <td><span class="paid-badge ${h.paid?"paid":"unpaid"}" style="margin-right:0.35rem">${h.paid?"Paid":"Unpaid"}</span><span style="font-size:0.74rem;color:var(--muted)">${escHtml(h.note||"")}</span></td>
+      </tr>`;
+    });
+  }
+
+  // Reuse the existing modal overlay — create a temporary history panel
+  const historyHtml=`
+    <div class="modal-overlay open" id="historyOverlay" style="z-index:500">
+      <div class="modal-panel" style="max-width:680px">
+        <div class="modal-header">
+          <h2>Invoice History — ${escHtml(invoiceLabel)}</h2>
+          <button class="modal-close" onclick="document.getElementById('historyOverlay').remove()">✕</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="inv-list-table">
+            <thead><tr><th>Date &amp; Time</th><th>Total Billed</th><th>Amount Paid</th><th>Remaining</th><th>Status &amp; Note</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+        <p style="font-size:0.74rem;color:var(--muted);margin-top:1rem;line-height:1.6">Each row is a snapshot saved every time this invoice was created, edited, or marked as paid.</p>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML("beforeend",historyHtml);
+  document.getElementById("historyOverlay").addEventListener("click",e=>{
+    if(e.target===document.getElementById("historyOverlay"))document.getElementById("historyOverlay").remove();
+  });
+}
+
+// Mark invoice fully paid: sets amount_paid = grand_total, amount_remaining = 0, paid = true.
+// Uses PATCH so the real payment figures are written to the database — not just a flag flip.
+async function markInvoiceFullyPaid(id){
+  if(!viewingPatient)return;
+  // Confirm with staff before settling
+  if(!confirm("Mark this invoice as fully paid?\n\nThis will record the full outstanding balance as received and cannot be undone here."))return;
+
+  // Fetch fresh invoice data so we have the exact grand_total and items
+  const params=new URLSearchParams({ref:viewingPatient});
+  let inv;
+  try{
+    const res=await fetch(`${API_BASE}/api/invoices?${params}`,{headers:authHeader()});
+    const data=await res.json();
+    inv=data.invoices.find(i=>i.id===id);
+  }catch{showToast("Could not fetch invoice",true);return;}
+  if(!inv){showToast("Invoice not found",true);return;}
+
+  const grand=parseFloat(inv.grand_total||0);
+  const payload={
+    
+    id,
+    reference_number:inv.reference_number,
+    invoice_number:inv.invoice_number||null,
+    date:inv.date,
+    discount_pct:0,
+    discount_amount:parseFloat(inv.discount_amount||0),
+    subtotal:parseFloat(inv.subtotal||grand),
+    grand_total:grand,
+    amount_paid:grand,        // ← full amount recorded as received
+    amount_remaining:0,       // ← no balance outstanding
+    paid:true,
+    items:(inv.invoice_items||[]).map(it=>({
+      procedure:it.procedure,qty:it.qty,
+      unit_price:parseFloat(it.unit_price||0),
+      total_price:parseFloat(it.total_price||0),
+      patient_share:parseFloat(it.patient_share||0),
+    })),
+  };
+  try{
+    const res=await fetch(`${API_BASE}/api/invoices`,{method:"PATCH",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify(payload)});
+    const data=await res.json();
+    if(res.ok){showToast("✅ Invoice marked as fully paid");refreshInvoiceList();}
+    else showToast(data.error||"Failed",true);
+  }catch{showToast("Network error",true);}
+}
+
+async function deleteInvoice(id){
+  if(!confirm("Delete this invoice?"))return;
+  try{
+    const res=await fetch(`${API_BASE}/api/invoices`,{method:"DELETE",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({id})});
+    const data=await res.json();
+    if(res.ok){showToast("✅ Deleted");refreshInvoiceList();}else showToast(data.error||"Failed",true);
+  }catch{showToast("Network error",true);}
+}
+
+async function refreshInvoiceList(){
+  if(!viewingPatient)return;
+  const params=new URLSearchParams({ref:viewingPatient});
+  const res=await fetch(`${API_BASE}/api/invoices?${params}`,{headers:authHeader()});const data=await res.json();
+  const el=document.getElementById("invoiceList");
+  if(el)el.innerHTML=renderInvoiceList(data.invoices||[],data.total||0,data.unpaid||0);
+}
+
+// Edit invoice — load existing data into modal
+async function editInvoice(id){
+  // fetch all invoices for this patient and find by id
+  if(!viewingPatient)return;
+  const params=new URLSearchParams({ref:viewingPatient});
+  const res=await fetch(`${API_BASE}/api/invoices?${params}`,{headers:authHeader()});const data=await res.json();
+  const inv=data.invoices.find(i=>i.id===id);
+  if(!inv){showToast("Invoice not found",true);return;}
+  // open modal pre-filled
+  const p=allPatients.find(p=>p.reference_number===viewingPatient);
+  openInvoiceModal(viewingPatient,p?.name||viewingPatient,viewingPatient,inv);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INVOICE MODAL LOGIC
+// ═══════════════════════════════════════════════════════════════
+let invRowCount=0;
+
+function buildActOptions(sel){
+  return`<option value="">— Select procedure —</option>`+ACTS.map(a=>`<option value="${escHtml(a)}"${a===sel?" selected":""}>${escHtml(a)}</option>`).join("");
+}
+
+function invAddActRow(procedure="",qty=1,unitPrice=""){
+  invRowCount++;const id=invRowCount;
+  const tbody=document.getElementById("invActsBody");
+  const tr=document.createElement("tr");tr.id=`invrow-${id}`;
+  tr.innerHTML=`
+    <td><select id="invact-${id}" onchange="invOnActSelect(${id})">${buildActOptions(procedure)}</select></td>
+    <td><input type="number" id="invqty-${id}" value="${qty}" min="1" step="1" oninput="invRecalcRow(${id})"></td>
+    <td><input type="number" id="invup-${id}" value="${unitPrice}" min="0" step="0.01" placeholder="0.00" oninput="invMarkManual(${id});invRecalcRow(${id})"></td>
+    <td><span class="computed" id="invtp-${id}">0.00</span></td>
+    <td><span class="computed" id="invps-${id}">0.00</span></td>
+    <td><button class="del-row-btn" onclick="invDeleteRow(${id})" title="Remove">✕</button></td>`;
+  tbody.appendChild(tr);
+  if(procedure&&unitPrice!=="")invRecalcRow(id);
+  else if(procedure)invOnActSelect(id);
+  invUpdateActCount();
+}
+function invMarkManual(id){const el=document.getElementById(`invup-${id}`);if(el)el.dataset.manual="1";}
+function invOnActSelect(id){
+  const sel=document.getElementById(`invact-${id}`);const upEl=document.getElementById(`invup-${id}`);
+  if(!sel||!upEl)return;
+  const price=ACT_PRICES[sel.value];
+  if(price!==undefined&&!upEl.dataset.manual)upEl.value=price.toFixed(2);
+  invRecalcRow(id);
+}
+function invRecalcRow(id){
+  const qty=parseFloat(document.getElementById(`invqty-${id}`)?.value)||0;
+  const up=parseFloat(document.getElementById(`invup-${id}`)?.value)||0;
+  const tp=qty*up;
+  const tpEl=document.getElementById(`invtp-${id}`);const psEl=document.getElementById(`invps-${id}`);
+  if(tpEl)tpEl.textContent=tp.toFixed(2);if(psEl)psEl.textContent=tp.toFixed(2);
+  invRecalcTotals();
+}
+function invDeleteRow(id){document.getElementById(`invrow-${id}`)?.remove();invRecalcTotals();invUpdateActCount();}
+function invUpdateActCount(){const c=document.querySelectorAll("[id^='invrow-']").length;document.getElementById("invActCount").textContent=`${c} item${c!==1?"s":""}`;}
+
+function invRecalcTotals(){
+  let tot=0;document.querySelectorAll("[id^='invtp-']").forEach(el=>{tot+=parseFloat(el.textContent)||0;});
+  const dAmt=Math.min(parseFloat(document.getElementById("invDiscountAmt")?.value)||0, tot);
+  const grand=tot-dAmt;
+  const paid=parseFloat(document.getElementById("invAmountPaid")?.value)||0;
+  const rem=grand-paid;
+  document.getElementById("invTotMedActs").textContent=`GHS ${tot.toFixed(2)}`;
+  document.getElementById("invTotDiscount").textContent=`GHS ${dAmt.toFixed(2)}`;
+  document.getElementById("invTotGrand").textContent=`GHS ${grand.toFixed(2)}`;
+  document.getElementById("invRemaining").textContent=`GHS ${rem.toFixed(2)}`;
+  document.getElementById("invRemaining").style.color=rem>0.005?"var(--red)":"var(--green)";
+}
+
+function invUpdateHeader(){
+  const num=document.getElementById("invNumber").value.trim();
+  const date=document.getElementById("invDate").value;
+  document.getElementById("invNumberDisplay").textContent=num||"—";
+  if(date){const d=new Date(date);document.getElementById("invDateDisplay").textContent=d.toLocaleDateString("en-GH",{day:"numeric",month:"long",year:"numeric"});}
+  else document.getElementById("invDateDisplay").textContent="";
+}
+
+
+// OPEN INVOICE MODAL — also accepts existing invoice for editing
+function openInvoiceModal(ref, patientName, invoiceNumber, existingInv){
+  document.getElementById("invoicePatientRef").value=ref;
+  document.getElementById("editingInvoiceId").value=existingInv?existingInv.id:"";
+  const displayName=patientName||ref;
+  document.getElementById("invPatientName").value=displayName;
+  document.getElementById("invPatientDisplay").textContent=displayName.toUpperCase();
+  // Invoice number = patient reference (as requested)
+  const invNum=existingInv?.invoice_number||invoiceNumber||ref;
+  document.getElementById("invNumber").value=invNum;
+  document.getElementById("invDate").value=existingInv?existingInv.date:new Date().toISOString().split("T")[0];
+  document.getElementById("invDiscountAmt").value=existingInv?existingInv.discount_amount||0:0;
+  document.getElementById("invAmountPaid").value=existingInv?existingInv.amount_paid||0:0;
+  document.getElementById("invActsBody").innerHTML="";invRowCount=0;
+  if(existingInv&&existingInv.invoice_items&&existingInv.invoice_items.length>0){
+    existingInv.invoice_items.forEach(it=>invAddActRow(it.procedure,it.qty,it.unit_price));
+  }else{invAddActRow();}
+  document.getElementById("submitInvoice").textContent=existingInv?"Update Invoice":"Save Invoice";
+  invUpdateHeader();invRecalcTotals();invUpdateActCount();
+  document.getElementById("invoiceModal").classList.add("open");
+}
+
+document.getElementById("addActBtn").addEventListener("click",()=>invAddActRow());
+document.getElementById("invoiceModal").addEventListener("click",e=>{if(e.target===document.getElementById("invoiceModal"))document.getElementById("invoiceModal").classList.remove("open");});
+
+document.getElementById("submitInvoice").addEventListener("click",async()=>{
+  const ref=document.getElementById("invoicePatientRef").value;
+  const date=document.getElementById("invDate").value;
+  const editId=document.getElementById("editingInvoiceId").value;
+  const btn=document.getElementById("submitInvoice");
+  if(!date){showToast("Please select a date",true);return;}
+  const items=[];
+  document.querySelectorAll("[id^='invrow-']").forEach(row=>{
+    const rid=row.id.replace("invrow-","");
+    const proc=document.getElementById(`invact-${rid}`)?.value;
+    const qty=parseFloat(document.getElementById(`invqty-${rid}`)?.value)||0;
+    const up=parseFloat(document.getElementById(`invup-${rid}`)?.value)||0;
+    const tp=parseFloat(document.getElementById(`invtp-${rid}`)?.textContent)||0;
+    const ps=parseFloat(document.getElementById(`invps-${rid}`)?.textContent)||0;
+    if(proc)items.push({procedure:proc,qty,unit_price:up,total_price:tp,patient_share:ps});
+  });
+  if(items.length===0){showToast("Add at least one medical act",true);return;}
+  
+  const discAmt=parseFloat(document.getElementById("invDiscountAmt").value)||0;
+  const amtPaid=parseFloat(document.getElementById("invAmountPaid").value)||0;
+  const totalMed=items.reduce((s,i)=>s+i.total_price,0);
+  const grandTotal=Math.max(0,totalMed-discAmt);
+  const remaining=grandTotal-amtPaid;
+  const payload={
+    reference_number:ref,
+    invoice_number:document.getElementById("invNumber").value.trim()||null,
+    date,discount_pct:0,discount_amount:discAmt,subtotal:totalMed,
+    grand_total:grandTotal,amount_paid:amtPaid,amount_remaining:remaining,
+    paid:remaining<=0.005,items,
+  };
+  btn.disabled=true;btn.textContent="Saving…";
+  try{
+    let res;
+    if(editId){
+      // update: delete old items + update header
+      res=await fetch(`${API_BASE}/api/invoices`,{method:"PATCH",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({...payload,id:editId})});
+    }else{
+      res=await fetch(`${API_BASE}/api/invoices`,{method:"POST",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify(payload)});
+    }
+    const data=await res.json();
+    if(res.ok){
+      document.getElementById("invoiceModal").classList.remove("open");
+      showToast(editId?"✅ Invoice updated":"✅ Invoice saved");
+      refreshInvoiceList();
+    }else showToast(data.error||"Failed",true);
+  }catch{showToast("Network error",true);}
+  btn.disabled=false;btn.textContent=editId?"Update Invoice":"Save Invoice";
+});
+
+// ── Print invoice (clean A4 with PAID stamp + watermark) ───────
+function invPrint(){
+  const pName=document.getElementById("invPatientName").value;
+  const invNum=document.getElementById("invNumber").value||"—";
+  const date=document.getElementById("invDate").value;
+  const dateStr=date?new Date(date).toLocaleDateString("en-GH",{day:"numeric",month:"long",year:"numeric"}):"";
+  const discAmt=parseFloat(document.getElementById("invDiscountAmt").value)||0;
+  const amtPaid=parseFloat(document.getElementById("invAmountPaid").value)||0;
+
+  // Collect rows
+  let rowsHtml="";let totalMed=0;
+  document.querySelectorAll("[id^='invrow-']").forEach(row=>{
+    const rid=row.id.replace("invrow-","");
+    const proc=document.getElementById(`invact-${rid}`)?.value||"";
+    const qty=parseFloat(document.getElementById(`invqty-${rid}`)?.value)||0;
+    const up=parseFloat(document.getElementById(`invup-${rid}`)?.value)||0;
+    const tp=qty*up;totalMed+=tp;
+    if(proc)rowsHtml+=`<tr><td>${escHtml(proc)}</td><td>${qty}</td><td style="text-align:right">GHS ${up.toFixed(2)}</td><td style="text-align:right">GHS ${tp.toFixed(2)}</td><td style="text-align:right">GHS ${tp.toFixed(2)}</td></tr>`;
+  });
+  const grand=Math.max(0,totalMed-discAmt);const rem=grand-amtPaid;
+  const isFullyPaid=rem<=0.005;
+
+  // Watermark logo — centered, 30% opacity
+  const watermark=`
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:380pt;height:380pt;z-index:0;pointer-events:none;display:flex;align-items:center;justify-content:center;">
+      <img src="/imgs/rivers_dental_logo.png"
+        style="width:100%;height:100%;object-fit:contain;opacity:0.18;" alt="">
+    </div>`;
+
+  document.getElementById("printInvoiceArea").innerHTML=`
+  <div class="print-inv-wrap" style="position:relative;overflow:hidden;">
+    ${watermark}
+    <div style="position:relative;z-index:2;">
+    <div class="print-inv-header">
+      <div>
+        <div class="print-inv-clinic-name">Rivers Dental Clinic</div>
+        <span class="print-inv-clinic-sub">Your Health is Our Priority</span>
+        <div class="print-inv-contact">riversdentalghana@gmail.com<br>0302 448742<br>Tantra Street, Taifa, Accra, Ghana</div>
+      </div>
+      <div class="print-inv-meta">
+        <div class="print-inv-patient">${escHtml(pName.toUpperCase())}</div>
+        <div class="print-inv-numbox">
+          <div class="print-inv-num-label">Invoice No.</div>
+          <div class="print-inv-num-val">${escHtml(invNum)}</div>
+        </div>
+        <div class="print-inv-date">${dateStr}</div>
+      </div>
+    </div>
+    <div class="print-sec-title">Medical Acts</div>
+    <table class="print-acts-table">
+      <thead><tr><th>Procedure</th><th style="text-align:right">Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Total</th><th style="text-align:right">Patient Share</th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    <div class="print-totals-grid">
+      <div>
+        <div class="print-sec-title">Summary</div>
+        <table class="print-totals-table">
+          <tr><td>Total medical acts</td><td>GHS ${totalMed.toFixed(2)}</td></tr>
+          <tr><td>Discount</td><td>GHS ${discAmt.toFixed(2)}</td></tr>
+          <tr><td>Grand Total</td><td>GHS ${grand.toFixed(2)}</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="print-sec-title">Payment</div>
+        <table class="print-payment-table">
+          <tr><td>Amount Paid (GHS)</td><td>GHS ${amtPaid.toFixed(2)}</td></tr>
+          <tr><td>Remaining Balance</td><td style="font-weight:700;color:${isFullyPaid?"#0B6B4A":"#C0392B"}">GHS ${rem.toFixed(2)}</td></tr>
+        </table>
+      </div>
+    </div>
+    ${isFullyPaid?`<div style="margin-top:12pt;text-align:right;"><span style="display:inline-block;background:#E8F8F2;border:1.5pt solid #0B6B4A;border-radius:4pt;padding:3pt 10pt;font-size:8pt;font-weight:700;color:#0B6B4A;letter-spacing:0.1em;text-transform:uppercase;">✓ PAID</span></div>`:""}
+    </div><!-- end z-index wrapper -->
+    <div class="print-footer">
+      <span>Rivers Dental Clinic &nbsp;·&nbsp; Tantra Street, Taifa, Accra</span>
+      <span>Thank you for choosing Rivers Dental Clinic</span>
+    </div>
+  </div>`;
+  window.print();
+}
+
+// ── Email invoice ─────────────────────────────────────────────
+async function invEmail() {
+  // Get email from the patient record already loaded in the detail pane
+  const ref = document.getElementById("invoicePatientRef").value;
+  let toEmail = null;
+
+  // Try to get patient email from the database
+  if (ref) {
+    try {
+      const params = new URLSearchParams({ token: API_TOKEN, password: currentPassword, ref });
+      const res = await fetch(`${API_BASE}/api/patients?${params}`);
+      const data = await res.json();
+      toEmail = data.patient?.email || null;
+    } catch { /* fall through to prompt */ }
+  }
+
+  // If no email on file, ask staff to enter one
+  if (!toEmail) {
+    toEmail = prompt("No email on file for this patient.\nEnter email address to send invoice to:");
+    if (!toEmail || !toEmail.includes("@")) {
+      if (toEmail !== null) showToast("Please enter a valid email address", true);
+      return;
+    }
+  } else {
+    // Confirm with staff before sending
+    const confirmed = confirm(`Send invoice to ${toEmail}?\n(This is the email address on file for this patient)`);
+    if (!confirmed) return;
+  }
+
+  // Reuse the same HTML that invPrint() builds
+  const pName    = document.getElementById("invPatientName").value;
+  const invNum   = document.getElementById("invNumber").value || "—";
+  const date     = document.getElementById("invDate").value;
+  const dateStr  = date ? new Date(date).toLocaleDateString("en-GH", { day:"numeric", month:"long", year:"numeric" }) : "";
+  const discAmt  = parseFloat(document.getElementById("invDiscountAmt").value) || 0;
+  const amtPaid  = parseFloat(document.getElementById("invAmountPaid").value) || 0;
+
+  let rowsHtml = ""; let totalMed = 0;
+  document.querySelectorAll("[id^='invrow-']").forEach(row => {
+    const rid  = row.id.replace("invrow-", "");
+    const proc = document.getElementById(`invact-${rid}`)?.value || "";
+    const qty  = parseFloat(document.getElementById(`invqty-${rid}`)?.value) || 0;
+    const up   = parseFloat(document.getElementById(`invup-${rid}`)?.value)  || 0;
+    const tp   = qty * up; totalMed += tp;
+    if (proc) rowsHtml += `<tr><td style="padding:6px 8px;border-bottom:1px solid #eee">${escHtml(proc)}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">${qty}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right">GHS ${up.toFixed(2)}</td><td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:right;font-weight:600">GHS ${tp.toFixed(2)}</td></tr>`;
+  });
+
+  const grand = Math.max(0, totalMed - discAmt);
+  const rem   = grand - amtPaid;
+  const isPaid = rem <= 0.005;
+
+  const invoiceHtml = `
+<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+<body style="font-family:Arial,sans-serif;color:#1A2B3C;max-width:600px;margin:0 auto;padding:24px">
+  <table width="100%" style="margin-bottom:24px">
+    <tr>
+      <td>
+        <div style="font-size:22px;font-weight:700;color:#0A3A63"><a style="text-decoration:none;" href="https://riversdentalclinic.vercel.app">Rivers Dental Clinic</a></div>
+        <div style="font-size:12px;color:#6B7A8D">riversdentalghana@gmail.com &nbsp;·&nbsp; 0302 448742<br>Tantra Street, Taifa, Accra, Ghana</div>
+      </td>
+      <td style="text-align:right">
+        <div style="font-size:16px;font-weight:700;color:#0A3A63">${escHtml(pName.toUpperCase())}</div>
+        <div style="font-size:12px;color:#6B7A8D">Invoice No: <strong>${escHtml(invNum)}</strong></div>
+        <div style="font-size:12px;color:#6B7A8D">${dateStr}</div>
+      </td>
+    </tr>
+  </table>
+  <hr style="border:none;border-top:2px solid #00A9A5;margin-bottom:20px">
+  <table width="100%" style="border-collapse:collapse;margin-bottom:20px">
+    <thead>
+      <tr style="background:#0A3A63;color:white">
+        <th style="padding:8px;text-align:left">Procedure</th>
+        <th style="padding:8px;text-align:right">Qty</th>
+        <th style="padding:8px;text-align:right">Unit Price</th>
+        <th style="padding:8px;text-align:right">Total</th>
+      </tr>
+    </thead>
+    <tbody>${rowsHtml}</tbody>
+  </table>
+  <table width="100%" style="margin-bottom:20px">
+    <tr>
+      <td width="50%" valign="top">
+        <div style="font-weight:700;margin-bottom:8px;color:#0A3A63">Summary</div>
+        <table style="font-size:13px;width:100%">
+          <tr><td>Total Medical Acts</td><td style="text-align:right">GHS ${totalMed.toFixed(2)}</td></tr>
+          <tr><td>Discount</td><td style="text-align:right">GHS ${discAmt.toFixed(2)}</td></tr>
+          <tr style="font-weight:700;font-size:15px;color:#0A3A63"><td>Grand Total</td><td style="text-align:right">GHS ${grand.toFixed(2)}</td></tr>
+        </table>
+      </td>
+      <td width="10%"></td>
+      <td width="40%" valign="top">
+        <div style="font-weight:700;margin-bottom:8px;color:#0A3A63">Payment</div>
+        <table style="font-size:13px;width:100%">
+          <tr><td>Amount Paid</td><td style="text-align:right">GHS ${amtPaid.toFixed(2)}</td></tr>
+          <tr style="font-weight:700;color:${isPaid ? "#0B6B4A" : "#C0392B"}"><td>Remaining</td><td style="text-align:right">GHS ${rem.toFixed(2)}</td></tr>
+        </table>
+        ${isPaid ? `<div style="margin-top:10px;display:inline-block;background:#E8F8F2;border:1.5px solid #0B6B4A;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700;color:#0B6B4A;text-transform:uppercase">✓ PAID IN FULL</div>` : ""}
+      </td>
+    </tr>
+  </table>
+  <hr style="border:none;border-top:1px solid #eee;margin:20px 0">
+  <div style="font-size:11px;color:#6B7A8D;text-align:center">
+    <a style="text-decoration:none;" href="https://riversdentalclinic.vercel.app">Rivers Dental Clinic</a> &nbsp;·&nbsp; Tantra Street, Taifa, Accra &nbsp;·&nbsp; Thank you for choosing us
+  </div>
+</body></html>`;
+
+  const btn = event?.target;
+  if (btn) { btn.disabled = true; btn.textContent = "Sending…"; }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/invoices`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeader() },
+      body: JSON.stringify({
+        action: "email",
+        to: toEmail,
+        invoiceNumber: invNum,
+        patientName: pName,
+        invoiceHtml,
+      }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`✅ Invoice emailed to ${toEmail}`);
+    } else {
+      showToast(data.error || "Failed to send email", true);
+    }
+  } catch {
+    showToast("Network error sending email", true);
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = "📧 Email"; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MEDICAL ACTS MANAGER
+// ═══════════════════════════════════════════════════════════════
+async function toggleActsManager(){
+  const body=document.getElementById("actsManagerBody");
+  const toggle=document.getElementById("actsManagerToggle");
+  if(!body)return;
+  if(body.style.display==="none"){
+    body.style.display="block";
+    toggle.textContent="Hide ▴";
+    await renderActsList();
+  }else{
+    body.style.display="none";
+    toggle.textContent="Show ▾";
+  }
+}
+
+async function renderActsList(){
+  const container=document.getElementById("actsList");
+  if(!container)return;
+  container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading…</div>`;
+  try{
+    const res=await fetch(`${API_BASE}/api/acts`,{headers:authHeader()});
+    const data=await res.json();
+    const acts=data.acts||[];
+    if(acts.length===0){container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:#b0bec8;font-style:italic">No acts found.</div>`;return;}
+    let html=`<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+      <thead><tr>
+        <th style="padding:0.5rem 0.85rem;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Procedure</th>
+        <th style="padding:0.5rem 0.85rem;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Price (GHS)</th>
+        <th style="padding:0.5rem 0.85rem;background:var(--surface);border-bottom:1px solid var(--border);width:120px"></th>
+      </tr></thead><tbody>`;
+    acts.forEach(a=>{
+      html+=`<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:0.45rem 0.85rem">
+          <input type="text" value="${escAttr(a.name)}" id="act-name-${a.id}"
+            style="border:1px solid var(--border);border-radius:6px;padding:0.28rem 0.5rem;font-size:0.79rem;font-family:'Plus Jakarta Sans',sans-serif;width:100%;text-transform:uppercase">
+        </td>
+        <td style="padding:0.45rem 0.85rem">
+          <input type="number" value="${a.price}" id="act-price-${a.id}" min="0" step="0.01"
+            style="border:1px solid var(--border);border-radius:6px;padding:0.28rem 0.5rem;font-size:0.79rem;font-family:'Plus Jakarta Sans',sans-serif;width:80px;text-align:right">
+        </td>
+        <td style="padding:0.45rem 0.85rem">
+          <div style="display:flex;gap:0.3rem">
+            <button class="inv-action-btn edit" onclick="updateAct('${a.id}')">Save</button>
+            <button class="inv-action-btn del" onclick="deleteAct('${a.id}')">Remove</button>
+          </div>
+        </td>
+      </tr>`;
+    });
+    html+=`</tbody></table>`;
+    container.innerHTML=html;
+  }catch{container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load acts.</div>`;}
+}
+
+async function saveNewAct(){
+  const name=(document.getElementById("newActName").value||"").trim().toUpperCase();
+  const price=parseFloat(document.getElementById("newActPrice").value)||0;
+  if(!name){showToast("Please enter a procedure name",true);return;}
+  try{
+    const res=await fetch(`${API_BASE}/api/acts`,{method:"POST",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({name,price})});
+    const data=await res.json();
+    if(res.ok){
+      showToast("✅ Act added");
+      document.getElementById("newActName").value="";
+      document.getElementById("newActPrice").value="";
+      await loadMedicalActs();   // refresh the in-memory list for dropdowns
+      await renderActsList();
+    }else showToast(data.error||"Failed",true);
+  }catch{showToast("Network error",true);}
+}
+
+async function updateAct(id){
+  const name=(document.getElementById(`act-name-${id}`)?.value||"").trim().toUpperCase();
+  const price=parseFloat(document.getElementById(`act-price-${id}`)?.value)||0;
+  if(!name){showToast("Name cannot be empty",true);return;}
+  try{
+    const res=await fetch(`${API_BASE}/api/acts`,{method:"PUT",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({id,name,price})});
+    const data=await res.json();
+    if(res.ok){showToast("✅ Act updated");await loadMedicalActs();await renderActsList();}
+    else showToast(data.error||"Failed",true);
+  }catch{showToast("Network error",true);}
+}
+
+async function deleteAct(id){
+  if(!confirm("Remove this act from the dropdown?\n\nIt will be hidden but existing invoices won't be affected."))return;
+  try{
+    const res=await fetch(`${API_BASE}/api/acts`,{method:"DELETE",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({id})});
+    const data=await res.json();
+    if(res.ok){showToast("✅ Act removed");await loadMedicalActs();await renderActsList();}
+    else showToast(data.error||"Failed",true);
+  }catch{showToast("Network error",true);}
+}
+
+// ── Resizable split pane (mobile only) ──────────────────
+(function() {
+  const handle = document.getElementById('splitDragHandle');
+  const leftPane = handle && handle.previousElementSibling;
+  if (!handle || !leftPane) return;
+
+  let dragging = false;
+  let startY = 0;
+  let startH = 0;
+
+  function onStart(e) {
+    if (window.innerWidth > 860) return;
+    dragging = true;
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    startH = leftPane.getBoundingClientRect().height;
+    e.preventDefault();
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+    const delta = y - startY;
+    const newH = Math.min(Math.max(startH + delta, 120), window.innerHeight - 200);
+    leftPane.style.height = newH + 'px';
+    e.preventDefault();
+  }
+
+  function onEnd() { dragging = false; }
+
+  handle.addEventListener('mousedown', onStart);
+  handle.addEventListener('touchstart', onStart, { passive: false });
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('mouseup', onEnd);
+  document.addEventListener('touchend', onEnd);
+})();
+</script>
+</body>
+</html>
