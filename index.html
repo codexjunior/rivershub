@@ -1239,7 +1239,14 @@ function invPrint(){
       <span>Thank you for choosing Rivers Dental Clinic</span>
     </div>
   </div>`;
-  window.print();
+    const logoImg = new Image();
+  let printed = false;
+  const doPrint = () => { if (!printed) { printed = true; window.print(); } };
+  logoImg.onload = doPrint;
+  logoImg.onerror = doPrint;
+  logoImg.src = "/imgs/rivers_dental_logo.png";
+  if (logoImg.complete) doPrint();
+  setTimeout(doPrint, 1500);
 }
 
 // ── Email invoice ─────────────────────────────────────────────
