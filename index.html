@@ -807,7 +807,7 @@ async function submitPatientForm(){
   const btn=document.getElementById("submitPatient");btn.disabled=true;btn.textContent="Saving…";
   document.querySelectorAll("#patientsRight input[type='text'],#patientsRight input[type='email']").forEach(el=>{el.value=el.value.toUpperCase();});
   const body={
-    reference_number:ref||undefined,
+    reference_number:ref,
     name:document.getElementById("pName").value.trim()||null,
     gender:document.getElementById("pGender").value!==""?parseInt(document.getElementById("pGender").value):null,
     phone:document.getElementById("pPhone").value.trim()||null,
@@ -1129,7 +1129,7 @@ document.getElementById("submitInvoice").addEventListener("click",async()=>{
   const grandTotal=Math.max(0,totalMed-discAmt);
   const remaining=grandTotal-amtPaid;
   const payload={
-    reference_number:ref||undefined,
+    reference_number:ref,
     invoice_number:document.getElementById("invNumber").value.trim()||null,
     date,discount_pct:0,discount_amount:discAmt,subtotal:totalMed,
     grand_total:grandTotal,amount_paid:amtPaid,amount_remaining:remaining,

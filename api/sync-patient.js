@@ -11,6 +11,7 @@
 
 const { createClient } = require("@supabase/supabase-js");
 const { applyCors } = require("./_cors");
+
 let _supabase = null;
 function getSupabase() {
   if (!_supabase) {
