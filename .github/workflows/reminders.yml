@@ -1,0 +1,29 @@
+name: SMS Appointment Reminders
+
+on:
+  schedule:
+    # 13:00 UTC = 1PM Ghana time (Ghana is UTC+0 year-round)
+    - cron: "0 13 * * *"
+    # 18:00 UTC = 6PM Ghana time
+    - cron: "0 18 * * *"
+  # Allow manual trigger for testing
+  workflow_dispatch:
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger SMS reminders
+        run: |
+          curl --fail --silent --show-error \
+            --max-time 60 \
+            -X POST "${{ secrets.VERCEL_URL }}/api/sms" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.DASHBOARD_TOKEN }}" \
+            -d '{"trigger":"cron"}' \
+            | tee /dev/stderr \
+            | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          print(f'Sent: {data.get(\"sent\", 0)}, Skipped: {data.get(\"skipped\", 0)}, Failed: {data.get(\"failed\", 0)}')
+          "

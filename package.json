@@ -1,0 +1,13 @@
+{
+  "name": "rivers-dental-dashboard",
+  "version": "1.0.0",
+  "description": "Staff dashboard for Rivers Dental Clinic",
+  "private": true,
+  "engines": {
+    "node": ">=18.x"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.103.0",
+    "googleapis": "^144.0.0"
+  }
+}
