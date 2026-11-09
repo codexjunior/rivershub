@@ -65,6 +65,27 @@ function buildRow(p, timestamp = "") {
   ];
 }
 
+// Supabase returns at most 1000 rows per request (project "max rows" setting),
+// silently. Read the table page by page so we always see EVERY patient.
+async function fetchAllPatients(supabase) {
+  const PAGE = 1000;
+  const all = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from("patients")
+      .select("*")
+      .order("reference_number", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error("Supabase error: " + error.message);
+    all.push(...data);
+    if (data.length < PAGE) break;
+  }
+  return all;
+}
+
+// Never delete more than this many Sheet rows in one run unless force=true
+const MAX_DELETES = 25;
+
 module.exports = async function handler(req, res) {
   if (applyCors(req, res)) return;
 
@@ -87,12 +108,19 @@ module.exports = async function handler(req, res) {
     const sheets   = getSheets();
 
     // ── 1. Fetch ALL patients from Supabase ─────────────────────────────────
-    const { data: dbPatients, error: dbErr } = await supabase
-      .from("patients")
-      .select("*")
-      .order("reference_number", { ascending: true });
-    if (dbErr) return res.status(500).json({ error: "Supabase error: " + dbErr.message });
+        const dbPatients = await fetchAllPatients(supabase);
 
+    // Safety check: what we fetched must match Supabase's own row count,
+    // otherwise we could mistake missing rows for "deleted" ones.
+    const { count: dbCount, error: countErr } = await supabase
+      .from("patients")
+      .select("*", { count: "exact", head: true });
+    if (countErr) throw new Error("Supabase count error: " + countErr.message);
+    if (dbCount !== dbPatients.length) {
+      return res.status(500).json({
+        error: `Incomplete Supabase read: fetched ${dbPatients.length} of ${dbCount} rows. Nothing was changed.`,
+      });
+    }
     const dbMap = new Map(); // reference_number → patient object
     for (const p of dbPatients) dbMap.set(p.reference_number, p);
 
@@ -131,6 +159,16 @@ module.exports = async function handler(req, res) {
     if (isDryRun || (onlyInSheets.length === 0 && onlyInSupabase.length === 0)) {
       report.action = isDryRun ? "dry_run_no_changes_made" : "already_in_sync";
       return res.status(200).json(report);
+    }
+
+    // Safety valve: a normal night deletes a handful of rows at most
+    const force = req.query.force === "true" ||
+      (req.body && (typeof req.body === "string" ? JSON.parse(req.body) : req.body).force === true);
+    if (onlyInSheets.length > MAX_DELETES && !force) {
+      report.action = "aborted_too_many_deletions";
+      report.message = `Refusing to delete ${onlyInSheets.length} Sheet rows (limit ${MAX_DELETES}). Check the report, then re-run with force=true if this is intended. Nothing was changed.`;
+      console.error("[sync-reconcile] " + report.message);
+      return res.status(409).json(report);
     }
 
     const batchRequests = [];
@@ -175,9 +213,13 @@ module.exports = async function handler(req, res) {
         return buildRow(p, ts);
       });
 
-      await sheets.spreadsheets.values.append({
+      // Write at the true next empty row (same approach as patients.js) instead of
+      // values.append, which guesses where the "table" ends and can land in the wrong place.
+      // Rows deleted above were all inside sheetRows, so the count drops by that many.
+      const firstNewRow = sheetRows.length - rowsToDelete.length + 1;
+      await sheets.spreadsheets.values.update({
         spreadsheetId: sheetId,
-        range: "Patient_data!A:O",
+        range: `Patient_data!A${firstNewRow}:O${firstNewRow + newRows.length - 1}`,
         valueInputOption: "RAW",
         requestBody: { values: newRows },
       });
