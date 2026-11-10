@@ -1,0 +1,120 @@
+/* ═══ Rivers Dental · Phase 3 theme (loads AFTER style.css; overrides only) ═══
+   Direction: calm clinical dashboard. Brand navy + teal kept; cool-lavender page,
+   white sidebar, tinted KPI cards, soft depth. Mobile-first fixes at the bottom. */
+:root{
+  --bg:#EDF1F9; --surface:#F6F8FC; --border:#E3E9F3; --border-strong:#CFD9E8;
+  --muted:#66788C; --text-mid:#34495E;
+  --radius:12px; --radius-sm:9px; --radius-lg:16px;
+  --shadow-sm:0 1px 2px rgba(16,42,74,.05),0 2px 8px rgba(16,42,74,.04);
+  --shadow:0 2px 4px rgba(16,42,74,.05),0 10px 28px rgba(16,42,74,.08);
+  --side:248px; --tint-blue:#E4EEFC; --tint-teal:#DDF3F1; --tint-amber:#FCEFD9;
+}
+html{scroll-behavior:smooth}
+::selection{background:rgba(0,169,165,.22)}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+button,input,select,textarea{-webkit-tap-highlight-color:transparent}
+
+/* ── Login ── */
+.login-screen{background:radial-gradient(1200px 600px at 15% 0%,#D9E6FA 0%,transparent 60%),linear-gradient(160deg,#E9EFFA,#F6F8FD)}
+.login-card{border-radius:20px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.login-btn{border-radius:var(--radius)}
+
+/* ── Shell: the <nav> is the sidebar on desktop and the top bar on mobile ── */
+.app{padding-left:var(--side)}
+.nav{position:fixed;left:0;top:0;bottom:0;width:var(--side);height:auto;flex-direction:column;align-items:stretch;
+  justify-content:flex-start;gap:1.5rem;padding:1.4rem 1rem 1.2rem;background:#fff;border-right:1px solid var(--border);box-shadow:none}
+.nav-brand{padding:0 .5rem}
+.nav-brand img{width:38px;height:38px}
+.nav-brand-text{color:var(--blue);font-size:1rem}
+.nav-brand-sub{color:var(--teal);font-weight:600}
+.nav-links{flex:1;flex-direction:column;align-items:stretch;gap:.25rem}
+.nav-link{display:flex;align-items:center;gap:.7rem;color:var(--text-mid);font-size:.88rem;padding:.7rem .85rem;border-radius:var(--radius);min-height:44px;text-align:left}
+.nav-link svg{width:19px;height:19px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-link:hover{background:var(--surface);color:var(--blue)}
+.nav-link.active{background:var(--tint-teal);color:var(--blue);font-weight:700}
+.nav-link.active svg{stroke:var(--teal)}
+.nav-divider{display:none}
+.logout-btn{margin-top:auto;color:var(--muted);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem;font-size:.82rem;min-height:44px}
+.logout-btn:hover{color:var(--red);border-color:#f2c5c0;background:var(--red-light)}
+.hamburger span{background:var(--blue)}
+
+/* ── Drawer (mobile menu), light to match ── */
+.drawer{background:#fff}
+.drawer.open{box-shadow:-12px 0 40px rgba(16,42,74,.15)}
+.drawer-header{border-bottom:1px solid var(--border)}
+.drawer-header div div:first-child{color:var(--blue)!important}
+.drawer-header div div:last-child{color:var(--teal)!important}
+.drawer-close{color:var(--muted);min-width:44px;min-height:44px}
+.drawer-link{color:var(--text-mid);min-height:48px}
+.drawer-link:hover,.drawer-link.active{background:var(--tint-teal);color:var(--blue)}
+.drawer-footer{border-top:1px solid var(--border)}
+.drawer-logout{background:#fff;color:var(--muted);border-color:var(--border);min-height:48px}
+.drawer-logout:hover{background:var(--red-light);color:var(--red)}
+.drawer-overlay{background:rgba(14,30,46,.45)}
+
+/* ── KPI cards (Upcoming / Today / This week) ── */
+.stats-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;padding:1.5rem 2rem 0;max-width:1080px;margin:0 auto;background:none;border:0}
+.stats-divider{display:none}
+.stat{position:relative;flex-direction:column;justify-content:center;gap:.15rem;padding:1.1rem 1.2rem 1.1rem 4.6rem;border-radius:var(--radius-lg);min-height:92px;box-shadow:var(--shadow-sm)}
+.stat:nth-child(1){background:var(--tint-blue)} .stat:nth-child(3){background:var(--tint-teal)} .stat:nth-child(5){background:var(--tint-amber)}
+.stat::before{content:"";position:absolute;left:1.1rem;top:50%;width:46px;height:46px;transform:translateY(-50%);border-radius:13px;box-shadow:0 6px 14px rgba(16,42,74,.14);
+  background-color:#2F6FD6;background-repeat:no-repeat;background-position:center;background-size:24px}
+.stat:nth-child(3)::before{background-color:#0E9C97}
+.stat:nth-child(5)::before{background-color:#D98A12}
+.stat:nth-child(1)::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='5' width='17' height='15' rx='2.5'/%3E%3Cpath d='M8 3v4M16 3v4M3.5 10h17'/%3E%3C/svg%3E")}
+.stat:nth-child(3)::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E")}
+.stat:nth-child(5)::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19V9M10 19V5M16 19v-7M21 19H3'/%3E%3C/svg%3E")}
+.stat-val{font-size:1.9rem;color:var(--blue);font-variant-numeric:tabular-nums}
+.stat-label{margin-top:0;color:var(--text-mid);letter-spacing:.06em}
+
+/* ── Toolbar + lists ── */
+.controls{max-width:1080px;margin:1.1rem auto 0;width:calc(100% - 4rem);padding:.7rem .8rem;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+.page-content{max-width:1080px;padding:1.1rem 2rem 2.5rem}
+.btn-primary{background:var(--blue);border-radius:var(--radius);min-height:40px;box-shadow:0 2px 6px rgba(10,58,99,.2)}
+.btn-primary:hover{background:var(--blue-mid)}
+.btn-ghost{border-radius:var(--radius);min-height:40px}
+.search-wrap input,.patient-search-wrap input{border-radius:var(--radius);background:var(--surface)}
+.appt-card{border-radius:var(--radius-lg);padding:1.15rem 1.4rem}
+.appt-card.today-card{border:1px solid rgba(0,169,165,.5);box-shadow:0 0 0 3px rgba(0,169,165,.08),var(--shadow-sm)}
+.appt-title{font-size:1rem}
+.appt-time{background:var(--tint-blue);color:var(--blue);padding:.32rem .55rem;border-radius:8px}
+.appt-time.today-time{background:var(--tint-teal);color:#0A6E6A}
+.page-btn{border-radius:var(--radius-sm);min-width:38px;min-height:38px}
+.page-btn.active{background:var(--blue)}
+
+/* ── Patients split ── */
+.patients-split{height:100vh}
+.patients-left{background:#fff;border-right:1px solid var(--border)}
+.patients-right{background:var(--bg)}
+.pt-row{border-radius:var(--radius)}
+.pt-row.active{background:var(--tint-teal);border-color:rgba(0,169,165,.3)}
+.detail-pane,.edit-pane{border-radius:var(--radius-lg)}
+
+/* ═══ Mobile / tablet (≤860px): sidebar becomes a top bar ═══ */
+@media(max-width:860px){
+  .app{padding-left:0}
+  .nav{position:sticky;top:0;bottom:auto;width:auto;height:58px;flex-direction:row;align-items:center;justify-content:space-between;gap:.5rem;
+    padding:0 .9rem;padding-top:env(safe-area-inset-top);box-sizing:content-box;box-shadow:var(--shadow-sm)}
+  .nav-brand{padding:0}
+  .nav-brand img{width:32px;height:32px}
+  .hamburger{width:44px;height:44px;align-items:center;justify-content:center}
+  .stats-bar{gap:.6rem;padding:1rem 1rem 0}
+  .stat{padding:.8rem .8rem .8rem .8rem;min-height:84px;align-items:flex-start}
+  .stat::before{position:static;transform:none;width:30px;height:30px;border-radius:9px;background-size:17px;margin-bottom:.4rem;box-shadow:0 3px 8px rgba(16,42,74,.14)}
+  .stat-val{font-size:1.45rem}
+  .stat-label{font-size:.62rem}
+  .controls{width:calc(100% - 2rem);margin-top:.8rem;padding:.6rem}
+  .controls .search-wrap{flex:1 1 100%}
+  .controls .btn-primary{flex:1}
+  .page-content{padding:.9rem 1rem 2rem}
+  .appt-card{padding:1rem}
+  .appt-card-actions .btn-ghost,.appt-card-actions button{min-height:40px}
+  .patients-split{height:calc(100vh - 58px)}
+  /* F13: show the drag handle (style.css hides it after its media query) */
+  .split-drag-handle{display:flex;touch-action:none;height:22px}
+}
+@media(max-width:380px){
+  .stat-label{letter-spacing:.02em}
+  .stat-val{font-size:1.3rem}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
