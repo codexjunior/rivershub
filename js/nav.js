@@ -1,38 +1,40 @@
-// ── Resizable split pane (mobile only) ──────────────────
+// ── Resizable split pane (phone layout only) ────────────
+// Pointer Events (mouse + touch + pen in one path). The list can grow to 85% of the
+// split area, never below 220px. Leaving the phone layout clears the dragged height
+// so the desktop 3-column CSS rules again (F15).
 (function() {
   const handle = document.getElementById('splitDragHandle');
   const leftPane = handle && handle.previousElementSibling;
-  if (!handle || !leftPane) return;
+  const split = leftPane && leftPane.parentElement;
+  if (!handle || !leftPane || !split) return;
 
-  let dragging = false;
-  let startY = 0;
-  let startH = 0;
+  const MOBILE = window.matchMedia('(max-width: 860px)');
+  const MIN_H = 220;
+  let dragging = false, startY = 0, startH = 0;
 
-  function onStart(e) {
-    if (window.innerWidth > 860) return;
+  const maxH = () => Math.round(split.getBoundingClientRect().height * 0.85);
+
+  handle.addEventListener('pointerdown', e => {
+    if (!MOBILE.matches) return;
     dragging = true;
-    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    startY = e.clientY;
     startH = leftPane.getBoundingClientRect().height;
+    handle.setPointerCapture(e.pointerId);
     e.preventDefault();
-  }
-
-  function onMove(e) {
+  });
+  handle.addEventListener('pointermove', e => {
     if (!dragging) return;
-    const y = e.touches ? e.touches[0].clientY : e.clientY;
-    const delta = y - startY;
-    const newH = Math.min(Math.max(startH + delta, 120), window.innerHeight - 200);
-    leftPane.style.height = newH + 'px';
-    e.preventDefault();
-  }
+    const h = Math.min(Math.max(startH + (e.clientY - startY), MIN_H), maxH());
+    leftPane.style.height = h + 'px';
+  });
+  const stop = e => {
+    dragging = false;
+    try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
+  };
+  handle.addEventListener('pointerup', stop);
+  handle.addEventListener('pointercancel', stop);
 
-  function onEnd() { dragging = false; }
-
-  handle.addEventListener('mousedown', onStart);
-  handle.addEventListener('touchstart', onStart, { passive: false });
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('touchmove', onMove, { passive: false });
-  document.addEventListener('mouseup', onEnd);
-  document.addEventListener('touchend', onEnd);
+  MOBILE.addEventListener('change', e => { if (!e.matches) leftPane.style.height = ''; });
 })();
 
 // ═══════════════════════════════════════════════════════════════

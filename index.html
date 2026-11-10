@@ -53,6 +53,7 @@
     <div class="nav-links">
       <button class="nav-link active" data-page="appointments"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Appointments</button>
 <button class="nav-link" data-page="patients"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .6 3.3 2.3 3.5 5.2"/></svg>Patients</button>
+<button class="nav-link" data-page="reports"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6"/></svg>Reports</button>
       <div class="nav-divider"></div>
       <button class="logout-btn" id="logoutBtn">Sign Out</button>
     </div>
@@ -74,6 +75,7 @@
     <div class="drawer-nav">
       <button class="drawer-link active" data-page="appointments"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Appointments</button>
       <button class="drawer-link" data-page="patients"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .6 3.3 2.3 3.5 5.2"/></svg>Patients</button>
+      <button class="drawer-link" data-page="reports"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6"/></svg>Reports</button>
     </div>
     <div class="drawer-footer">
       <button class="drawer-logout" id="drawerLogout">Sign Out</button>
@@ -142,6 +144,54 @@
           <p>Click a patient from the list on the left to view their details.</p>
         </div>
       </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ REPORTS PAGE (Phase 4): read-only invoice log ═══ -->
+  <div class="page" id="page-reports">
+    <div class="rep-wrap">
+
+      <div class="stats-bar rep-stats">
+        <div class="stat"><span class="stat-val" id="repBilled">-</span><span class="stat-label">Billed (GHS)</span></div>
+        <div class="stats-divider"></div>
+        <div class="stat"><span class="stat-val" id="repCollected">-</span><span class="stat-label">Collected (GHS)</span></div>
+        <div class="stats-divider"></div>
+        <div class="stat"><span class="stat-val" id="repOutstanding">-</span><span class="stat-label">Outstanding (GHS)</span></div>
+      </div>
+
+      <div class="rep-filters">
+        <div class="rep-field rep-c3"><label for="repPreset">Period</label>
+          <select id="repPreset">
+            <option value="month">This month</option>
+            <option value="lastmonth">Last month</option>
+            <option value="year">This year</option>
+            <option value="all">All time</option>
+            <option value="custom">Custom dates</option>
+          </select></div>
+        <div class="rep-field rep-c3"><label for="repFrom">From</label><input type="date" id="repFrom"></div>
+        <div class="rep-field rep-c3"><label for="repTo">To</label><input type="date" id="repTo"></div>
+        <div class="rep-field rep-c3"><label for="repStatus">Status</label>
+          <select id="repStatus">
+            <option value="all">All</option>
+            <option value="paid">Paid</option>
+            <option value="partial">Partly paid</option>
+            <option value="unpaid">Unpaid</option>
+          </select></div>
+        <div class="rep-field rep-c4"><label for="repProc">Procedure</label>
+          <input type="text" id="repProc" list="repProcList" placeholder="Any procedure" autocomplete="off">
+          <datalist id="repProcList"></datalist></div>
+        <div class="rep-field rep-c4"><label for="repQ">Patient</label>
+          <input type="search" id="repQ" placeholder="Name or reference" autocomplete="off"></div>
+        <div class="rep-actions rep-c4">
+          <button class="btn-ghost" id="repReset" type="button">Reset</button>
+          <button class="btn-ghost" id="repExport" type="button">Export CSV</button>
+        </div>
+      </div>
+
+      <div class="rep-summary" id="repSummary"></div>
+      <div id="repContent"></div>
+      <div class="pagination" id="repPagination"></div>
 
     </div>
   </div>
@@ -282,6 +332,7 @@
 <script src="js/invoice-form.js"></script>
 <script src="js/invoice-print.js"></script>
 <script src="js/invoice-email.js"></script>
+<script src="js/reports.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

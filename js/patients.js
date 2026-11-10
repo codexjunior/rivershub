@@ -67,22 +67,30 @@ async function viewPatient(ref){
   const rp=document.getElementById("patientsRight");
   rp.innerHTML=`<div class="right-empty"><div class="empty-icon" style="font-size:1.75rem;background:white">⏳</div><h3>Loading…</h3></div>`;
   try{
-    const params=new URLSearchParams({token:API_TOKEN,password:currentPassword,ref});
-    const [pRes,iRes]=await Promise.all([fetch(`${API_BASE}/api/patients?${params}`),fetch(`${API_BASE}/api/invoices?${params}`)]);
+    const params=new URLSearchParams({ref});
+    const opts={headers:authHeader()};   // credentials in the header, not the URL
+    const [pRes,iRes]=await Promise.all([fetch(`${API_BASE}/api/patients?${params}`,opts),fetch(`${API_BASE}/api/invoices?${params}`,opts)]);
     const pData=await pRes.json();const iData=await iRes.json();
     const p=pData.patient;
-    const f=(lbl,val)=>`<div class="info-item"><span class="info-item-label">${lbl}</span><span class="info-item-value${!val?" empty":""}">${escHtml(val||"-")}</span></div>`;
+    // f(label, value, link?) - link "tel" / "mailto" makes the value tap-to-call / tap-to-mail
+    const f=(lbl,val,link)=>{
+      const txt=escHtml(val||"-");
+      const href=!val||!link?"":link==="tel"?"tel:"+escAttr(String(val).replace(/[^\d+]/g,"")):"mailto:"+escAttr(val);
+      return `<div class="info-item"><span class="info-item-label">${lbl}</span><span class="info-item-value${!val?" empty":""}">${href?`<a href="${href}">${txt}</a>`:txt}</span></div>`;
+    };
+    const facts=[genderLabel(p.gender),ageCatLabel(p.age_category),p.phone].filter(Boolean).map(x=>`<span>${escHtml(x)}</span>`).join("");
     rp.innerHTML=`
     <div class="detail-pane">
       <div class="detail-pane-header">
         <div>
           <div class="detail-pane-name">${escHtml(p.name||p.reference_number)}</div>
           <div class="detail-pane-ref">${escHtml(p.reference_number)}</div>
+          ${facts?`<div class="pt-facts">${facts}</div>`:""}
         </div>
         <div class="detail-pane-actions">
           <button class="btn-primary" onclick="openInvoiceModal('${escAttr(ref)}','${escAttr(p.name||ref)}','${escAttr(ref)}')">+ Invoice</button>
           <button class="btn-ghost" onclick="openEditPatientPane(null,'${escAttr(ref)}')">Edit</button>
-          <button class="btn-ghost" style="padding: 0.28rem 0.8rem; color:var(--red);border-color:var(--red)" onclick="deletePatient('${escAttr(ref)}','${escAttr(p.name||ref)}')">Delete</button>
+          <button class="btn-ghost btn-danger" onclick="deletePatient('${escAttr(ref)}','${escAttr(p.name||ref)}')">Delete</button>
         </div>
       </div>
 
@@ -91,8 +99,8 @@ async function viewPatient(ref){
         <div class="info-card-body">
           <div class="info-grid">
             ${f("Reference",p.reference_number)}${f("Gender",genderLabel(p.gender))}${f("Age Category",ageCatLabel(p.age_category))}
-            ${f("Date of Birth",dateLabel(p.birthdate))}${f("Phone",p.phone)}${f("WhatsApp",p.whatsapp)}
-            ${f("Email",p.email)}${f("City",p.city)}${f("Company",p.company)}${f("Profession",p.profession)}
+            ${f("Date of Birth",dateLabel(p.birthdate))}${f("Phone",p.phone,"tel")}${f("WhatsApp",p.whatsapp,"tel")}
+            ${f("Email",p.email,"mailto")}${f("City",p.city)}${f("Company",p.company)}${f("Profession",p.profession)}
           </div>
         </div>
       </div>
@@ -100,7 +108,7 @@ async function viewPatient(ref){
       <div class="info-card">
         <div class="info-card-header"><span class="info-card-title">Emergency Contact</span></div>
         <div class="info-card-body">
-          <div class="info-grid">${f("Name",p.emergency_contact_name)}${f("Relationship",p.emergency_contact_relation)}${f("Phone",p.emergency_contact_phone)}</div>
+          <div class="info-grid">${f("Name",p.emergency_contact_name)}${f("Relationship",p.emergency_contact_relation)}${f("Phone",p.emergency_contact_phone,"tel")}</div>
         </div>
       </div>
 
