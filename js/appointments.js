@@ -91,11 +91,11 @@ function renderAll(){
   const allByDate={};filtered.forEach(a=>{const k=a.dateRaw.split("T")[0];allByDate[k]=(allByDate[k]||0)+1;});
   let html="";
   Object.entries(byDate).forEach(([dk,appts])=>{
-    const isT=dk===todayStr;const cnt=allByDate[dk]||appts.length;const lbl=isT?`📅 Today - ${appts[0].date}`:appts[0].date;
+    const isT=dk===todayStr;const cnt=allByDate[dk]||appts.length;const lbl=isT?`Today - ${appts[0].date}`:appts[0].date;
     html+=`<div class="date-group-header">${lbl}<span class="day-count">${cnt} appt${cnt!==1?"s":""}</span></div><div class="appt-list">`;
     appts.forEach(a=>{
-      const tr=a.timeEnd&&a.timeEnd!==a.time?`${a.time} – ${a.timeEnd}`:a.time;
-      const src=a.isWebBooking?`<span class="source-badge web">Website</span>`:`<span class="source-badge manual">Manual</span>`;
+        const tr=a.time;      
+        const src=a.isWebBooking?`<span class="source-badge web">Website</span>`:`<span class="source-badge manual">Manual</span>`;
       const notesH=(a.notes||"").trim()?`<div class="appt-notes">${escHtml(a.notes)}</div>`:`<div class="appt-no-notes">No notes</div>`;
       const hasDet=a.patient||a.phone||a.email||a.service;
       const det=hasDet?`<div class="appt-details">
@@ -105,13 +105,13 @@ function renderAll(){
         ${a.email?`<div class="appt-detail"><span class="detail-label">Email</span><span class="detail-value"><a href="mailto:${escHtml(a.email)}">${escHtml(a.email)}</a></span></div>`:""}
       </div>`:"";
       html+=`<div class="appt-card${isT?" today-card":""}" id="card-${a.id}" data-id="${a.id}">
-        <div class="appt-top"><div><div class="appt-title">${escHtml(a.title)}</div>${src}</div><span class="appt-time${isT?" today-time":""}">${tr}</span></div>
+        <div class="appt-top"><span class="appt-time${isT?" today-time":""}">${tr}</span><div><div class="appt-title">${escHtml(a.title)}</div>${src}</div></div>
         ${det}
         <div class="notes-display">${notesH}</div>
         <div class="edit-area" style="display:none"><textarea class="edit-textarea" placeholder="Add notes…"></textarea><div style="display:flex;gap:0.4rem;margin-top:0.4rem"><button class="save-btn">Save</button><button class="cancel-edit-btn">Cancel</button></div></div>
         <div class="appt-card-actions">
           ${(a.phone) ? `<button class="remind-btn" onclick="event.stopPropagation();sendManualReminder('${escAttr(a.id)}','${escAttr(a.phone)}','${escAttr(a.patient||a.title)}','${escAttr(a.dateRaw)}','${escAttr(a.time||'')}')">Remind</button>` : ""}
-          <button class="edit-btn">✏️ Edit Notes</button>
+          <button class="edit-btn">Edit Notes</button>
         </div>      
       </div>`;
     });

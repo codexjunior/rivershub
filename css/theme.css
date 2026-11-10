@@ -74,11 +74,6 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
 .btn-primary:hover{background:var(--blue-mid)}
 .btn-ghost{border-radius:var(--radius);min-height:40px}
 .search-wrap input,.patient-search-wrap input{border-radius:var(--radius);background:var(--surface)}
-.appt-card{border-radius:var(--radius-lg);padding:1.15rem 1.4rem}
-.appt-card.today-card{border:1px solid rgba(0,169,165,.5);box-shadow:0 0 0 3px rgba(0,169,165,.08),var(--shadow-sm)}
-.appt-title{font-size:1rem}
-.appt-time{background:var(--tint-blue);color:var(--blue);padding:.32rem .55rem;border-radius:8px}
-.appt-time.today-time{background:var(--tint-teal);color:#0A6E6A}
 .page-btn{border-radius:var(--radius-sm);min-width:38px;min-height:38px}
 .page-btn.active{background:var(--blue)}
 
@@ -107,8 +102,6 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
   .controls .search-wrap{flex:1 1 100%}
   .controls .btn-primary{flex:1}
   .page-content{padding:.9rem 1rem 2rem}
-  .appt-card{padding:1rem}
-  .appt-card-actions .btn-ghost,.appt-card-actions button{min-height:40px}
   .patients-split{height:calc(100vh - 58px)}
   /* F13: show the drag handle (style.css hides it after its media query) */
   .split-drag-handle{display:flex;touch-action:none;height:22px}
@@ -118,3 +111,39 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
   .stat-val{font-size:1.3rem}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* ═══ Appointment cards (Phase 3b): one separate card per appointment ═══ */
+.date-group-header{margin:1.75rem 0 .7rem;font-size:.95rem;letter-spacing:-.005em}
+.date-group-header:first-child{margin-top:.25rem}
+.appt-list{background:none;border:0;border-radius:0;overflow:visible;gap:.85rem;margin-bottom:.5rem}
+.appt-card{display:flex;flex-direction:column;align-items:stretch;gap:.8rem;min-width:0;padding:1.1rem 1.25rem;background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);transition:box-shadow .15s,border-color .15s}
+.appt-card:last-child{border-bottom:1px solid var(--border)}
+.appt-card:hover{background:#fff;border-color:var(--border-strong);box-shadow:var(--shadow)}
+.appt-card.today-card{border-color:rgba(0,169,165,.5)}
+.appt-top{display:flex;align-items:flex-start;gap:.9rem;min-width:0}
+.appt-top>div{flex:1;min-width:0;min-height:0;margin:0;flex-direction:row;flex-wrap:wrap;align-items:center;gap:.3rem .6rem}
+.appt-time{flex:none;padding:.38rem .65rem;border-radius:9px;background:var(--tint-blue);color:var(--blue);font-size:.85rem;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.appt-time.today-time{background:var(--tint-teal);color:#00625F}
+.appt-title{font-size:1.02rem;line-height:1.3;overflow-wrap:anywhere}
+.appt-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.65rem 1.25rem;margin:0;padding-top:.8rem;border-top:1px solid var(--border)}
+.appt-detail{flex-direction:column;align-items:flex-start;gap:.1rem;min-width:0}
+.detail-label{font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.detail-value,.detail-value a{max-width:100%;overflow-wrap:anywhere;word-break:break-word}
+.notes-display{min-width:0}
+.appt-notes{margin:0;padding:.7rem .85rem;background:var(--surface);border-radius:var(--radius);overflow-wrap:anywhere}
+.edit-textarea{max-width:100%}
+.appt-card-actions{justify-content:flex-end;gap:.5rem;padding-top:.8rem;border-top:1px solid var(--border)}
+.appt-card-actions .remind-btn,.appt-card-actions .edit-btn{min-height:38px;padding:0 1.05rem;border-radius:10px;font-size:.85rem;font-weight:600}
+.appt-card-actions .remind-btn{background:var(--tint-teal);border:1px solid transparent;color:#00625F}
+.appt-card-actions .remind-btn:hover{background:#CBEBE8;border-color:transparent;color:#004E4C}
+.appt-card-actions .edit-btn{background:#fff;border:1px solid var(--border-strong);color:var(--text-mid)}
+.appt-card-actions .edit-btn:hover{border-color:var(--blue);color:var(--blue)}
+@media(max-width:860px){
+  .appt-list{gap:.7rem}
+  .appt-card{padding:.95rem 1rem;gap:.7rem}
+  .appt-top>div{margin-top:0}
+  .appt-details{gap:.55rem 1rem;margin:0;padding-top:.7rem}
+  .appt-card-actions{padding-top:.7rem}
+  .appt-card-actions .remind-btn,.appt-card-actions .edit-btn{flex:1;min-height:42px}
+}
