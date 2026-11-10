@@ -1,0 +1,133 @@
+/* ═══ Invoice modal ═══════════════════════════════════════════════
+   Loads after theme.css. Layout: fixed header, a work area that scrolls
+   (medical acts on the left, totals and payment on the right), fixed footer.
+   Under 860px the totals move below the acts and the sheet rises from the
+   bottom. All class names are im-*; the old inv-* modal rules are gone from
+   style.css. Element ids are unchanged (print, email and save read them). */
+
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+.modal-panel.im-panel{
+  --pad:0;padding:0;width:100%;max-width:1040px !important;
+  display:flex;flex-direction:column;overflow:hidden;
+  max-height:92vh;max-height:92dvh;border-radius:var(--radius-lg);
+}
+.im-panel svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Header ── */
+.im-head{display:flex;align-items:center;gap:.9rem;padding:1rem 1.25rem 1rem 1.5rem;border-bottom:1px solid var(--border);flex:none}
+.im-head-main{flex:1;min-width:0}
+.im-head h2{font-size:1.3rem;line-height:1.2;font-weight:700;color:var(--blue);letter-spacing:-.01em}
+.im-sub{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .6rem;margin-top:.2rem;font-size:.95rem;color:var(--text-mid)}
+.im-patient{font-weight:600;overflow-wrap:anywhere}
+.im-ref{padding:.1rem .6rem;border-radius:999px;background:var(--tint-teal,#DDF3F1);color:#00625F;font-size:.8rem;font-weight:700;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.im-close{width:44px;height:44px;margin-right:-.5rem;display:flex;align-items:center;justify-content:center;border:0;border-radius:var(--radius);background:none;color:var(--muted);flex:none;transition:background-color .15s,color .15s}
+.im-close:hover{background:var(--navy-tint);color:var(--blue)}
+
+/* ── Work area ── */
+.im-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 21.5rem}
+.im-main{overflow-y:auto;padding:1.5rem 1.5rem 1.75rem;min-width:0}
+.im-summary{overflow-y:auto;padding:1.5rem 1.5rem 1.75rem;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;gap:1rem}
+
+.im-meta{display:flex;align-items:flex-end;flex-wrap:wrap;gap:.5rem 1rem;margin-bottom:1.75rem}
+.im-meta .im-date{width:13.5rem;margin-bottom:0}
+.im-date-long{padding-bottom:.65rem;font-size:.95rem;color:var(--muted)}
+
+.im-sec{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.5rem}
+.im-sec h3{font-size:1.05rem;font-weight:700;color:var(--blue)}
+.im-sec #invActCount{font-size:.9rem;font-weight:600}
+
+/* Acts table */
+.im-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.im-table col.c-qty{width:5.25rem}
+.im-table col.c-price{width:8.25rem}
+.im-table col.c-amt{width:7.75rem}
+.im-table col.c-x{width:2.75rem}
+.im-table th{padding:.45rem .4rem;font-size:.85rem;font-weight:600;color:var(--muted);text-align:left;border-bottom:1px solid var(--border-strong);white-space:nowrap}
+.im-table th:first-child,.im-table td:first-child{padding-left:0}
+.im-table th.num{text-align:right}
+.im-table td{padding:.5rem .4rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.im-table select,.im-table input{width:100%;min-width:0;min-height:42px;padding:0 .65rem;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff;font-size:.98rem;color:var(--text)}
+.im-table select{text-overflow:ellipsis}
+.im-table input{text-align:right}
+.im-table select:focus,.im-table input:focus,.im-money input:focus{border-color:var(--teal);outline:2px solid var(--teal);outline-offset:-1px}
+.im-amount{display:block;padding:0 .4rem;text-align:right;font-weight:700;color:var(--blue);font-variant-numeric:tabular-nums}
+.im-remove{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:0;border-radius:var(--radius-sm);background:none;color:var(--muted);transition:background-color .15s,color .15s}
+.im-remove:hover{background:var(--red-light);color:var(--red)}
+.im-remove svg{width:16px;height:16px}
+.im-table[hidden]{display:none !important}
+.im-empty{padding:1.1rem 0;font-size:.95rem;color:var(--muted);border-top:1px solid var(--border-strong);border-bottom:1px solid var(--border)}
+.im-empty[hidden]{display:none}
+
+.im-add{display:inline-flex;align-items:center;gap:.45rem;margin-top:.75rem;min-height:42px;padding:0 .9rem 0 .7rem;border:1px solid transparent;border-radius:var(--radius);background:none;color:var(--teal-ink);font-size:.95rem;font-weight:600;transition:background-color .15s,border-color .15s}
+.im-add:hover{background:var(--teal-dim);border-color:rgba(0,122,118,.25)}
+
+/* ── Totals and payment ── */
+.im-lines{display:flex;flex-direction:column;gap:.7rem}
+.im-line{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:42px}
+.im-line dt,.im-line dt label{font-size:.98rem;color:var(--text-mid)}
+.im-line dd{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.im-money{display:flex;align-items:center;gap:.4rem;width:10rem;min-height:42px;padding:0 .65rem;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:#fff}
+.im-money:focus-within{border-color:var(--teal);outline:2px solid var(--teal);outline-offset:-1px}
+.im-money>span{font-size:.85rem;font-weight:600;color:var(--muted)}
+.im-money input{flex:1;min-width:0;width:100%;padding:0;border:0;outline:0 !important;background:none;text-align:right;font-size:1rem;font-weight:600;color:var(--text)}
+
+.im-total{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding:1rem 0;border-top:1px solid var(--border-strong);border-bottom:1px solid var(--border-strong)}
+.im-total span{font-size:1.05rem;font-weight:700;color:var(--blue)}
+.im-total strong{font-size:1.65rem;line-height:1.1;font-weight:700;color:var(--blue);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+
+.im-payfull{align-self:flex-start;min-height:40px;margin:-.35rem 0 0 -.5rem;padding:0 .5rem;border:0;border-radius:var(--radius-sm);background:none;color:var(--teal-ink);font-size:.95rem;font-weight:600;text-decoration:underline;text-decoration-color:rgba(0,122,118,.35);text-underline-offset:3px}
+.im-payfull:hover{background:var(--teal-dim)}
+
+.im-balance{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-top:auto;padding:.9rem 1rem;border-radius:var(--radius);font-weight:700;transition:background-color .2s,color .2s}
+.im-balance span{font-size:.98rem;white-space:nowrap}
+.im-balance strong{font-size:1.2rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.im-balance[data-state="due"]{background:var(--red-light);color:var(--red)}
+.im-balance[data-state="paid"]{background:var(--green-light);color:var(--green)}
+.im-balance[data-state="over"]{background:#FCEFD9;color:#7A4B00}
+.im-balance[data-state="empty"]{background:var(--navy-tint);color:var(--text-mid)}
+
+/* ── Footer ── */
+.im-foot{flex:none;display:flex;align-items:center;gap:.5rem;padding:.85rem 1.5rem;background:#fff;border-top:1px solid var(--border)}
+.im-foot .btn-ghost,.im-foot .btn-primary{min-height:44px;padding:0 1.1rem;font-size:.95rem}
+.im-foot .im-save{margin-left:auto;padding:0 1.75rem;border-color:var(--blue)}
+
+/* ── Tablet and phone: sheet from the bottom, one scroll, totals under the acts ── */
+@media(max-width:860px){
+  .modal-panel.im-panel{max-width:100% !important;max-height:94vh;max-height:94dvh;border-radius:14px 14px 0 0;padding:0}
+  .im-head{padding:.8rem .5rem .8rem 1rem}
+  .im-head h2{font-size:1.2rem}
+  .im-body{display:block;overflow-y:auto;overscroll-behavior:contain}
+  .im-main{overflow:visible;padding:1.1rem 1rem 1.25rem}
+  .im-summary{overflow:visible;border-left:0;border-top:1px solid var(--border);padding:1.1rem 1rem 1.4rem}
+  .im-balance{margin-top:.25rem}
+  .im-foot{padding:.75rem 1rem calc(.75rem + env(safe-area-inset-bottom))}
+}
+
+@media(max-width:640px){
+  .im-meta .im-date{width:100%}
+  .im-date-long{padding-bottom:0}
+  .im-meta{margin-bottom:1.4rem}
+
+  /* each act becomes one block: procedure, then qty / price / amount */
+  .im-table,.im-table tbody{display:block}
+  .im-table thead,.im-table colgroup{display:none}
+  .im-table tbody{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .im-table tr{position:relative;display:grid;grid-template-columns:5rem minmax(0,1fr) minmax(0,1fr);gap:.55rem .6rem;padding:.8rem;border-bottom:1px solid var(--border)}
+  .im-table tr:last-child{border-bottom:0}
+  .im-table td,.im-table td:first-child{display:block;padding:0;border:0}
+  .im-table td.im-c-proc{grid-column:1/-1;padding-right:2.4rem}
+  .im-table td.im-c-x{position:absolute;top:.55rem;right:.35rem}
+  .im-table td[data-label]::before{content:attr(data-label);display:block;margin-bottom:.2rem;font-size:.8rem;font-weight:500;color:var(--muted);white-space:nowrap}
+  .im-table select,.im-table input{min-height:46px;font-size:1rem}
+  .im-amount{padding:.7rem 0 0;font-size:1.05rem}
+  .im-remove{width:44px;height:44px}
+  .im-money input{font-size:1rem}
+  .im-money{width:9.5rem;min-height:46px}
+  .im-line{min-height:46px}
+  .im-foot .im-lbl{display:none}
+  .im-foot .btn-ghost{width:48px;padding:0}
+  .im-foot .im-save{flex:1;margin-left:0}
+}
+
+@media print{.modal-panel.im-panel{display:none !important}}

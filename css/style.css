@@ -278,59 +278,6 @@ button:disabled{cursor:not-allowed}
 .modal-submit{width:100%;min-height:46px;font-size:1rem}
 .modal-panel .form-field input,.modal-panel .form-field textarea{background:#fff}
 
-/* ── Invoice modal ────────────────────────────────────────────── */
-.inv-modal-panel{max-width:880px !important}
-.inv-header-strip{padding:1.25rem var(--pad);margin:calc(-1*var(--pad)) calc(-1*var(--pad)) 1.5rem;border-bottom:2px solid var(--teal);display:grid;grid-template-columns:1fr auto;gap:1.5rem;align-items:start}
-.inv-clinic-logo-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.4rem}
-.inv-clinic-logo-row img{width:52px;height:52px;object-fit:contain}
-.inv-clinic-name{font-size:1.2rem;font-weight:700;color:var(--blue)}
-.inv-clinic-loc{font-size:.9rem;color:var(--teal-ink);display:block;font-weight:600}
-.inv-clinic-details{font-size:.9rem;color:var(--muted);line-height:1.6}
-.inv-meta-right{text-align:right}
-.inv-patient-name-display{font-size:1.15rem;font-weight:700;color:var(--blue);margin:.6rem 0 .3rem;word-break:break-word}
-.inv-number-chip{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.35rem .8rem;display:inline-block;text-align:center}
-.inv-number-chip-label{font-size:.8rem;color:var(--muted)}
-.inv-number-chip-val{font-size:1rem;font-weight:700;color:var(--blue)}
-.inv-date-chip{font-size:.95rem;color:var(--muted)}
-.inv-sec-title{font-size:1rem;font-weight:700;color:var(--blue);margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--border-strong);display:flex;justify-content:space-between;align-items:center}
-.inv-details-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.85rem;margin-bottom:1.4rem}
-
-.acts-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:.6rem}
-.acts-table{width:100%;border-collapse:collapse;font-size:.95rem;min-width:560px}
-.acts-table th{font-size:.85rem;font-weight:600;color:var(--muted);padding:.55rem .6rem;text-align:left;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap}
-.acts-table th:not(:first-child){text-align:right}
-.acts-table td{padding:.45rem .4rem;border-bottom:1px solid var(--border);vertical-align:middle}
-.acts-table td:not(:first-child){text-align:right}
-.acts-table tr:last-child td{border-bottom:none}
-.acts-table select,.acts-table input[type="number"]{min-height:38px;padding:0 .55rem;border:1px solid var(--border-strong);border-radius:var(--radius);font-size:.95rem;color:var(--text);background:#fff;width:100%;min-width:0}
-.acts-table select{min-width:200px}
-.acts-table input[type="number"]{text-align:right;width:84px}
-.acts-table select:focus,.acts-table input[type="number"]:focus{border-color:var(--teal);outline:2px solid var(--teal);outline-offset:-1px}
-.acts-table .computed{font-weight:600;color:var(--blue);padding:.3rem .5rem;display:inline-block}
-.del-row-btn{background:none;border:none;color:var(--muted);font-size:.95rem;width:36px;height:36px;border-radius:var(--radius);line-height:1;transition:background-color .15s,color .15s}
-.del-row-btn:hover{color:var(--red);background:var(--red-light)}
-.add-act-btn{background:none;border:1px dashed var(--border-strong);color:var(--text-mid);min-height:40px;padding:0 1rem;border-radius:var(--radius);font-size:.95rem;font-weight:500;width:100%;text-align:left;transition:border-color .15s,color .15s,background-color .15s}
-.add-act-btn:hover{border-color:var(--teal-ink);color:var(--teal-ink);background:var(--teal-dim)}
-
-.inv-discount-row{display:flex;align-items:center;gap:.75rem;margin:.9rem 0;padding:0;flex-wrap:wrap}
-.inv-discount-row label{font-weight:600;color:var(--text-mid);font-size:.95rem}
-.inv-discount-row input{min-height:38px;padding:0 .55rem;border:1px solid var(--border-strong);border-radius:var(--radius);font-size:.95rem;width:96px;text-align:right;background:#fff}
-.inv-totals-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:.5rem}
-.inv-summary-table,.inv-payment-table{width:100%;border-collapse:collapse;font-size:.95rem;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
-.inv-summary-table td,.inv-payment-table td{padding:.55rem .85rem;border-bottom:1px solid var(--border)}
-.inv-summary-table td:last-child{text-align:right;font-weight:600}
-.inv-summary-table tr:last-child td{border-bottom:none;font-weight:700;color:var(--blue);font-size:1.05rem;background:var(--teal-light)}
-.inv-summary-table tr:last-child td:last-child{color:var(--teal-ink)}
-.inv-payment-table td:first-child{font-weight:500;background:var(--surface);width:52%}
-.inv-payment-table td:last-child{text-align:right}
-.inv-payment-table tr:last-child td{border-bottom:none}
-.inv-payment-table td:last-child[style*="font-weight:700"]{font-size:1.05rem}
-.inv-payment-table input{border:1px solid var(--border-strong);border-radius:var(--radius);background:#fff;font-size:.95rem;text-align:right;width:8rem;max-width:100%;min-height:36px;padding:0 .55rem}
-.inv-payment-table input:focus{border-color:var(--teal);outline:2px solid var(--teal);outline-offset:-1px}
-.inv-modal-footer{display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap;position:sticky;bottom:0;background:#fff;margin:1.5rem calc(-1*var(--pad)) calc(-1*var(--pad));padding:.85rem var(--pad);border-top:1px solid var(--border)}
-.inv-modal-footer .btn-ghost,.inv-modal-footer .btn-primary{min-height:42px;font-size:.95rem !important;padding:0 1.25rem !important}
-.inv-modal-footer .btn-ghost{background:#fff !important}
-
 /* ── Print: the patient-facing invoice keeps its own layout ───── */
 @media print {
   @page{size:A4;margin:12mm 15mm}
@@ -409,9 +356,7 @@ button:disabled{cursor:not-allowed}
   .modal-panel{--pad:1.1rem;max-width:100% !important;border-radius:12px 12px 0 0;max-height:94vh;max-height:94dvh;padding-bottom:calc(var(--pad) + env(safe-area-inset-bottom))}
   .modal-overlay .modal-panel{transform:translateY(24px)}
   .modal-overlay.open .modal-panel{transform:none}
-  .inv-meta-right{text-align:left}
-  .inv-modal-footer{padding-bottom:calc(.85rem + env(safe-area-inset-bottom));margin-bottom:calc(-1*var(--pad) - env(safe-area-inset-bottom))}
-  .toast{bottom:calc(5.25rem + env(safe-area-inset-bottom))}
+    .toast{bottom:calc(5.25rem + env(safe-area-inset-bottom))}
 
   /* appointment row: time + actions on top, then who, details, notes */
   .appt-card{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"time actions" "title title" "details details" "notes notes" "edit edit";padding:.75rem .9rem;column-gap:.5rem}
@@ -421,35 +366,10 @@ button:disabled{cursor:not-allowed}
   .appt-card-actions .edit-btn,.appt-card-actions .remind-btn{min-height:38px;padding:0 .9rem}
 }
 
-@media(max-width:640px){
-  .inv-details-grid,.inv-totals-grid,.inv-header-strip{grid-template-columns:1fr}
-  .inv-header-strip{gap:.75rem}
-
-  /* acts table becomes one block per procedure */
-  .acts-wrap{border:none;overflow:visible}
-  .acts-table{min-width:0;display:block}
-  .acts-table thead{display:none}
-  .acts-table tbody{display:block;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
-  .acts-table tr{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .6rem;padding:.75rem;border-bottom:1px solid var(--border);position:relative}
-  .acts-table tr:last-child{border-bottom:none}
-  .acts-table td{display:block;padding:0;border:none;text-align:left !important}
-  .acts-table td:nth-child(1){grid-column:1/-1;padding-right:2.4rem}
-  .acts-table td:nth-child(6){position:absolute;top:.6rem;right:.4rem}
-  .acts-table td:nth-child(n+2):nth-child(-n+5)::before{display:block;font-size:.8rem;font-weight:500;color:var(--muted);margin-bottom:.15rem}
-  .acts-table td:nth-child(2)::before{content:"Qty"}
-  .acts-table td:nth-child(3)::before{content:"Unit price (GHS)"}
-  .acts-table td:nth-child(4)::before{content:"Total (GHS)"}
-  .acts-table td:nth-child(5)::before{content:"Patient share"}
-  .acts-table select,.acts-table input[type="number"]{width:100%;min-height:44px;text-align:left}
-  .acts-table input[type="number"]{text-align:right}
-  .acts-table .computed{padding:.5rem 0;font-size:1rem}
-  .inv-payment-table input{width:7rem}
-}
-
 /* iOS Safari zooms any focused control under 16px */
 @media(max-width:860px){
   .search-wrap input,.patient-search-wrap input,.edit-textarea,.form-field input,.form-field textarea,.form-field select,
-  .acts-table select,.acts-table input[type="number"],.inv-discount-row input,.inv-payment-table input,#actsList input{font-size:1rem !important}
+  #actsList input{font-size:1rem !important}
 }
 
 @media(prefers-reduced-motion:reduce){
