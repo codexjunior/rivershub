@@ -147,3 +147,54 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
   .appt-card-actions{padding-top:.7rem}
   .appt-card-actions .remind-btn,.appt-card-actions .edit-btn{flex:1;min-height:42px}
 }
+
+/* ═══ Phase 3c: drawer icons, patients split fixes, patient detail pane ═══ */
+
+/* Drawer links: icons were unsized SVGs and blew up on phones */
+.drawer-link{display:flex;align-items:center;gap:.8rem;font-size:1rem}
+.drawer-link svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.drawer-link.active svg{stroke:var(--teal)}
+.nav-link.active{border-bottom-color:transparent;box-shadow:none}
+
+/* Desktop 3-column layout must never inherit a dragged mobile height */
+@media(min-width:861px){.patients-left{height:auto!important}}
+@media(max-width:860px){
+  .patients-right{min-height:0}
+  .split-drag-handle{height:26px}
+  .split-drag-bar{width:48px;height:5px}
+}
+
+/* Patient detail: header card + section cards */
+.detail-pane{padding:1.5rem 2rem 3rem;max-width:1000px}
+.detail-pane-header{align-items:center;gap:1rem 1.5rem;margin-bottom:1.1rem;padding:1.25rem 1.5rem;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+.detail-pane-header>div:first-child{min-width:0;flex:1 1 260px}
+.detail-pane-name{font-size:1.5rem;line-height:1.2;letter-spacing:-.01em;overflow-wrap:anywhere}
+.detail-pane-ref{display:inline-block;margin-top:.5rem;padding:.2rem .65rem;border-radius:999px;background:var(--tint-teal);color:#00625F;font-size:.8rem;font-weight:700;letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.pt-facts{display:flex;flex-wrap:wrap;gap:.25rem .5rem;margin-top:.6rem;font-size:.9rem;color:var(--text-mid)}
+.pt-facts span+span::before{content:"·";margin-right:.5rem;color:var(--border-strong)}
+.detail-pane-actions{gap:.5rem}
+.btn-danger{background:#fff;border:1px solid #F0C4BE;color:var(--red)}
+.btn-danger:hover{background:var(--red-light);border-color:var(--red);color:var(--red)}
+.info-card{margin:0 0 1rem;padding:1.1rem 1.25rem;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+.info-card-header{padding:0 0 .75rem;border-bottom:1px solid var(--border)}
+.info-card-title{font-size:1rem;letter-spacing:-.005em}
+.info-card-body{padding:1rem 0 0}
+.info-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem 1.5rem}
+.info-item{gap:.2rem}
+.info-item-label{font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.info-item-value{font-size:.98rem}
+.info-item-value a{color:var(--teal-ink);text-decoration:underline;text-decoration-color:rgba(0,122,118,.35);text-underline-offset:2px}
+.info-notes-box{background:var(--surface);border:0}
+/* the invoice table sits directly in its card (no card inside a card) */
+#invoiceList,#actsManagerBody{margin-top:.5rem;border:0;border-radius:0;background:none;overflow-x:auto}
+@media(max-width:860px){
+  .detail-pane{padding:.9rem .85rem 2.5rem}
+  .detail-pane-header{padding:1rem}
+  .detail-pane-name{font-size:1.3rem}
+  .detail-pane-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+  .detail-pane-actions .btn-primary{grid-column:1/-1}
+  .detail-pane-actions .btn-ghost,.detail-pane-actions .btn-primary{min-height:44px;width:100%}
+  .info-card{padding:1rem}
+  .info-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem 1rem}
+}
+@media(max-width:380px){.info-grid{grid-template-columns:1fr}}
