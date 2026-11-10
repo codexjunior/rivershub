@@ -4,7 +4,7 @@
   "description": "Staff dashboard for Rivers Dental Clinic",
   "private": true,
   "engines": {
-    "node": ">=18.x"
+    "node": "26.x"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.103.0",

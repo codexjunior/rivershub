@@ -1,9 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  LOGIN / LOGOUT
 // ═══════════════════════════════════════════════════════════════
-const savedPw = localStorage.getItem("rdDashPassword");
-if(savedPw){document.getElementById("passwordInput").value=savedPw;attemptLogin();}
-
 document.getElementById("loginBtn").addEventListener("click",attemptLogin);
 document.getElementById("passwordInput").addEventListener("keydown",e=>{if(e.key==="Enter")attemptLogin();});
 
