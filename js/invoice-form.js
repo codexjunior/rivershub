@@ -1,11 +1,10 @@
-
 // ═══════════════════════════════════════════════════════════════
 //  INVOICE MODAL LOGIC
 // ═══════════════════════════════════════════════════════════════
 let invRowCount=0;
 
 function buildActOptions(sel){
-  return`<option value="">- Select procedure -</option>`+ACTS.map(a=>`<option value="${escHtml(a)}"${a===sel?" selected":""}>${escHtml(a)}</option>`).join("");
+  return`<option value="">Select procedure</option>`+ACTS.map(a=>`<option value="${escHtml(a)}"${a===sel?" selected":""}>${escHtml(a)}</option>`).join("");
 }
 
 function invAddActRow(procedure="",qty=1,unitPrice=""){
@@ -13,12 +12,11 @@ function invAddActRow(procedure="",qty=1,unitPrice=""){
   const tbody=document.getElementById("invActsBody");
   const tr=document.createElement("tr");tr.id=`invrow-${id}`;
   tr.innerHTML=`
-    <td><select id="invact-${id}" onchange="invOnActSelect(${id})">${buildActOptions(procedure)}</select></td>
-    <td><input type="number" id="invqty-${id}" value="${qty}" min="1" step="1" oninput="invRecalcRow(${id})"></td>
-    <td><input type="number" id="invup-${id}" value="${unitPrice}" min="0" step="0.01" placeholder="0.00" oninput="invMarkManual(${id});invRecalcRow(${id})"></td>
-    <td><span class="computed" id="invtp-${id}">0.00</span></td>
-    <td><span class="computed" id="invps-${id}">0.00</span></td>
-    <td><button class="del-row-btn" onclick="invDeleteRow(${id})" title="Remove">✕</button></td>`;
+    <td class="im-c-proc"><select id="invact-${id}" aria-label="Procedure" onchange="invOnActSelect(${id})">${buildActOptions(procedure)}</select></td>
+    <td class="im-c-qty" data-label="Qty"><input type="number" id="invqty-${id}" aria-label="Quantity" value="${qty}" min="1" step="1" inputmode="numeric" oninput="invRecalcRow(${id})"></td>
+    <td class="im-c-price" data-label="Unit price (GHS)"><input type="number" id="invup-${id}" aria-label="Unit price" value="${unitPrice}" min="0" step="0.01" inputmode="decimal" placeholder="0.00" oninput="invMarkManual(${id});invRecalcRow(${id})"></td>
+    <td class="im-c-amt" data-label="Amount (GHS)"><span class="im-amount" id="invtp-${id}">0.00</span><span id="invps-${id}" hidden>0.00</span></td>
+    <td class="im-c-x"><button type="button" class="im-remove" onclick="invDeleteRow(${id})" aria-label="Remove this act" title="Remove"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></td>`;
   tbody.appendChild(tr);
   if(procedure&&unitPrice!=="")invRecalcRow(id);
   else if(procedure)invOnActSelect(id);
@@ -41,7 +39,12 @@ function invRecalcRow(id){
   invRecalcTotals();
 }
 function invDeleteRow(id){document.getElementById(`invrow-${id}`)?.remove();invRecalcTotals();invUpdateActCount();}
-function invUpdateActCount(){const c=document.querySelectorAll("[id^='invrow-']").length;document.getElementById("invActCount").textContent=`${c} item${c!==1?"s":""}`;}
+function invUpdateActCount(){
+  const c=document.querySelectorAll("[id^='invrow-']").length;
+  document.getElementById("invActCount").textContent=`${c} item${c!==1?"s":""}`;
+  const hint=document.getElementById("invEmptyHint");if(hint)hint.hidden=c>0;
+  const tbl=document.querySelector(".im-table");if(tbl)tbl.hidden=c===0;
+}
 
 function invRecalcTotals(){
   let tot=0;document.querySelectorAll("[id^='invtp-']").forEach(el=>{tot+=parseFloat(el.textContent)||0;});
@@ -50,17 +53,28 @@ function invRecalcTotals(){
   const paid=parseFloat(document.getElementById("invAmountPaid")?.value)||0;
   const rem=grand-paid;
   document.getElementById("invTotMedActs").textContent=`GHS ${tot.toFixed(2)}`;
-  document.getElementById("invTotDiscount").textContent=`GHS ${dAmt.toFixed(2)}`;
   document.getElementById("invTotGrand").textContent=`GHS ${grand.toFixed(2)}`;
-  document.getElementById("invRemaining").textContent=`GHS ${rem.toFixed(2)}`;
-  document.getElementById("invRemaining").style.color=rem>0.005?"var(--red)":"var(--green)";
+  // state: empty (nothing billed) | due | paid | over. Label and colour both change, so state never relies on colour alone.
+  let state="due",label="Balance due",shown=rem;
+  if(grand<=0.005)      {state="empty";label="Balance";shown=0;}
+  else if(rem<-0.005)   {state="over";label="Overpaid by";shown=-rem;}
+  else if(rem<=0.005)   {state="paid";label="Paid in full";shown=0;}
+  document.getElementById("invRemaining").textContent=`GHS ${shown.toFixed(2)}`;
+  document.getElementById("invBalanceLabel").textContent=label;
+  document.getElementById("imBalance").dataset.state=state;
+}
+function invPayFull(){
+  let tot=0;document.querySelectorAll("[id^='invtp-']").forEach(el=>{tot+=parseFloat(el.textContent)||0;});
+  const dAmt=Math.min(parseFloat(document.getElementById("invDiscountAmt")?.value)||0, tot);
+  document.getElementById("invAmountPaid").value=(tot-dAmt).toFixed(2);
+  invRecalcTotals();
 }
 
 function invUpdateHeader(){
   const num=document.getElementById("invNumber").value.trim();
   const date=document.getElementById("invDate").value;
   document.getElementById("invNumberDisplay").textContent=num||"-";
-  if(date){const d=new Date(date);document.getElementById("invDateDisplay").textContent=d.toLocaleDateString("en-GH",{day:"numeric",month:"long",year:"numeric"});}
+  if(date){const d=new Date(date);document.getElementById("invDateDisplay").textContent=d.toLocaleDateString("en-GH",{weekday:"long",day:"numeric",month:"long",year:"numeric"});}
   else document.getElementById("invDateDisplay").textContent="";
 }
 
@@ -83,11 +97,17 @@ function openInvoiceModal(ref, patientName, invoiceNumber, existingInv){
     existingInv.invoice_items.forEach(it=>invAddActRow(it.procedure,it.qty,it.unit_price));
   }else{invAddActRow();}
   document.getElementById("submitInvoice").textContent=existingInv?"Update Invoice":"Save Invoice";
+  document.getElementById("imTitle").textContent=existingInv?"Edit invoice":"New invoice";
   invUpdateHeader();invRecalcTotals();invUpdateActCount();
   document.getElementById("invoiceModal").classList.add("open");
 }
 
-document.getElementById("addActBtn").addEventListener("click",()=>invAddActRow());
+document.getElementById("addActBtn").addEventListener("click",()=>{
+  invAddActRow();
+  const sels=document.querySelectorAll("#invActsBody select");sels[sels.length-1]?.focus();
+});
+document.getElementById("imPayFull").addEventListener("click",invPayFull);
+document.getElementById("imClose").addEventListener("click",()=>document.getElementById("invoiceModal").classList.remove("open"));
 document.getElementById("invoiceModal").addEventListener("click",e=>{if(e.target===document.getElementById("invoiceModal"))document.getElementById("invoiceModal").classList.remove("open");});
 document.getElementById("submitInvoice").addEventListener("click",async()=>{
   const ref=document.getElementById("invoicePatientRef").value;
