@@ -50,11 +50,7 @@ function invRecalcTotals(){
   let tot=0;document.querySelectorAll("[id^='invtp-']").forEach(el=>{tot+=parseFloat(el.textContent)||0;});
   const dAmt=Math.min(parseFloat(document.getElementById("invDiscountAmt")?.value)||0, tot);
   const grand=tot-dAmt;
-  // Paid so far = what was already recorded on the invoice (read-only) + the payment typed now.
-  const prior=parseFloat(document.getElementById("invPriorPaid").value)||0;
-  const now=Math.max(0,parseFloat(document.getElementById("invPaymentNow").value)||0);
-  const paid=prior+now;
-  document.getElementById("invAmountPaid").value=paid.toFixed(2);
+  const paid=parseFloat(document.getElementById("invAmountPaid")?.value)||0;
   const rem=grand-paid;
   document.getElementById("invTotMedActs").textContent=`GHS ${tot.toFixed(2)}`;
   document.getElementById("invTotGrand").textContent=`GHS ${grand.toFixed(2)}`;
@@ -70,8 +66,8 @@ function invRecalcTotals(){
 function invPayFull(){
   let tot=0;document.querySelectorAll("[id^='invtp-']").forEach(el=>{tot+=parseFloat(el.textContent)||0;});
   const dAmt=Math.min(parseFloat(document.getElementById("invDiscountAmt")?.value)||0, tot);
-  const prior=parseFloat(document.getElementById("invPriorPaid").value)||0;
-  document.getElementById("invPaymentNow").value=Math.max(0,tot-dAmt-prior).toFixed(2);
+  const grand=tot-dAmt;
+  document.getElementById("invAmountPaid").value=grand.toFixed(2);
   invRecalcTotals();
 }
 
