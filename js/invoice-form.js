@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════
+// ═════════════════════════════════════════════════════════════════
 //  INVOICE MODAL LOGIC
-// ═══════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════
 let invRowCount=0;
 
 function buildActOptions(sel){
@@ -46,11 +46,16 @@ function invUpdateActCount(){
   const tbl=document.querySelector(".im-table");if(tbl)tbl.hidden=c===0;
 }
 
+// ── Recalculate totals: reads from visible Amount Paid field, keeps hidden invAmountPaid in sync ──
 function invRecalcTotals(){
   let tot=0;document.querySelectorAll("[id^='invtp-']").forEach(el=>{tot+=parseFloat(el.textContent)||0;});
   const dAmt=Math.min(parseFloat(document.getElementById("invDiscountAmt")?.value)||0, tot);
   const grand=tot-dAmt;
-  const paid=parseFloat(document.getElementById("invAmountPaid")?.value)||0;
+  // User types into invPaymentNow (visible). invPriorPaid holds already-recorded paid amount.
+  const paidNow=parseFloat(document.getElementById("invPaymentNow")?.value)||0;
+  const paidPrior=parseFloat(document.getElementById("invPriorPaid")?.value)||0;
+  const paid=paidNow+paidPrior;
+  document.getElementById("invAmountPaid").value=paid.toFixed(2);   // hidden field used by save/print/email
   const rem=grand-paid;
   document.getElementById("invTotMedActs").textContent=`GHS ${tot.toFixed(2)}`;
   document.getElementById("invTotGrand").textContent=`GHS ${grand.toFixed(2)}`;
@@ -63,11 +68,13 @@ function invRecalcTotals(){
   document.getElementById("invBalanceLabel").textContent=label;
   document.getElementById("imBalance").dataset.state=state;
 }
+
+// ── Mark as paid in full: fills visible amount paid field, triggers recalc ──
 function invPayFull(){
   let tot=0;document.querySelectorAll("[id^='invtp-']").forEach(el=>{tot+=parseFloat(el.textContent)||0;});
   const dAmt=Math.min(parseFloat(document.getElementById("invDiscountAmt")?.value)||0, tot);
   const grand=tot-dAmt;
-  document.getElementById("invAmountPaid").value=grand.toFixed(2);
+  document.getElementById("invPaymentNow").value=grand.toFixed(2);
   invRecalcTotals();
 }
 
@@ -79,41 +86,98 @@ function invUpdateHeader(){
   else document.getElementById("invDateDisplay").textContent="";
 }
 
-
 // OPEN INVOICE MODAL - also accepts existing invoice for editing
-  function openInvoiceModal(ref, patientName, invoiceNumber, existingInv){
-    document.getElementById("invoicePatientRef").value=ref;
-    document.getElementById("editingInvoiceId").value=existingInv?existingInv.id:"";
-    const displayName=patientName||ref;
-    document.getElementById("invPatientName").value=displayName;
-    document.getElementById("invPatientDisplay").textContent=displayName.toUpperCase();
-    // Invoice number = patient reference (as requested)
-    const invNum=existingInv?.invoice_number||invoiceNumber||ref;
-    document.getElementById("invNumber").value=invNum;
-    document.getElementById("invDate").value=existingInv?existingInv.date:new Date().toISOString().split("T")[0];
-    document.getElementById("invDiscountAmt").value=existingInv?existingInv.discount_amount||0:0;
+function openInvoiceModal(ref, patientName, invoiceNumber, existingInv){
+  document.getElementById("invoicePatientRef").value=ref;
+  document.getElementById("editingInvoiceId").value=existingInv?existingInv.id:"";
+  const displayName=patientName||ref;
+  document.getElementById("invPatientName").value=displayName;
+  document.getElementById("invPatientDisplay").textContent=displayName.toUpperCase();
+  // Invoice number = patient reference (as requested)
+  const invNum=existingInv?.invoice_number||invoiceNumber||ref;
+  document.getElementById("invNumber").value=invNum;
+  document.getElementById("invDate").value=existingInv?existingInv.date:new Date().toISOString().split("T")[0];
+  document.getElementById("invDiscountAmt").value=existingInv?existingInv.discount_amount||0:0;
 
-    // ── FIX: robustly load amount_paid from existing invoice ──
-    // API returns amount_paid; fallback to (grand_total - amount_remaining) if missing
-    let loadedPaid = 0;
-    if (existingInv) {
-      if (typeof existingInv.amount_paid === "number") loadedPaid = existingInv.amount_paid;
-      else if (typeof existingInv.amount_paid === "string") loadedPaid = parseFloat(existingInv.amount_paid) || 0;
-      else if (typeof existingInv.grand_total === "number" && typeof existingInv.amount_remaining === "number") {
-        loadedPaid = existingInv.grand_total - existingInv.amount_remaining;
-      } else if (typeof existingInv.grand_total === "string" && typeof existingInv.amount_remaining === "string") {
-        loadedPaid = (parseFloat(existingInv.grand_total) || 0) - (parseFloat(existingInv.amount_remaining) || 0);
-      }
+  // ── Robustly load amount_paid from existing invoice into invPriorPaid ──
+  let loadedPaid = 0;
+  if (existingInv) {
+    if (typeof existingInv.amount_paid === "number") loadedPaid = existingInv.amount_paid;
+    else if (typeof existingInv.amount_paid === "string") loadedPaid = parseFloat(existingInv.amount_paid) || 0;
+    else if (typeof existingInv.grand_total === "number" && typeof existingInv.amount_remaining === "number") {
+      loadedPaid = existingInv.grand_total - existingInv.amount_remaining;
+    } else if (typeof existingInv.grand_total === "string" && typeof existingInv.amount_remaining === "string") {
+      loadedPaid = (parseFloat(existingInv.grand_total) || 0) - (parseFloat(existingInv.amount_remaining) || 0);
     }
-    document.getElementById("invAmountPaid").value = loadedPaid.toFixed(2);
-
-    document.getElementById("invActsBody").innerHTML="";invRowCount=0;
-    if(existingInv&&existingInv.invoice_items&&existingInv.invoice_items.length>0){
-      existingInv.invoice_items.forEach(it=>invAddActRow(it.procedure,it.qty,it.unit_price));
-    }else{invAddActRow();}
-    document.getElementById("submitInvoice").textContent=existingInv?"Update Invoice":"Save Invoice";
-    document.getElementById("imTitle").textContent=existingInv?"Edit invoice":"New invoice";
-    // Recalc AFTER all fields (including amount_paid) and items are loaded
-    invUpdateHeader();invRecalcTotals();invUpdateActCount();
-    document.getElementById("invoiceModal").classList.add("open");
   }
+  // Show already-paid in the "Paid before" row
+  document.getElementById("invPaidBefore").textContent=`GHS ${loadedPaid.toFixed(2)}`;
+  document.getElementById("invPriorPaid").value=loadedPaid.toFixed(2);
+  // User-facing amount paid field starts empty (new payment to add); prior paid is tracked separately
+  document.getElementById("invPaymentNow").value="0";
+
+  document.getElementById("invActsBody").innerHTML="";invRowCount=0;
+  if(existingInv&&existingInv.invoice_items&&existingInv.invoice_items.length>0){
+    existingInv.invoice_items.forEach(it=>invAddActRow(it.procedure,it.qty,it.unit_price));
+  }else{invAddActRow();}
+  document.getElementById("submitInvoice").textContent=existingInv?"Update Invoice":"Save Invoice";
+  document.getElementById("imTitle").textContent=existingInv?"Edit invoice":"New invoice";
+  invUpdateHeader();invRecalcTotals();invUpdateActCount();
+  document.getElementById("invoiceModal").classList.add("open");
+}
+
+// ── Event listeners ──
+document.getElementById("addActBtn").addEventListener("click",()=>{
+  invAddActRow();
+  const sels=document.querySelectorAll("#invActsBody select");sels[sels.length-1]?.focus();
+});
+document.getElementById("imPayFull").addEventListener("click",invPayFull);
+document.getElementById("imClose").addEventListener("click",()=>document.getElementById("invoiceModal").classList.remove("open"));
+document.getElementById("invoiceModal").addEventListener("click",e=>{if(e.target===document.getElementById("invoiceModal"))document.getElementById("invoiceModal").classList.remove("open");});
+document.getElementById("submitInvoice").addEventListener("click",async()=>{
+  const ref=document.getElementById("invoicePatientRef").value;
+  const date=document.getElementById("invDate").value;
+  const editId=document.getElementById("editingInvoiceId").value;
+  const btn=document.getElementById("submitInvoice");
+  if(!date){showToast("Please select a date",true);return;}
+  const items=[];
+  document.querySelectorAll("[id^='invrow-']").forEach(row=>{
+    const rid=row.id.replace("invrow-","");
+    const proc=document.getElementById(`invact-${rid}`)?.value;
+    const qty=parseFloat(document.getElementById(`invqty-${rid}`)?.value)||0;
+    const up=parseFloat(document.getElementById(`invup-${rid}`)?.value)||0;
+    const tp=parseFloat(document.getElementById(`invtp-${rid}`)?.textContent)||0;
+    const ps=parseFloat(document.getElementById(`invps-${rid}`)?.textContent)||0;
+    if(proc)items.push({procedure:proc,qty,unit_price:up,total_price:tp,patient_share:ps});
+  });
+  if(items.length===0){showToast("Add at least one medical act",true);return;}
+
+  const discAmt=parseFloat(document.getElementById("invDiscountAmt").value)||0;
+  const amtPaid=parseFloat(document.getElementById("invAmountPaid").value)||0;
+  const totalMed=items.reduce((s,i)=>s+i.total_price,0);
+  const grandTotal=Math.max(0,totalMed-discAmt);
+  const remaining=grandTotal-amtPaid;
+  const payload={
+    reference_number:ref,
+    invoice_number:document.getElementById("invNumber").value.trim()||null,
+    date,discount_pct:0,discount_amount:discAmt,subtotal:totalMed,
+    grand_total:grandTotal,amount_paid:amtPaid,amount_remaining:remaining,
+    paid:remaining<=0.005,items,
+  };
+  btn.disabled=true;btn.textContent="Saving…";
+  try{
+    let res;
+    if(editId){
+      res=await fetch(`${API_BASE}/api/invoices`,{method:"PATCH",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({...payload,id:editId})});
+    }else{
+      res=await fetch(`${API_BASE}/api/invoices`,{method:"POST",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify(payload)});
+    }
+    const data=await res.json();
+    if(res.ok){
+      document.getElementById("invoiceModal").classList.remove("open");
+      showToast(editId?"✅ Invoice updated":"✅ Invoice saved");
+      refreshInvoiceList();
+    }else showToast(data.error||"Failed",true);
+  }catch{showToast("Network error",true);}
+  btn.disabled=false;btn.textContent=editId?"Update Invoice":"Save Invoice";
+});

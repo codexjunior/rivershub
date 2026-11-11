@@ -69,6 +69,7 @@ async function loadReport(page = 1, withTotals = true) {
     repRenderSummary(data);
     repRenderRows(data.rows || []);
     repRenderPager(data);
+    sortRepRows();          // FIX: re-sort rendered rows by date (newest first)
     box.classList.remove("is-loading");
   } catch (e) {
     if (id !== repReq) return;
@@ -165,6 +166,24 @@ function repOpenPatient(ref) {
   showPage("patients");
   if (allPatients.length === 0) loadPatients();
   viewPatient(ref);
+}
+
+// ── FIX: after each report load, re-sort repContent rows by date (newest first)
+function sortRepRows() {
+  const container = repEl("repContent");
+  if (!container || !container.querySelector(".rep-row")) return;
+  const rows = Array.from(container.querySelectorAll(".rep-row"));
+  rows.sort((a, b) => {
+    const da = new Date(a.cells[0]?.textContent || "").getTime();
+    const db = new Date(b.cells[0]?.textContent || "").getTime();
+    return db - da; // newest first
+  });
+  // re-append sorted rows into tbody
+  const tbody = container.querySelector("tbody");
+  if (tbody) {
+    tbody.innerHTML = "";
+    rows.forEach(r => tbody.appendChild(r));
+  }
 }
 
 // ── Wiring ──────────────────────────────────────────────────────
