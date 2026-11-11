@@ -290,11 +290,18 @@
         <div class="im-total"><span>Total</span><strong id="invTotGrand">GHS 0.00</strong></div>
 
         <dl class="im-lines">
+          <div class="im-line im-prior" id="imPriorRow" hidden>
+            <dt>Paid before</dt>
+            <dd id="invPaidBefore">GHS 0.00</dd>
+          </div>
           <div class="im-line">
-            <dt><label for="invAmountPaid">Amount paid</label></dt>
-            <dd><span class="im-money"><span>GHS</span><input type="number" id="invAmountPaid" value="0" min="0" step="0.01" inputmode="decimal" placeholder="0.00" oninput="invRecalcTotals()"></span></dd>
+            <dt><label for="invPaymentNow" id="invPayLabel">Amount paid</label></dt>
+            <dd><span class="im-money"><span>GHS</span><input type="number" id="invPaymentNow" value="0" min="0" step="0.01" inputmode="decimal" placeholder="0.00" autocomplete="off" oninput="invRecalcTotals()"></span></dd>
           </div>
         </dl>
+        <!-- invAmountPaid = everything paid so far (before + now). Save, print and email read it; it is computed, never typed. -->
+        <input type="hidden" id="invAmountPaid" value="0">
+        <input type="hidden" id="invPriorPaid" value="0">
         <button type="button" class="im-payfull" id="imPayFull">Mark as paid in full</button>
 
         <div class="im-balance" id="imBalance" data-state="empty" aria-live="polite">

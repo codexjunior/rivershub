@@ -164,6 +164,12 @@ async function editInvoice(id){
   const inv=data.invoices.find(i=>i.id===id);
   if(!inv){showToast("Invoice not found",true);return;}
   // open modal pre-filled
-  const p=allPatients.find(p=>p.reference_number===viewingPatient);
-  openInvoiceModal(viewingPatient,p?.name||viewingPatient,viewingPatient,inv);
+  let name=allPatients.find(p=>p.reference_number===viewingPatient)?.name;
+  if(!name){ // patient is not on the current list page: ask the API
+    try{
+      const r=await fetch(`${API_BASE}/api/patients?ref=${encodeURIComponent(viewingPatient)}`,{headers:authHeader()});
+      name=(await r.json()).patient?.name;
+    }catch{}
+  }
+  openInvoiceModal(viewingPatient,name||viewingPatient,viewingPatient,inv);
 }
