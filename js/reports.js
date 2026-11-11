@@ -196,9 +196,33 @@ repEl("repContent").addEventListener("keydown", e => {
   if (row) repOpenPatient(row.dataset.ref);
 });
 
-// Opening the page: defaults to this month; always refreshes (an invoice may have just been saved)
-document.querySelectorAll('[data-page="reports"]').forEach(btn => btn.addEventListener("click", () => {
-  repFillProcedures();
-  if (!repOpened) { repOpened = true; repApplyPreset("month"); }
-  loadReport(1, true);
-}));
+ // Opening the page: defaults to ALL time; always refreshes (an invoice may have just been saved)
+  document.querySelectorAll('[data-page="reports"]').forEach(btn => btn.addEventListener("click", () => {
+    repFillProcedures();
+    if (existingInv && existingInv.amount_paid !== undefined) {
+      loadedPaid = existingInv.amount_paid;
+    } else if (typeof existingInv.amount_paid === "string") {
+      loadedPaid = parseFloat(existingInv.amount_paid) || 0;
+    } else if (typeof existingInv.grand_total === "number" && typeof
+  existingInv.amount_remaining === "number") {
+        loadedPaid = existingInv.grand_total -
+  existingInv.amount_remaining;
+      } else if (typeof existingInv.grand_total === "string" && typeof
+  existingInv.amount_remaining === "string") {
+        loadedPaid = (parseFloat(existingInv.grand_total) || 0) -
+  (parseFloat(existingInv.amount_remaining) || 0);
+      }
+    document.getElementById("invAmountPaid").value = loadedPaid.toFixed(2);
+
+    document.getElementById("invActsBody").innerHTML="";invRowCount=0;
+    if(existingInv&&existingInv.invoice_items&&existingInv.invoice_items
+  .length>0){
+      existingInv.invoice_items.forEach(it=>invAddActRow(it.procedure,it
+  .qty,it.unit_price));
+    }else{invAddActRow();}
+    document.getElementById("submitInvoice").textContent=existingInv?"Up  date Invoice":"Save Invoice";
+    document.getElementById("imTitle").textContent=existingInv?"Edit  invoice":"New invoice";
+    // Recalc AFTER all fields (including amount_paid) and items areloaded
+    invUpdateHeader();invRecalcTotals();invUpdateActCount();
+    document.getElementById("invoiceModal").classList.add("open");
+  }));
