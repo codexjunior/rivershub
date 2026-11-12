@@ -20,7 +20,7 @@ The repo has **Phase 0–3 applied** (latest: **Phase 3c**, 10 Nov 2026). The co
 - §8–14: Systems outside the repo, decisions, roadmap, open items
 - §15: Additional observations / bugs not yet scheduled
 
-**Phases**: 0 (done) → 1 (done, backend/DB hardening) → 2 (done, frontend split into 12 script files) → 3 (done, UI redesign via `css/theme.css` override + appointment cards + patient detail pane) → 4 (Reports page + `/api/reports` — done; fixes: all-invoices view, real-time balance) → 5 (SMS expansion — **not started**)
+**Phases**: 0 (done) → 1 (done, backend/DB hardening) → 2 (done, frontend split into 12 script files) → 3 (done, UI redesign via `css/theme.css` override + appointment cards + patient detail pane) → 4 (Reports page + `/api/reports` — done; 12 Nov: activity-log rewrite, one row per invoice event) → 5 (SMS expansion — **not started**)
 
 ## Development Commands
 
@@ -101,7 +101,7 @@ All handlers are Vercel serverless functions. Shared middleware: `applyCors()` (
 | `/api/sms` | POST | Manual SMS (`{phone,message}`) or cron reminders (`{trigger:"cron"}`) |
 | `/api/sync-patient` | POST | Apps Script webhook: upsert patient into Supabase |
 | `/api/sync-reconcile` | GET/POST | Nightly Supabase ↔ Sheets reconciliation (`dry_run` supported, `MAX_DELETES=25`) |
-| `/api/reports` | GET | **Written but frontend not built** — cross-patient invoice log with filters, totals, CSV export |
+| `/api/reports` | GET | Invoice **activity log** (12 Nov 2026 rewrite): one row per `invoice_history` entry (created / updated / payment) with per-entry `payment` delta; filters, totals, CSV export. All filtering done in memory after deriving deltas |
 
 **Auth**: `Authorization: Bearer TOKEN:PASSWORD` (colon-separated, not space). Separate `SYNC_TOKEN` for machine endpoints (`sync-patient`, `sync-reconcile`, `patients?action=next-ref-public`).
 
@@ -137,13 +137,25 @@ These are the known items that still need attention:
 
 **Open bugs** (§15): mid-day appointments disappear from "Today" count (API only returns "now onward"); password with `:` breaks `authRequest`; credentials in query string for `viewPatient`/`invEmail`; `editInvoice` name lookup fails if patient isn't on current list page; cron SMS can send duplicates; no appointment delete/reschedule from UI; **invoice math fixed**: `invRecalcTotals` now reads from `invPaymentNow` / `invPriorPaid` with real-time balance display.
 
-**Bugs resolved in this session**:
+**Reports rewrite (12 Nov 2026)**:
+- Reports now logs every invoice event, not one row per invoice. `invoice_history` stores *cumulative* snapshots, so `payment = amount_paid − previous snapshot's amount_paid` for the same invoice (e.g. 3000 invoice → +2000 → +500 gives three rows).
+- Fixed prod 500s: `PGRST200` (`invoice_history` has no FK to `patients`, so `patients(name)` can't be embedded — names are now looked up via `invoices.reference_number`) and `.range is not a function`.
+- Totals: Billed = grand_total of *new* invoices in range; Collected = sum of payment deltas in range; Outstanding = latest `amount_remaining` per invoice in range.
+- Items come from `invoice_history.snapshot_items` (carried forward when null, e.g. "Marked paid" rows), falling back to live `invoice_items`.
+- `sortRepRows()` removed (server sorts newest first); frontend table has Event / Payment / Paid-to-date columns.
+- Known limit: whole history is loaded per request (cap 20,000 rows). Deleting an invoice removes it from the log.
+
+**Bugs resolved in an earlier session**:
 - Reports page now defaults to "All time" period, showing all invoices from every patient, sorted newest first
 - Invoice modal Cancel button added; save event listener restored
 - Invoice `invRecalcTotals` now reads from `invPaymentNow` (visible) + `invPriorPaid` (hidden prior paid), with real-time balance update like the discount field
 - Invoice `invPayFull` now correctly sets `invPaymentNow` and triggers full recalc
 - Reports sorting re-sorts rendered rows by date (newest first) after each load
 - API `api/reports.js` correctly embeds `patients.name` so each row shows the patient who owns the invoice
+
+**Bugs resolved (this session)**:
+- **Invoice print/email Amount Paid fix**: Print and email now show the current payment being made (`invPaymentNow`) instead of the cumulative total (`invAmountPaid`). Previously paid amount is shown separately as "Previously Paid" when > 0.
+- **Invoice action icons**: "Mark Paid" uses checkmark icon (outline → filled teal on click), "History" uses clock icon, "Edit" uses pencil icon — all in invoice list and modal.
 
 ## Common Tasks
 

@@ -264,3 +264,33 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
   .rep-table td.num{text-align:left}
   .rep-table td.num::before{content:attr(data-label);display:block;font-size:.68rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 }
+
+/* ═══ Checkmark icon styles for Mark Paid buttons (invoice list + modal) ═══ */
+.im-payfull, .inv-action-btn.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.im-payfull .check-icon-filled,
+.inv-action-btn.toggle .check-icon-filled {
+  display: none;
+}
+
+.im-payfull.paid .check-icon-outline,
+.inv-action-btn.toggle.paid .check-icon-outline {
+  display: none;
+}
+
+.im-payfull.paid .check-icon-filled,
+.inv-action-btn.toggle.paid .check-icon-filled {
+  display: block;
+}
+
+.inv-action-btn.history svg,
+.inv-action-btn.edit svg {
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}

@@ -76,6 +76,14 @@ function invPayFull(){
   const grand=tot-dAmt;
   document.getElementById("invPaymentNow").value=grand.toFixed(2);
   invRecalcTotals();
+
+  // Toggle checkmark icon to filled state
+  const btn = document.getElementById("imPayFull");
+  if (btn) {
+    btn.classList.add("paid");
+    btn.querySelector(".check-icon-outline")?.style.setProperty("display", "none");
+    btn.querySelector(".check-icon-filled")?.style.setProperty("display", "block");
+  }
 }
 
 function invUpdateHeader(){

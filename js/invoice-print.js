@@ -5,7 +5,9 @@ function invPrint(){
   const date=document.getElementById("invDate").value;
   const dateStr=date?new Date(date).toLocaleDateString("en-GH",{day:"numeric",month:"long",year:"numeric"}):"";
   const discAmt=parseFloat(document.getElementById("invDiscountAmt").value)||0;
-  const amtPaid=parseFloat(document.getElementById("invAmountPaid").value)||0;
+  // FIX: Use invPaymentNow (current payment being made) instead of invAmountPaid (cumulative total)
+  const amtPaid=parseFloat(document.getElementById("invPaymentNow")?.value)||0;
+  const priorPaid=parseFloat(document.getElementById("invPriorPaid")?.value)||0;
 
   // Collect rows
   let rowsHtml="";let totalMed=0;
@@ -17,7 +19,7 @@ function invPrint(){
     const tp=qty*up;totalMed+=tp;
     if(proc)rowsHtml+=`<tr><td>${escHtml(proc)}</td><td>${qty}</td><td style="text-align:right">GHS ${up.toFixed(2)}</td><td style="text-align:right">GHS ${tp.toFixed(2)}</td><td style="text-align:right">GHS ${tp.toFixed(2)}</td></tr>`;
   });
-  const grand=Math.max(0,totalMed-discAmt);const rem=grand-amtPaid;
+  const grand=Math.max(0,totalMed-discAmt);const rem=grand-(amtPaid+priorPaid);
   const isFullyPaid=rem<=0.005;
 
   // Watermark logo - centered, 30% opacity
@@ -65,6 +67,7 @@ function invPrint(){
         <div class="print-sec-title">Payment</div>
         <table class="print-payment-table">
           <tr><td>Amount Paid (GHS)</td><td>GHS ${amtPaid.toFixed(2)}</td></tr>
+          ${priorPaid > 0.005 ? `<tr><td style="font-size:10pt;color:var(--muted)">Previously Paid</td><td style="font-size:10pt;text-align:right;color:var(--muted)">GHS ${priorPaid.toFixed(2)}</td></tr>` : ''}
           <tr><td>Remaining Balance</td><td style="font-weight:700;color:${isFullyPaid?"#0B6B4A":"#C0392B"}">GHS ${rem.toFixed(2)}</td></tr>
         </table>
       </div>

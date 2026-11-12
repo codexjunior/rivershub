@@ -33,7 +33,9 @@ async function invEmail() {
   const date     = document.getElementById("invDate").value;
   const dateStr  = date ? new Date(date).toLocaleDateString("en-GH", { day:"numeric", month:"long", year:"numeric" }) : "";
   const discAmt  = parseFloat(document.getElementById("invDiscountAmt").value) || 0;
-  const amtPaid  = parseFloat(document.getElementById("invAmountPaid").value) || 0;
+  // FIX: Use invPaymentNow (current payment) instead of invAmountPaid (cumulative)
+  const amtPaid  = parseFloat(document.getElementById("invPaymentNow")?.value) || 0;
+  const priorPaid = parseFloat(document.getElementById("invPriorPaid")?.value) || 0;
 
   let rowsHtml = ""; let totalMed = 0;
   document.querySelectorAll("[id^='invrow-']").forEach(row => {
@@ -92,6 +94,7 @@ async function invEmail() {
         <div style="font-weight:700;margin-bottom:8px;color:#0A3A63">Payment</div>
         <table style="font-size:13px;width:100%">
           <tr><td>Amount Paid</td><td style="text-align:right">GHS ${amtPaid.toFixed(2)}</td></tr>
+          ${priorPaid > 0.005 ? `<tr><td style="font-size:12px;color:#6B7A8D">Previously Paid</td><td style="text-align:right;font-size:12px;color:#6B7A8D">GHS ${priorPaid.toFixed(2)}</td></tr>` : ''}
           <tr style="font-weight:700;color:${isPaid ? "#0B6B4A" : "#C0392B"}"><td>Remaining</td><td style="text-align:right">GHS ${rem.toFixed(2)}</td></tr>
         </table>
         ${isPaid ? `<div style="margin-top:10px;display:inline-block;background:#E8F8F2;border:1.5px solid #0B6B4A;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700;color:#0B6B4A;text-transform:uppercase">✓ PAID IN FULL</div>` : ""}
