@@ -222,7 +222,7 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
 .rep-warn{padding:.3rem .65rem;border-radius:var(--radius-sm);background:var(--tint-amber);color:#6B4300}
 #repContent.is-loading{opacity:.5;pointer-events:none;transition:opacity .15s}
 
-.rep-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden}
+.rep-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:auto}
 .rep-table{width:100%;border-collapse:collapse;font-size:.92rem}
 .rep-table th{text-align:left;font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:.7rem .9rem;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap}
 .rep-table td{padding:.75rem .9rem;border-bottom:1px solid var(--border);vertical-align:top}
@@ -291,6 +291,4 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
 .inv-action-btn.history svg,
 .inv-action-btn.edit svg {
   stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
 }
