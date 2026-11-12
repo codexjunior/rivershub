@@ -238,7 +238,7 @@ button:disabled{cursor:not-allowed}
 .inv-footer-total{font-size:1.05rem;color:var(--blue);font-weight:700}
 .inv-footer-unpaid{font-size:.95rem;color:var(--red);font-weight:600}
 .inv-actions-cell{display:flex;gap:.25rem;align-items:center;flex-wrap:nowrap; justify-content: space-evenly;}
-.inv-action-btn{font-size:.9rem !important;font-weight:500;background:none;border:none !important;padding:.3rem .5rem !important;min-height:32px;border-radius:var(--radius-sm);color:var(--teal-ink);white-space:nowrap}
+.inv-action-btn{font-size:.9rem !important;font-weight:500;background:none;border:none !important;padding:.1rem .2rem !important;min-height:32px;border-radius:var(--radius-sm);color:var(--teal-ink);white-space:nowrap}
 .inv-action-btn:hover{background:var(--teal-dim);color:var(--teal-ink-hover)}
 .inv-action-btn.history,.inv-action-btn.edit{color:var(--text-mid)}
 .inv-action-btn.del{color:var(--muted)}
