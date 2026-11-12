@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-//  REPORTS (Phase 4): read-only invoice log across all patients
+//  REPORTS (Phase 4): invoice ACTIVITY log (one row per create/update/payment)
 //  Data: GET /api/reports (see api/reports.js). Loaded before main.js.
 // ═══════════════════════════════════════════════════════════════
 const REP_LIMIT = 25;
@@ -9,8 +9,11 @@ let repLastProc = "";          // procedure filter used by the rows on screen (f
 const repEl = id => document.getElementById(id);
 const repMoney = v => Number(v || 0).toLocaleString("en-GH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const repDate = s => s
-  ? new Date(s + "T00:00:00Z").toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" })
+  ? new Date(String(s).length <= 10 ? s + "T00:00:00Z" : s).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" })
   : "-";
+const repTime = s => (s && String(s).length > 10)
+  ? new Date(s).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" })
+  : "";
 const REP_STATUS = { paid: "Paid", partial: "Partly paid", unpaid: "Unpaid" };
 
 // ── Filters ─────────────────────────────────────────────────────
@@ -68,8 +71,7 @@ async function loadReport(page = 1, withTotals = true) {
     if (data.totals) repRenderTotals(data.totals);
     repRenderSummary(data);
     repRenderRows(data.rows || []);
-    repRenderPager(data);
-    sortRepRows();          // FIX: re-sort rendered rows by date (newest first)
+    repRenderPager(data);    
     box.classList.remove("is-loading");
   } catch (e) {
     if (id !== repReq) return;
@@ -89,10 +91,10 @@ function repRenderTotals(t) {
 
 function repRenderSummary(data) {
   const n = data.total || 0;
-  let html = `<span><strong>${n}</strong> invoice${n === 1 ? "" : "s"}</span>`;
+  let html = `<span><strong>${n}</strong> invoice entr${n === 1 ? "y" : "ies"}</span>`;
   const p = data.totals && data.totals.procedure;
   if (p) {
-    html += `<span class="rep-proc">${escHtml(repFilters().procedure.toUpperCase())}: ${p.lines} line${p.lines === 1 ? "" : "s"}, qty ${p.qty}, <strong>GHS ${repMoney(p.subtotal)}</strong> (matching lines only)</span>`;
+    html += `<span class="rep-proc">${escHtml(repFilters().procedure.toUpperCase())}: ${p.lines} line${p.lines === 1 ? "" : "s"}, qty ${p.qty}, <strong>GHS ${repMoney(p.subtotal)}</strong> (matching lines on newly created invoices)</span>`;
   }
   if (data.warning) html += `<span class="rep-warn">${escHtml(data.warning)}</span>`;
   repEl("repSummary").innerHTML = html;
@@ -101,12 +103,12 @@ function repRenderSummary(data) {
 function repRenderRows(rows) {
   const box = repEl("repContent");
   if (rows.length === 0) {
-    box.innerHTML = `<div class="state-msg"><p>No invoices match these filters.</p></div>`;
+    box.innerHTML = `<div class="state-msg"><p>No invoice activity matches these filters.</p></div>`;
     return;
   }
   const pf = repLastProc.toLowerCase();
   let html = `<div class="rep-card"><table class="rep-table"><thead><tr>
-    <th>Date</th><th>Patient</th><th>Procedures</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Remaining</th><th>Status</th>
+    <th>Date</th><th>Patient</th><th>Event</th><th>Procedures</th><th class="num">Invoice total</th><th class="num">Payment</th><th class="num">Paid to date</th><th class="num">Remaining</th><th>Status</th>
   </tr></thead><tbody>`;
   rows.forEach(r => {
     const items = (r.items || []).length
@@ -116,12 +118,18 @@ function repRenderRows(rows) {
         }).join("")}</ul>`
       : "-";
     const due = r.amount_remaining > 0.005;
+    const pay = r.payment;
+    const payCls = pay > 0.005 ? "rep-ok" : pay < -0.005 ? "rep-due" : "";
+    const payTxt = pay > 0.005 ? "+" + repMoney(pay) : pay < -0.005 ? "−" + repMoney(-pay) : "-";
+    const evt = r.event === "created" ? "New invoice" : "Update";
     html += `<tr class="rep-row" data-ref="${escAttr(r.reference_number)}" tabindex="0" title="Open patient">
-      <td data-label="Date">${escHtml(repDate(r.date))}</td>
+      <td data-label="Date">${escHtml(repDate(r.date))}<span class="rep-ref">${escHtml(repTime(r.date))}</span></td>
       <td data-label="Patient"><span class="rep-name">${escHtml(r.name || "No name")}</span><span class="rep-ref">${escHtml(r.reference_number)}</span></td>
+      <td data-label="Event">${escHtml(evt)}${r.note ? `<span class="rep-ref">${escHtml(r.note)}</span>` : ""}</td>
       <td data-label="Procedures">${items}</td>
-      <td class="num" data-label="Total">${repMoney(r.grand_total)}</td>
-      <td class="num" data-label="Paid">${repMoney(r.amount_paid)}</td>
+      <td class="num" data-label="Invoice total">${repMoney(r.grand_total)}</td>
+      <td class="num ${payCls}" data-label="Payment">${payTxt}</td>
+      <td class="num" data-label="Paid to date">${repMoney(r.amount_paid)}</td>
       <td class="num ${due ? "rep-due" : "rep-ok"}" data-label="Remaining">${repMoney(r.amount_remaining)}</td>
       <td data-label="Status"><span class="paid-badge ${escAttr(r.status)}">${escHtml(REP_STATUS[r.status] || r.status)}</span></td>
     </tr>`;
@@ -153,7 +161,7 @@ async function repExport() {
     const text = await res.text();
     const url = URL.createObjectURL(new Blob(["\ufeff" + text], { type: "text/csv;charset=utf-8" }));   // BOM: Excel reads UTF-8
     const a = document.createElement("a");
-    a.href = url; a.download = `rivers-invoices-${getAccraToday()}.csv`;
+    a.href = url; a.download = `rivers-invoice-activity-${getAccraToday()}.csv`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     showToast("CSV downloaded");
@@ -166,24 +174,6 @@ function repOpenPatient(ref) {
   showPage("patients");
   if (allPatients.length === 0) loadPatients();
   viewPatient(ref);
-}
-
-// ── FIX: after each report load, re-sort repContent rows by date (newest first)
-function sortRepRows() {
-  const container = repEl("repContent");
-  if (!container || !container.querySelector(".rep-row")) return;
-  const rows = Array.from(container.querySelectorAll(".rep-row"));
-  rows.sort((a, b) => {
-    const da = new Date(a.cells[0]?.textContent || "").getTime();
-    const db = new Date(b.cells[0]?.textContent || "").getTime();
-    return db - da; // newest first
-  });
-  // re-append sorted rows into tbody
-  const tbody = container.querySelector("tbody");
-  if (tbody) {
-    tbody.innerHTML = "";
-    rows.forEach(r => tbody.appendChild(r));
-  }
 }
 
 // ── Wiring ──────────────────────────────────────────────────────
