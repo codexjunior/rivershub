@@ -20,7 +20,7 @@ The repo has **Phase 0–3 applied** (latest: **Phase 3c**, 10 Nov 2026). The co
 - §8–14: Systems outside the repo, decisions, roadmap, open items
 - §15: Additional observations / bugs not yet scheduled
 
-**Phases**: 0 (done) → 1 (done, backend/DB hardening) → 2 (done, frontend split into 12 script files) → 3 (done, UI redesign via `css/theme.css` override + appointment cards + patient detail pane) → 4 (Reports page + `/api/reports` — **not started**) → 5 (SMS expansion — **not started**)
+**Phases**: 0 (done) → 1 (done, backend/DB hardening) → 2 (done, frontend split into 12 script files) → 3 (done, UI redesign via `css/theme.css` override + appointment cards + patient detail pane) → 4 (Reports page + `/api/reports` — done; fixes: all-invoices view, real-time balance) → 5 (SMS expansion — **not started**)
 
 ## Development Commands
 
@@ -70,10 +70,11 @@ Required for local `vercel dev` or production:
 6. `appointments.js` — `renderAll()`, `changePage()`, notes edit (event-delegated), `sendManualReminder`, new-appointment modal
 7. `patients.js` — `loadPatients()`, `renderPatientList`, `viewPatient(ref)`, `openEditPatientPane`, `submitPatientForm`, `deletePatient`
 8. `invoice-list.js` — `renderInvoiceList`, `viewInvoiceHistory`, `markInvoiceFullyPaid`, `deleteInvoice`, `editInvoice`
-9. `invoice-form.js` — `invAddActRow`, `invRecalcRow/Totals`, `openInvoiceModal`, submit
+9. `invoice-form.js` — `invAddActRow`, `invRecalcRow/Totals`, `openInvoiceModal`, submit, event listeners
 10. `invoice-print.js` — `invPrint` (A4 print layout with watermark + PAID stamp)
 11. `invoice-email.js` — `invEmail` (builds inline-styled HTML, posts to `/api/invoices` `action:"email"`)
-12. `main.js` — **must be last**: saved-password auto-login (`localStorage["rdDashPassword"]`)
+12. `reports.js` — Reports page: `loadReport`, `repRenderRows`, `repRenderPager`, `repExport`, `sortRepRows`, wiring
+13. `main.js` — **must be last**: saved-password auto-login (`localStorage["rdDashPassword"]`)
 
 **Pages** (markup in `index.html`):
 - `#loginScreen` — password gate
@@ -134,7 +135,15 @@ These are the known items that still need attention:
 | **SQL 1b** | — | Confirm `on_patient_deleted` trigger and `notify_patient_deleted()` function dropped | **To confirm** (run two queries, expect 0 rows) |
 | **F4** | Medium | Rotate `SYNC_TOKEN` (value was in a chat once) | **Deferred by owner** |
 
-**Open bugs** (§15): mid-day appointments disappear from "Today" count (API only returns "now onward"); password with `:` breaks `authRequest`; credentials in query string for `viewPatient`/`invEmail`; `editInvoice` name lookup fails if patient isn't on current list page; cron SMS can send duplicates; no appointment delete/reschedule from UI; invoice math is client-trusted.
+**Open bugs** (§15): mid-day appointments disappear from "Today" count (API only returns "now onward"); password with `:` breaks `authRequest`; credentials in query string for `viewPatient`/`invEmail`; `editInvoice` name lookup fails if patient isn't on current list page; cron SMS can send duplicates; no appointment delete/reschedule from UI; **invoice math fixed**: `invRecalcTotals` now reads from `invPaymentNow` / `invPriorPaid` with real-time balance display.
+
+**Bugs resolved in this session**:
+- Reports page now defaults to "All time" period, showing all invoices from every patient, sorted newest first
+- Invoice modal Cancel button added; save event listener restored
+- Invoice `invRecalcTotals` now reads from `invPaymentNow` (visible) + `invPriorPaid` (hidden prior paid), with real-time balance update like the discount field
+- Invoice `invPayFull` now correctly sets `invPaymentNow` and triggers full recalc
+- Reports sorting re-sorts rendered rows by date (newest first) after each load
+- API `api/reports.js` correctly embeds `patients.name` so each row shows the patient who owns the invoice
 
 ## Common Tasks
 
@@ -185,9 +194,10 @@ These are the known items that still need attention:
 │   ├── appointments.js     # Appointments page: list, search, pagination, notes edit, SMS reminders
 │   ├── patients.js         # Patients page: list, view, edit, delete, search, submit
 │   ├── invoice-list.js     # Invoice table render, history, mark paid, delete, edit
-│   ├── invoice-form.js     # Invoice modal: rows, totals, open, save
+│   ├── invoice-form.js     # Invoice modal: rows, totals, open, save, real-time balance recalc
 │   ├── invoice-print.js    # invPrint (A4 print + watermark + PAID stamp)
 │   ├── invoice-email.js    # invEmail (inline HTML → Gmail API)
+│   ├── reports.js          # Reports page: loadReport, rendering, CSV export, date sorting
 │   └── main.js             # Boot: auto-login (MUST be last script; currently empty per F14)
 ├── api/
 │   ├── _auth.js            # authRequest(req): Bearer / body / query auth
