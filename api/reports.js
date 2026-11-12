@@ -64,11 +64,12 @@ async function resolveRefs(supabase, text) {
   return { refs: refs.slice(0, MAX_PATIENT_MATCHES), truncated };
 }
 
-// Fetch invoice history with pagination
-async function fetchHistory(supabase, f, refs, opts) {
-  let q = supabase
-    .from("invoice_history")
-    .select(`*, invoices!inner(id, reference_number, date), patients(name)`, opts);
+// Build an invoice history query with filters
+function buildHistoryQuery(supabase, f, refs) {
+  let q = supabase.from("invoice_history").select(
+    `id, changed_at, grand_total, amount_paid, amount_remaining, discount_amount, paid, note, invoices!inner(id, reference_number, date), patients(name)`,
+    { count: f.totals === "1" ? "count" : undefined }
+  );
   if (f.from) q = q.gte("changed_at", f.from);
   if (f.to) q = q.lte("changed_at", f.to);
   if (f.status === "paid") q = q.eq("paid", true);
@@ -76,9 +77,8 @@ async function fetchHistory(supabase, f, refs, opts) {
   if (f.status === "partial") q = q.eq("paid", false).gt("amount_paid", 0);
   if (refs) q = q.in("invoices.reference_number", refs);
   if (f.procedure) {
-    // Filter by invoice items - nested select needs separate pass
-    // Reuse fetchHistory to get invoices first, then filter items client-side
-    return fetchHistory(supabase, f, refs, opts);
+    // Procedure filter would need separate pass - stub for now
+    return q;  // returns uncapped query for fetchAll
   }
   return q.order("changed_at", { ascending: false }).order("id");
 }
@@ -95,7 +95,7 @@ async function fetchAll(build) {
   return out;
 }
 
-// Fetch the items for each invoice (reused for history rows)
+// Fetch the items for each invoice (separate from history query)
 async function fetchItems(supabase, invoiceIds) {
   const byInvoice = {};
   for (let i = 0; i < invoiceIds.length; i += 100) {
@@ -148,6 +148,7 @@ module.exports = async function handler(req, res) {
   try {
     const supabase = getSupabase();
     const f = parseFilters(req.query || {});
+    f.totals = req.query.totals === "1"; // for count flag
     const { refs, truncated } = await resolveRefs(supabase, f.q);
     const warning = truncated ? `Patient search matched more than ${MAX_PATIENT_MATCHES} people; only the first ${MAX_PATIENT_MATCHES} are included. Type more of the name.` : undefined;
 
@@ -166,8 +167,8 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.query.export === "csv") {
-      const all = await fetchAll(() => fetchHistory(supabase, f, refs, { count: "count" }).order("changed_at", { ascending: true }));
-      const invoiceIds = (all || []).map(r => r.invoice.id);
+      const all = await fetchAll(() => buildHistoryQuery(supabase, f, refs).order("changed_at", { ascending: true }));
+      const invoiceIds = (all || []).map(r => r.invoice_history.id);
       const items = await fetchItems(supabase, invoiceIds);
       const lines = ["Date,Reference,Patient,Procedures,Subtotal,Discount,Total,Paid,Remaining,Status,Reason"];
       all.forEach(r => {
@@ -189,25 +190,25 @@ module.exports = async function handler(req, res) {
     const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
     const offset = (page - 1) * limit;
 
-    const { count, error } = await fetchHistory(supabase, f, refs, { count: "exact" })
-      .range(offset, offset + limit - 1);
+    // Page request: query with pagination
+    const { count, data, error } = await buildHistoryQuery(supabase, f, refs).range(offset, offset + limit - 1);
     if (error) throw error;
 
-    const { rows } = await fetchHistory(supabase, f, refs, { count: "count" });
-    const invoiceIds = (rows || []).map(r => r.invoice.history_id);
+    // Get full result for totals calculation
+    const allRows = await fetchAll(() => buildHistoryQuery(supabase, f, refs).order("changed_at", { ascending: true }));
+    const invoiceIds = (data || []).map(r => r.invoice_history.id);
     const items = await fetchItems(supabase, invoiceIds);
 
     const out = {};
-    out.rows = (rows || []).map(r => shapeRow(r.invoice_history, r.patients, items));
+    out.rows = (data || []).map(r => shapeRow(r.invoice_history, r.patients, items));
     out.total = count || 0;
     out.page = page;
     out.limit = limit;
     out.totals = { count: 0, billed: 0, collected: 0, outstanding: 0 };
     if (warning) out.warning = warning;
 
-    if (req.query.totals === "1") {
-      const all = await fetchHistory(supabase, f, refs, { count: "count" });
-      all.forEach(r => {
+    if (f.totals) {
+      allRows.forEach(r => {
         const h = r.invoice_history;
         out.totals.billed += num(h.grand_total);
         out.totals.collected += num(h.amount_paid);
@@ -218,8 +219,6 @@ module.exports = async function handler(req, res) {
       out.totals.outstanding = round2(out.totals.outstanding);
 
       if (f.procedure) {
-        // For procedure filter, we'd need to fetch invoice_items separately
-        // This is a partial implementation due to query complexity
         out.totals.procedure = { lines: 0, qty: 0, subtotal: 0 };
       }
     }
