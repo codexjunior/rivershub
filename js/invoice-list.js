@@ -24,7 +24,6 @@ function renderInvoiceList(invoices,total,unpaid){
         <div class="inv-actions-cell">
           ${actionBtn}
           <button title ="Edit" class="inv-action-btn edit" onclick="editInvoice('${inv.id}')" aria-label="Edit invoice">
-            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
           <svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path fill="#444" d="M16 4c0 0 0-1-1-2s-1.9-1-1.9-1l-1.1 1.1v-2.1h-12v16h12v-8l4-4zM6.3 11.4l-0.6-0.6 0.3-1.1 1.5 1.5-1.2 0.2zM7.2 9.5l-0.6-0.6 5.2-5.2c0.2 0.1 0.4 0.3 0.6 0.5zM14.1 2.5l-0.9 1c-0.2-0.2-0.4-0.3-0.6-0.5l0.9-0.9c0.1 0.1 0.3 0.2 0.6 0.4zM11 15h-10v-14h10v2.1l-5.9 5.9-1.1 4.1 4.1-1.1 2.9-3v6z"></path></svg>
             </button>
           <button title ="View History" class="inv-action-btn history" onclick="viewInvoiceHistory('${inv.id}','${escAttr(inv.invoice_number||inv.date)}')" aria-label="View history">

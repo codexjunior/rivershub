@@ -122,12 +122,12 @@ function repRenderRows(rows) {
     const payCls = pay > 0.005 ? "rep-ok" : pay < -0.005 ? "rep-due" : "";
     const payTxt = pay > 0.005 ? "+" + repMoney(pay) : pay < -0.005 ? "−" + repMoney(-pay) : "-";
     const evt = r.event === "created" ? "New invoice" : "Update";
-    html += `<tr class="rep-row" data-ref="${escAttr(r.reference_number)}" tabindex="0" title="Open patient" style="
-    text-wrap: nowrap">
+    html += `<tr class="rep-row" data-ref="${escAttr(r.reference_number)}" tabindex="0" title="Open patient">
       <td data-label="Date">${escHtml(repDate(r.date))}<span class="rep-ref">${escHtml(repTime(r.date))}</span></td>
-      <td data-label="Patient"><span class="rep-name">${escHtml(r.name || "No name")}</span><span class="rep-ref">${escHtml(r.reference_number)}</span></td>
+      <td data-label="Patient" ><span class="rep-name">${escHtml(r.name || "No name")}</span><span class="rep-ref">${escHtml(r.reference_number)}</span></td>
       <td data-label="Event">${escHtml(evt)}${r.note ? `<span class="rep-ref">${escHtml(r.note)}</span>` : ""}</td>
-      <td data-label="Procedures">${items}</td>
+      <td data-label="Procedures" style="
+    text-wrap: nowrap">${items}</td>
       <td class="num" data-label="Invoice total">${repMoney(r.grand_total)}</td>
       <td class="num ${payCls}" data-label="Payment">${payTxt}</td>
       <td class="num" data-label="Paid to date">${repMoney(r.amount_paid)}</td>
