@@ -84,10 +84,13 @@ module.exports = async function handler(req, res) {
   try {
     const auth     = getAuthClient();
     const calendar = google.calendar({ version: "v3", auth });
-    const now      = new Date().toISOString();
+    // Start of today in Accra timezone (UTC+0) so "Today" stat includes mid-day appointments
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const timeMin = startOfDay.toISOString();
     const response = await calendar.events.list({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
-      timeMin: now,
+      timeMin,
       singleEvents: true,
       orderBy: "startTime",
       maxResults: 150,

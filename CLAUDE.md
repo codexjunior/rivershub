@@ -14,13 +14,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Project Phase (from `RIVERSHUB_CONTEXT (1).md`)
 
-The repo has **Phase 0–3 applied** (latest: **Phase 3c**, 10 Nov 2026). The context file `RIVERSHUB_CONTEXT (1).md` is the **single source of truth** for project state — read it before starting new work. It covers:
+The repo has **Phase 0–4 applied** (latest: **Phase 4**, 13 Nov 2026). The context file `RIVERSHUB_CONTEXT (1).md` is the **single source of truth** for project state — read it before starting new work. It covers:
 
-- §1–7: Code as of Phase 3c (current code state)
+- §1–7: Code as of Phase 4 (current code state)
 - §8–14: Systems outside the repo, decisions, roadmap, open items
 - §15: Additional observations / bugs not yet scheduled
 
-**Phases**: 0 (done) → 1 (done, backend/DB hardening) → 2 (done, frontend split into 12 script files) → 3 (done, UI redesign via `css/theme.css` override + appointment cards + patient detail pane) → 4 (Reports page + `/api/reports` — done; 12 Nov: activity-log rewrite, one row per invoice event) → 5 (SMS expansion — **not started**)
+**Phases**: 0 (done) → 1 (done, backend/DB hardening) → 2 (done, frontend split into 12 script files) → 3 (done, UI redesign via `css/theme.css` override + appointment cards + patient detail pane) → 4 (Reports page + `/api/reports` — done; 12 Nov: activity-log rewrite, one row per invoice event; 13 Nov: invoice UI fixes — checkmark icons, print/email amount paid fix) → 5 (SMS expansion — **not started**)
 
 ## Development Commands
 
@@ -156,6 +156,10 @@ These are the known items that still need attention:
 **Bugs resolved (this session)**:
 - **Invoice print/email Amount Paid fix**: Print and email now show the current payment being made (`invPaymentNow`) instead of the cumulative total (`invAmountPaid`). Previously paid amount is shown separately as "Previously Paid" when > 0.
 - **Invoice action icons**: "Mark Paid" uses checkmark icon (outline → filled teal on click), "History" uses clock icon, "Edit" uses pencil icon — all in invoice list and modal.
+- **Appointments "Today" count**: `/api/appointments` now returns full day (00:00–23:59 Accra) instead of "now onward" — mid-day appointments included.
+- **Auth token format**: Changed from `TOKEN:PASSWORD` to `TOKEN|PASSWORD` (pipe separator) to allow passwords containing colons.
+- **Credentials in query string**: `invEmail` and `editInvoice` now use `Authorization` header via `authHeader()` instead of query params.
+- **`editInvoice` name lookup**: Now always fetches patient name from API (primary) instead of relying on `allPatients` (current page only).
 
 ## Common Tasks
 
@@ -185,6 +189,7 @@ These are the known items that still need attention:
 ### Phase 3 Styling (`css/theme.css`)
 - Theme overrides `style.css` only via class/ID selectors — no markup changes needed except the two sidebar SVG icons and `<link>` to `theme.css`.
 - Appointment-card section at end of `theme.css` (Phase 3b) works standalone even if old grid rules in `style.css` are deleted.
+- Checkmark icon toggle styles for "Mark Paid" buttons (invoice list + modal) at end of `theme.css` (Phase 4).
 - Not yet restyled: inner patient detail/edit panes, invoice modal, print and email layouts, dark mode.
 
 ## File Reference Map
@@ -205,10 +210,10 @@ These are the known items that still need attention:
 │   ├── acts.js             # Medical acts loader + manager UI
 │   ├── appointments.js     # Appointments page: list, search, pagination, notes edit, SMS reminders
 │   ├── patients.js         # Patients page: list, view, edit, delete, search, submit
-│   ├── invoice-list.js     # Invoice table render, history, mark paid, delete, edit
-│   ├── invoice-form.js     # Invoice modal: rows, totals, open, save, real-time balance recalc
-│   ├── invoice-print.js    # invPrint (A4 print + watermark + PAID stamp)
-│   ├── invoice-email.js    # invEmail (inline HTML → Gmail API)
+│   ├── invoice-list.js     # Invoice table render, history, mark paid (checkmark icon), delete, edit
+│   ├── invoice-form.js     # Invoice modal: rows, totals, open, save, real-time balance recalc, checkmark icon
+│   ├── invoice-print.js    # invPrint (A4 print + watermark + PAID stamp; shows current payment not cumulative)
+│   ├── invoice-email.js    # invEmail (inline HTML → Gmail API; shows current payment not cumulative)
 │   ├── reports.js          # Reports page: loadReport, rendering, CSV export, date sorting
 │   └── main.js             # Boot: auto-login (MUST be last script; currently empty per F14)
 ├── api/
@@ -238,7 +243,7 @@ These are the known items that still need attention:
 - **Supabase row limit**: 1000 rows/request — any full-table read must paginate with `.range()` (see F12 fix in `sync-reconcile.js`)
 - **Google Sheets**: `values.append` is unreliable; use `values.update` at a calculated row index
 - **Timezone**: Ghana = UTC+0 year-round; UTC date == Ghana date; display uses `timeZone:"Africa/Accra"`
-- **Auth token format**: `Bearer TOKEN:PASSWORD` — colon-separated; a password containing `:` breaks auth (bug #5)
+- **Auth token format**: `Bearer TOKEN|PASSWORD` — pipe-separated (changed 13 Nov); allows passwords containing colons
 - **Invoice number** = patient reference number (every invoice for a patient shares it)
 - **Medical acts**: `medical_acts` table (id, name unique, price, active); cached in `ACTS`/`ACT_PRICES` on login
 - **`patient_share`** always equals row total (no insurance/split logic yet)

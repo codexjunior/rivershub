@@ -126,8 +126,7 @@ function repRenderRows(rows) {
       <td data-label="Date">${escHtml(repDate(r.date))}<span class="rep-ref">${escHtml(repTime(r.date))}</span></td>
       <td data-label="Patient" ><span class="rep-name">${escHtml(r.name || "No name")}</span><span class="rep-ref">${escHtml(r.reference_number)}</span></td>
       <td data-label="Event">${escHtml(evt)}${r.note ? `<span class="rep-ref">${escHtml(r.note)}</span>` : ""}</td>
-      <td data-label="Procedures" style="
-    text-wrap: nowrap">${items}</td>
+      <td data-label="Procedures" class="rep-procedures" style="text-wrap: nowrap">${items}</td>
       <td class="num" data-label="Invoice total">${repMoney(r.grand_total)}</td>
       <td class="num ${payCls}" data-label="Payment">${payTxt}</td>
       <td class="num" data-label="Paid to date">${repMoney(r.amount_paid)}</td>

@@ -7,8 +7,7 @@ async function invEmail() {
   // Try to get patient email from the database
   if (ref) {
     try {
-      const params = new URLSearchParams({ token: API_TOKEN, password: currentPassword, ref });
-      const res = await fetch(`${API_BASE}/api/patients?${params}`);
+      const res = await fetch(`${API_BASE}/api/patients?ref=${encodeURIComponent(ref)}`, { headers: authHeader() });
       const data = await res.json();
       toEmail = data.patient?.email || null;
     } catch { /* fall through to prompt */ }

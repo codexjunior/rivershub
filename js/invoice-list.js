@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════════════
 function renderInvoiceList(invoices,total,unpaid){
   if(invoices.length===0)return`<div style="padding:1.25rem;font-size:0.84rem;color:#b0bec8;font-style:italic">No invoices yet.</div>`;
-  let html=`<div style="overflow-x:auto"><table class="inv-list-table"><thead><tr><th>Date</th><th>No.</th><th>Procedures</th><th>Total</th><th>Remaining</th><th>Status</th><th></th><th></th></tr></thead><tbody>`;
+  let html=`<div style="overflow-x:auto"><table class="inv-list-table"><thead><tr><th>Date</th><th>No.</th><th>Procedures</th><th>Total</th><th>Remaining</th><th>Status</th><th></th></tr></thead><tbody>`;
   invoices.forEach(inv=>{
     const procs=inv.invoice_items&&inv.invoice_items.length>0?inv.invoice_items.map(i=>escHtml(i.procedure)).join(", "):escHtml(inv.procedure||"-");
     const remaining=parseFloat(inv.amount_remaining||0);
@@ -29,7 +29,7 @@ function renderInvoiceList(invoices,total,unpaid){
           <button title ="View History" class="inv-action-btn history" onclick="viewInvoiceHistory('${inv.id}','${escAttr(inv.invoice_number||inv.date)}')" aria-label="View history">
             <svg width="19" height="19" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.5 7.5H7C7 7.63261 7.05268 7.75979 7.14645 7.85355L7.5 7.5ZM7.5 14C3.91015 14 1 11.0899 1 7.5H0C0 11.6421 3.35786 15 7.5 15V14ZM14 7.5C14 11.0899 11.0899 14 7.5 14V15C11.6421 15 15 11.6421 15 7.5H14ZM7.5 1C11.0899 1 14 3.91015 14 7.5H15C15 3.35786 11.6421 0 7.5 0V1ZM7.5 0C3.35786 0 0 3.35786 0 7.5H1C1 3.91015 3.91015 1 7.5 1V0ZM7 3V7.5H8V3H7ZM7.14645 7.85355L10.1464 10.8536L10.8536 10.1464L7.85355 7.14645L7.14645 7.85355Z"/></svg>
           </button>
-          <button title="Delete" class="inv-action-btn history" onclick="deleteInvoice('${inv.id}')" aria-label="Delete invoice"><svg width="19" height="19" viewBox="0 1 23 22"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg></button>
+          <button title="Delete" class="inv-action-btn delete" onclick="deleteInvoice('${inv.id}')" aria-label="Delete invoice"><svg width="19" height="19" viewBox="2 2 23 22"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg></button>
         </div>
       </td>
     </tr>`;
@@ -166,13 +166,11 @@ async function editInvoice(id){
   const res=await fetch(`${API_BASE}/api/invoices?${params}`,{headers:authHeader()});const data=await res.json();
   const inv=data.invoices.find(i=>i.id===id);
   if(!inv){showToast("Invoice not found",true);return;}
-  // open modal pre-filled
-  let name=allPatients.find(p=>p.reference_number===viewingPatient)?.name;
-  if(!name){ // patient is not on the current list page: ask the API
-    try{
-      const r=await fetch(`${API_BASE}/api/patients?ref=${encodeURIComponent(viewingPatient)}`,{headers:authHeader()});
-      name=(await r.json()).patient?.name;
-    }catch{}
-  }
-  openInvoiceModal(viewingPatient,name||viewingPatient,viewingPatient,inv);
+  // Always fetch patient name from API (primary) — avoids pagination issues
+  let name = viewingPatient;
+  try{
+    const r=await fetch(`${API_BASE}/api/patients?ref=${encodeURIComponent(viewingPatient)}`,{headers:authHeader()});
+    name=(await r.json()).patient?.name || viewingPatient;
+  }catch{}
+  openInvoiceModal(viewingPatient,name,viewingPatient,inv);
 }

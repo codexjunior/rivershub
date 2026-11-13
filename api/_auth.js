@@ -7,7 +7,7 @@ function authRequest(req) {
   // Check Authorization header first (most secure)
   const authHeader = req.headers["authorization"] || "";
   if (authHeader.startsWith("Bearer ")) {
-    const [token, password] = authHeader.slice(7).split(":");
+    const [token, password] = authHeader.slice(7).split("|");
     if (token === process.env.DASHBOARD_TOKEN && password === process.env.DASHBOARD_PASSWORD) return true;
   }
   // Fall back to body (POST/PUT/PATCH/DELETE)
