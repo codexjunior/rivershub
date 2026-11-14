@@ -14,16 +14,6 @@ const { createClient } = require("@supabase/supabase-js");
 const { applyCors } = require("./_cors");
 const { google } = require("googleapis");
 
-// ── Generate unique invoice code (e.g., "43e24w") ────────────────────────────
-function generateInvoiceCode() {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
-
 // ── Supabase singleton ────────────────────────────────────────────────────────
 let _supabase = null;
 function getSupabase() {
@@ -151,13 +141,9 @@ module.exports = async function handler(req, res) {
     if (!fields.reference_number || !fields.date || !Array.isArray(items) || items.length === 0)
       return res.status(400).json({ error: "reference_number, date and items[] are required" });
 
-    // Add unique invoice code
-    const invoiceCode = generateInvoiceCode();
-    const invoiceWithCode = { ...fields, invoice_code: invoiceCode };
-
     const { data: inv, error: invErr } = await supabase
       .from("invoices")
-      .insert(invoiceWithCode)
+      .insert(fields)
       .select()
       .single();
     if (invErr) return res.status(500).json({ error: invErr.message });
