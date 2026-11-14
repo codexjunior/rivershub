@@ -51,12 +51,15 @@ async function renderActsList(){
   }
 }
 
-// Hook into showPage to load acts when Acts page is viewed
-const originalShowPage = window.showPage;
-window.showPage = function(pageId){
-  originalShowPage(pageId);
-  if(pageId === "acts" && !actsPageInitialized){
-    setTimeout(() => renderActsList(), 100);
-    actsPageInitialized = true;
-  }
-};
+// Hook into showPage to load acts when Acts page is viewed (only if not already wrapped)
+if(!window.originalShowPageActs){
+  window.originalShowPageActs = window.showPage;
+  const prevShowPage = window.showPage;
+  window.showPage = function(pageId){
+    prevShowPage(pageId);
+    if(pageId === "acts" && !actsPageInitialized){
+      setTimeout(() => renderActsList(), 100);
+      actsPageInitialized = true;
+    }
+  };
+}

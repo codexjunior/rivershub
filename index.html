@@ -243,44 +243,7 @@
         <p style="margin:0.25rem 0 0 0;font-size:0.85rem;color:var(--muted)">Appointment, birthday, holiday, review, and follow-up SMS campaigns</p>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem">
-        <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:1.25rem">
-          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Appointment Reminders</div>
-          <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:0.25rem">13:00 & 18:00 UTC</div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Daily cron: upcoming appointments</div>
-          <button class="btn-primary btn-sm" onclick="testSMSTrigger('cron')" style="width:100%">Send Test</button>
-        </div>
-
-        <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:1.25rem">
-          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Birthday SMS</div>
-          <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:0.25rem">08:00 UTC Daily</div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Personalized birthday wishes</div>
-          <button class="btn-primary btn-sm" onclick="testSMSTrigger('birthday')" style="width:100%">Send Test</button>
-        </div>
-
-        <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:1.25rem">
-          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Holiday Greetings</div>
-          <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:0.25rem">08:00 UTC Daily</div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Ghana public holidays</div>
-          <button class="btn-primary btn-sm" onclick="testSMSTrigger('holiday')" style="width:100%">Send Test</button>
-        </div>
-
-        <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:1.25rem">
-          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Review Reminders</div>
-          <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:0.25rem">08:00 UTC Daily</div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Recall intervals per procedure</div>
-          <button class="btn-primary btn-sm" onclick="testSMSTrigger('review')" style="width:100%">Send Test</button>
-        </div>
-
-        <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:1.25rem">
-          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Follow-up SMS</div>
-          <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:0.25rem">08:00 UTC 4x/year</div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Customer retention messages</div>
-          <button class="btn-primary btn-sm" onclick="testSMSTrigger('followup')" style="width:100%">Send Test</button>
-        </div>
-      </div>
-
-      <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)">
+<div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)">
         <div style="padding:1.5rem;border-bottom:1px solid var(--border)">
           <h2 style="margin:0 0 0.5rem 0;font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text)">Test All SMS Types to One Patient</h2>
           <p style="margin:0;font-size:0.8rem;color:var(--muted)">Send all 5 SMS message types to a single patient to verify messaging (bypasses opt-out checks)</p>

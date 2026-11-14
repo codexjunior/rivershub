@@ -14,20 +14,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Current Project Phase (based on actual codebase files)
 
-The codebase is at **Phase 4** (November 2026), as confirmed by the files present:
-- `js/` has 13 scripts (no sms.js)
-- `.github/workflows/` has only `reconcile.yml` and `reminders.yml` (no sms-birthday.yml, sms-holiday.yml, sms-review.yml)
-- Invoice math is client-side, no server validation
-- No per-user authentication or audit trail
-- Auth token format uses `:` separator
+The codebase is at **Phase 5** (November 2026), confirmed by files present:
+- `js/` has 16 scripts including `acts-page.js`, `reminders-page.js`, `sms.js` (no separate medical acts/reminders pages)
+- `.github/workflows/` has `reconcile.yml`, `reminders.yml`, and all five SMS workflows (birthday, holiday, review, followup)
+- `api/sms.js` endpoint exists for manual SMS and cron triggers
+- SMS opt-out checkboxes in patients form, medical acts recall/months columns implemented
+- `@reminders-page.js` and `@acts-page.js` scripts (June), single-page app structure with `sms.js` (June)
 
 **Phases completed**:
 - 0 + 1: Backend/DB hardening, reference counter, Sheets mirroring via waitUntil, trimmed deps, shared CORS, atomic counter
 - 2: Frontend split into 12 script files (js/config, utils, acts, auth, nav, appointments, patients, invoice-list, invoice-form, invoice-print, invoice-email, reports) + main.js auto-login
 - 3: UI redesign via `css/theme.css` override (sidebar/top-bar, KPI cards, appointment cards, patient detail pane), split-pane fix F15
 - 4: Reports page + `/api/reports` endpoint with invoice activity-log rewrite (one row per invoice event), checkmark icons, print & email amount-paid fix, rep-procedures text wrap on mobile
-
-**Phase 5 (SMS expansion)**: **NOT STARTED**. Context file contains the full Phase 5 spec (schema changes, scheduled cron workflows, UI for opt-outs and SMS logs), but files are not present in the repo yet.
+- 5: SMS expansion (NOT FULLY INTEGRATED): `api/sms.js` endpoint exists (manual SMS + cron triggers birthday/holiday/review/followup), SMS workflows exist (8:00 UTC each), schema additions present (`patients.sms_optouts`, `medical_acts.recall_months`, `holidays` pending DDL), opt-out checkboxes UI implemented in patients form, `@reminders-page.js` and `@acts-page.js` scripts exist but are side-modules (not in main page routing yet)
 
 **Pending fixes applied**:
 - F13: `.split-drag-handle` fix (forced in `theme.css`)
