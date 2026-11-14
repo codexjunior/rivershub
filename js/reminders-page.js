@@ -197,7 +197,7 @@ async function updateSMSOptOut(ref, type, isOptedOut){
     const colMap={'birthday':'sms_optout_birthday','holiday':'sms_optout_holiday','review':'sms_optout_review','followup':'sms_optout_followup'};
     const col=colMap[type];
     const res=await fetch(`${API_BASE}/api/patients`,{
-      method:"PATCH",
+      method:"PUT",
       headers:{"Content-Type":"application/json",...authHeader()},
       body:JSON.stringify({reference_number:ref,[col]:isOptedOut})
     });

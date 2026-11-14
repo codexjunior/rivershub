@@ -244,7 +244,7 @@ module.exports = async function handler(req, res) {
 
     // List with search and pagination
     const page   = parseInt(req.query.page  || "1");
-    const limit = Math.min(parseInt(req.query.limit || "20"), 50);
+    const limit = Math.min(parseInt(req.query.limit || "20"), 500);
     const search = req.query.search || "";
     const offset = (page - 1) * limit;
 
