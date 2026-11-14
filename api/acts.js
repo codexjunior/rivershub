@@ -28,7 +28,7 @@ module.exports = async function handler(req, res) {
     if (!authRequest(req)) return res.status(401).json({ error: "Unauthorized" });
     const { data, error } = await supabase
       .from("medical_acts")
-      .select("id, name, price")
+      .select("id, name, price, review_months")
       .eq("active", true)
       .order("name", { ascending: true });
     if (error) return res.status(500).json({ error: error.message });
@@ -54,8 +54,9 @@ module.exports = async function handler(req, res) {
     if (!body.id) return res.status(400).json({ error: "id is required" });
     const name = (body.name || "").trim().toUpperCase();
     const price = parseFloat(body.price) || 0;
+    const review_months = body.review_months !== undefined && body.review_months !== null ? parseInt(body.review_months) : null;
     const { data, error } = await supabase
-      .from("medical_acts").update({ name, price }).eq("id", body.id).select().single();
+      .from("medical_acts").update({ name, price, review_months }).eq("id", body.id).select().single();
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ success: true, act: data });
   }

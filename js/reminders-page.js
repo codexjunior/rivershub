@@ -60,13 +60,7 @@ async function loadSMSOptOuts(){
     let page = 1;
     let hasMore = true;
     while(hasMore){
-      const url=`${API_BASE}/api/patients?page=${page}&limit=100${authQuery()}`;
-      const res=await fetch(url,{headers:authHeader()});
-      if(!res.ok){
-        console.error(`Failed to fetch patients page ${page}:`,res.status,res.statusText);
-        container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients (${res.status}).</div>`;
-        return;
-      }
+      const res=await fetch(`${API_BASE}/api/patients?page=${page}&limit=100`,{headers:authHeader()});
       const data=await res.json();
       const patients=data.patients||[];
       if(patients.length===0){hasMore=false;break;}
@@ -77,10 +71,7 @@ async function loadSMSOptOuts(){
     allSMSPatients=allPatients;
     if(allSMSPatients.length===0){container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:#b0bec8;font-style:italic">No patients found.</div>`;return;}
     renderSMSPreferencesTable();
-  }catch(e){
-    console.error("Error loading SMS opt-outs:",e);
-    container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients.</div>`;
-  }
+  }catch{container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients.</div>`;}
 }
 
 // Render SMS preferences table with current filter
@@ -185,7 +176,8 @@ if(!window.originalShowPageReminders){
       populateTestPatientDropdown();
       remindersPageInitialized = true;
     }
-};
+  };
+}
 
 // Populate patient dropdown for testing
 async function populateTestPatientDropdown(){
@@ -197,12 +189,7 @@ async function populateTestPatientDropdown(){
     let page = 1;
     let hasMore = true;
     while(hasMore){
-      const url=`${API_BASE}/api/patients?page=${page}&limit=100${authQuery()}`;
-      const res=await fetch(url,{headers:authHeader()});
-      if(!res.ok){
-        console.error(`Failed to fetch patients page ${page}:`,res.status);
-        break;
-      }
+      const res=await fetch(`${API_BASE}/api/patients?page=${page}&limit=100`,{headers:authHeader()});
       const data=await res.json();
       const patients=data.patients||[];
       if(patients.length===0){hasMore=false;break;}
@@ -215,7 +202,7 @@ async function populateTestPatientDropdown(){
       if(patients.length<100){hasMore=false;}
       page++;
     }
-  }catch(e){console.error("Failed to load patients for dropdown:",e);}
+  }catch{console.error("Failed to load patients for dropdown");}
 }
 
 // Send all 5 SMS types to a single patient for testing
