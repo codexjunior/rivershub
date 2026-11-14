@@ -528,7 +528,7 @@ async function handleFollowup(req, res) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// TEST: Send all 5 SMS types to a single patient (for testing with real DB)
+// TEST: Send all SMS types to a single patient (for testing with real DB)
 // ──────────────────────────────────────────────────────────────────────────────
 async function handleTestAll(req, res, body) {
   if (!process.env.MNOTIFY_API_KEY) {
@@ -546,7 +546,7 @@ async function handleTestAll(req, res, body) {
     // Get patient details
     const { data: patient, error: patientErr } = await supabase
       .from("patients")
-      .select("name, phone, birthdate")
+      .select("name, phone")
       .eq("reference_number", ref)
       .single();
 
@@ -554,129 +554,51 @@ async function handleTestAll(req, res, body) {
       return res.status(404).json({ error: "Patient not found or has no phone" });
     }
 
-    const results = { birthday: null, holiday: null, review: null, followup: null, appointment: null };
+    const results = {};
+    let totalSent = 0;
 
-    // 1. Birthday SMS
+    // Test Birthday SMS
     try {
-      const todayMonthDay = getTodayMonthDay();
-      if (patient.birthdate && getDateMonthDay(patient.birthdate) === todayMonthDay) {
-        const msg = `Happy Birthday, ${titleCase(patient.name)}! 🎂 Thank you for choosing Rivers Dental Clinic. Wishing you a year of healthy smiles!`;
-        await sendMnotify(patient.phone, msg);
-        results.birthday = "sent";
-      } else {
-        results.birthday = "not-today";
-      }
+      const msg = `Happy Birthday, ${titleCase(patient.name)}! Thank you for choosing Rivers Dental Clinic. Wishing you a year of healthy smiles!`;
+      await sendMnotify(patient.phone, msg);
+      results.birthday = "sent";
+      totalSent++;
     } catch (e) {
       results.birthday = `error: ${e.message}`;
     }
 
-    // 2. Holiday SMS
+    // Test Holiday SMS
     try {
-      const todayMonthDay = getTodayMonthDay();
-      const holiday = GHANA_HOLIDAYS.find((h) => h.date === todayMonthDay);
-      if (holiday) {
-        await sendMnotify(patient.phone, holiday.message);
-        results.holiday = "sent";
-      } else {
-        results.holiday = "not-today";
-      }
+      const holiday = GHANA_HOLIDAYS[0]; // Send first holiday for test
+      await sendMnotify(patient.phone, holiday.message);
+      results.holiday = "sent";
+      totalSent++;
     } catch (e) {
       results.holiday = `error: ${e.message}`;
     }
 
-    // 3. Review SMS (get latest invoices with recall procedures)
+    // Test Review SMS
     try {
-      const { data: invoices, error: invErr } = await supabase
-        .from("invoice_items")
-        .select("invoice_id, procedure")
-        .ilike("procedure", "%");
-
-      if (!invErr && invoices && invoices.length > 0) {
-        const { data: acts } = await supabase
-          .from("medical_acts")
-          .select("name, review_months")
-          .not("review_months", "is", null)
-          .eq("active", true);
-
-        if (acts && acts.length > 0) {
-          const act = acts[0]; // Send for first act with recall
-          const testDueDate = calculateDueDate(new Date().toISOString().split("T")[0], act.review_months);
-          if (isWithin7Days(testDueDate)) {
-            const msg = `Hello ${titleCase(patient.name)}, it's time for your ${act.name.toLowerCase()} review! Your last appointment was on ${testDueDate}. Please call 030 244 8742 to schedule your visit.`;
-            await sendMnotify(patient.phone, msg);
-            results.review = "sent";
-          } else {
-            results.review = "not-due";
-          }
-        } else {
-          results.review = "no-recalls";
-        }
-      } else {
-        results.review = "no-invoices";
-      }
+      const testMsg = `Hello ${titleCase(patient.name)}, it's time for your dental review! Please call 030 244 8742 to schedule your visit.`;
+      await sendMnotify(patient.phone, testMsg);
+      results.review = "sent";
+      totalSent++;
     } catch (e) {
       results.review = `error: ${e.message}`;
     }
 
-    // 4. Followup SMS (only on followup dates)
+    // Test Followup SMS
     try {
-      const todayMonthDay = getTodayMonthDay();
-      if (FOLLOWUP_SMS_DATES.includes(todayMonthDay)) {
-        const msg = `Hello ${titleCase(patient.name)}, thank you for choosing Rivers Dental Clinic! We appreciate your trust in our services. We look forward to seeing you again soon. Call 030 244 8742 to schedule your next visit.`;
-        await sendMnotify(patient.phone, msg);
-        results.followup = "sent";
-      } else {
-        results.followup = "not-today";
-      }
+      const testMsg = `Hello ${titleCase(patient.name)}, thank you for choosing Rivers Dental Clinic! We appreciate your trust in our services. Call 030 244 8742 to schedule your next visit.`;
+      await sendMnotify(patient.phone, testMsg);
+      results.followup = "sent";
+      totalSent++;
     } catch (e) {
       results.followup = `error: ${e.message}`;
     }
 
-    // 5. Appointment reminder (get tomorrow's appointment if exists)
-    try {
-      const tomorrow = getTomorrowDateStr();
-      const timeMin = new Date(tomorrow + "T00:00:00Z").toISOString();
-      const timeMax = new Date(tomorrow + "T23:59:59Z").toISOString();
-
-      const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
-      const auth = new google.auth.GoogleAuth({
-        credentials,
-        scopes: ["https://www.googleapis.com/auth/calendar.readonly"],
-      });
-      const calendar = google.calendar({ version: "v3", auth });
-      const response = await calendar.events.list({
-        calendarId: process.env.GOOGLE_CALENDAR_ID,
-        timeMin,
-        timeMax,
-        maxResults: 50,
-      });
-
-      const events = response.data.items || [];
-      const patientEvent = events.find((e) => {
-        const desc = e.description || "";
-        return desc.includes(patient.name) || desc.includes(patient.phone);
-      });
-
-      if (patientEvent) {
-        const start = new Date(patientEvent.start.dateTime || patientEvent.start.date);
-        const timeStr = start.toLocaleTimeString("en-GH", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-          timeZone: "Africa/Accra",
-        });
-        const msg = `Hello ${titleCase(patient.name)}, this is a reminder that your appointment is scheduled for ${tomorrow} at ${timeStr}. Please call 030 244 8742 if you would like to reschedule.`;
-        await sendMnotify(patient.phone, msg);
-        results.appointment = "sent";
-      } else {
-        results.appointment = "no-appointment";
-      }
-    } catch (e) {
-      results.appointment = `error: ${e.message}`;
-    }
-
-    console.log(`[sms-test-all] Results for ${ref}:`, results);
-    return res.status(200).json({ ...results, trigger: "test-all", reference_number: ref });
+    console.log(`[sms-test-all] Sent ${totalSent} test SMS to ${ref}`);
+    return res.status(200).json({ ...results, trigger: "test-all", reference_number: ref, totalSent });
   } catch (err) {
     console.error("[sms-test-all] Error:", err.message);
     return res.status(500).json({ error: err.message });

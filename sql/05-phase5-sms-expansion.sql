@@ -3,16 +3,22 @@
 -- Add SMS opt-out flags to patients table
 
 ALTER TABLE medical_acts
-ADD COLUMN review_months INTEGER NULL;
+ADD COLUMN IF NOT EXISTS review_months INTEGER NULL;
 
 -- Comment explaining the column
 COMMENT ON COLUMN medical_acts.review_months IS 'Recall interval in months (e.g., 6 for every 6 months). NULL = no recall/review reminder.';
 
--- Add SMS opt-out flags to patients
+-- Add SMS opt-out flags to patients (each in separate ALTER TABLE)
 ALTER TABLE patients
 ADD COLUMN IF NOT EXISTS sms_optout_birthday BOOLEAN DEFAULT false;
+
+ALTER TABLE patients
 ADD COLUMN IF NOT EXISTS sms_optout_holiday BOOLEAN DEFAULT false;
+
+ALTER TABLE patients
 ADD COLUMN IF NOT EXISTS sms_optout_review BOOLEAN DEFAULT false;
+
+ALTER TABLE patients
 ADD COLUMN IF NOT EXISTS sms_optout_followup BOOLEAN DEFAULT false;
 
 -- Comments

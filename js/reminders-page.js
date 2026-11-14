@@ -55,9 +55,20 @@ async function loadSMSOptOuts(){
   if(!container)return;
   container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading…</div>`;
   try{
-    const res=await fetch(`${API_BASE}/api/patients?page=1&limit=1000`,{headers:authHeader()});
-    const data=await res.json();
-    allSMSPatients=data.patients||[];
+    // Load ALL patients with pagination
+    let allPatients = [];
+    let page = 1;
+    let hasMore = true;
+    while(hasMore){
+      const res=await fetch(`${API_BASE}/api/patients?page=${page}&limit=100`,{headers:authHeader()});
+      const data=await res.json();
+      const patients=data.patients||[];
+      if(patients.length===0){hasMore=false;break;}
+      allPatients=allPatients.concat(patients);
+      if(patients.length<100){hasMore=false;}
+      page++;
+    }
+    allSMSPatients=allPatients;
     if(allSMSPatients.length===0){container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:#b0bec8;font-style:italic">No patients found.</div>`;return;}
     renderSMSPreferencesTable();
   }catch{container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients.</div>`;}
@@ -84,10 +95,10 @@ function renderSMSPreferencesTable(){
   let html=`<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
     <thead><tr>
       <th style="padding:0.5rem 0.85rem;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Patient</th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)" title="Birthday SMS">🎂</th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)" title="Holiday SMS">🎉</th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)" title="Review SMS">⏳</th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)" title="Followup SMS">💌</th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Birthday</th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Holiday</th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Review</th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Followup</th>
     </tr></thead><tbody>`;
 
   filtered.forEach(p=>{
@@ -170,15 +181,24 @@ async function populateTestPatientDropdown(){
   const select=document.getElementById("testPatientRef");
   if(!select)return;
   try{
-    const res=await fetch(`${API_BASE}/api/patients?page=1&limit=1000`,{headers:authHeader()});
-    const data=await res.json();
-    const patients=data.patients||[];
-    patients.forEach(p=>{
-      const opt=document.createElement("option");
-      opt.value=p.reference_number;
-      opt.textContent=`${p.name} (${p.reference_number})`;
-      select.appendChild(opt);
-    });
+    // Load ALL patients with pagination
+    let allPatients = [];
+    let page = 1;
+    let hasMore = true;
+    while(hasMore){
+      const res=await fetch(`${API_BASE}/api/patients?page=${page}&limit=100`,{headers:authHeader()});
+      const data=await res.json();
+      const patients=data.patients||[];
+      if(patients.length===0){hasMore=false;break;}
+      patients.forEach(p=>{
+        const opt=document.createElement("option");
+        opt.value=p.reference_number;
+        opt.textContent=`${p.name} (${p.reference_number})`;
+        select.appendChild(opt);
+      });
+      if(patients.length<100){hasMore=false;}
+      page++;
+    }
   }catch{console.error("Failed to load patients for dropdown");}
 }
 

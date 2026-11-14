@@ -2,6 +2,8 @@
 //  ACTS MANAGEMENT PAGE (Phase 5)
 // ═══════════════════════════════════════════════════════════════
 
+let actsPageInitialized = false;
+
 async function renderActsList(){
   const container=document.getElementById("actsList");
   if(!container)return;
@@ -43,5 +45,18 @@ async function renderActsList(){
     });
     html+=`</tbody></table>`;
     container.innerHTML=html;
-  }catch{container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load acts.</div>`;}
+  }catch(e){
+    console.error("Failed to load acts:",e);
+    container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load acts.</div>`;
+  }
 }
+
+// Hook into showPage to load acts when Acts page is viewed
+const originalShowPage = window.showPage;
+window.showPage = function(pageId){
+  originalShowPage(pageId);
+  if(pageId === "acts" && !actsPageInitialized){
+    setTimeout(() => renderActsList(), 100);
+    actsPageInitialized = true;
+  }
+};
