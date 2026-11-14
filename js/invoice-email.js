@@ -29,6 +29,7 @@ async function invEmail() {
   // Reuse the same HTML that invPrint() builds
   const pName    = document.getElementById("invPatientName").value;
   const invNum   = document.getElementById("invNumber").value || "-";
+  const invCode  = document.getElementById("invCode").value || "";
   const date     = document.getElementById("invDate").value;
   const dateStr  = date ? new Date(date).toLocaleDateString("en-GH", { day:"numeric", month:"long", year:"numeric" }) : "";
   const discAmt  = parseFloat(document.getElementById("invDiscountAmt").value) || 0;
@@ -62,6 +63,7 @@ async function invEmail() {
       <td style="text-align:right">
         <div style="font-size:16px;font-weight:700;color:#0A3A63">${escHtml(pName.toUpperCase())}</div>
         <div style="font-size:12px;color:#6B7A8D">Invoice No: <strong>${escHtml(invNum)}</strong></div>
+        ${invCode?`<div style="font-size:12px;color:#6B7A8D">Code: <strong>#${escHtml(invCode)}</strong></div>`:""}
         <div style="font-size:12px;color:#6B7A8D">${dateStr}</div>
       </td>
     </tr>

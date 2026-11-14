@@ -104,6 +104,11 @@ function openInvoiceModal(ref, patientName, invoiceNumber, existingInv){
   // Invoice number = patient reference (as requested)
   const invNum=existingInv?.invoice_number||invoiceNumber||ref;
   document.getElementById("invNumber").value=invNum;
+  // Display invoice code if it exists (editing), otherwise will be generated on save
+  const invCode=existingInv?.invoice_code||"";
+  const codeDisplay=document.getElementById("invCodeDisplay");
+  if(codeDisplay){codeDisplay.textContent=invCode?`#${invCode}`:"-";}
+  document.getElementById("invCode").value=invCode;
   document.getElementById("invDate").value=existingInv?existingInv.date:new Date().toISOString().split("T")[0];
   document.getElementById("invDiscountAmt").value=existingInv?existingInv.discount_amount||0:0;
 
@@ -182,6 +187,11 @@ document.getElementById("submitInvoice").addEventListener("click",async()=>{
     }
     const data=await res.json();
     if(res.ok){
+      // Capture the generated invoice code and display it
+      if(data.invoice && data.invoice.invoice_code){
+        document.getElementById("invCode").value=data.invoice.invoice_code;
+        document.getElementById("invCodeDisplay").textContent=`#${data.invoice.invoice_code}`;
+      }
       document.getElementById("invoiceModal").classList.remove("open");
       showToast(editId?"✅ Invoice updated":"✅ Invoice saved");
       refreshInvoiceList();

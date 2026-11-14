@@ -15,18 +15,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Current Project Phase (based on actual codebase files)
 
 The codebase is at **Phase 5** (November 2026), confirmed by files present:
-- `js/` has 16 scripts including `acts-page.js`, `reminders-page.js`, `sms.js` (no separate medical acts/reminders pages)
+- `js/` has 16 scripts including `acts-page.js`, `reminders-page.js`, `sms.js`
 - `.github/workflows/` has `reconcile.yml`, `reminders.yml`, and all five SMS workflows (birthday, holiday, review, followup)
 - `api/sms.js` endpoint exists for manual SMS and cron triggers
 - SMS opt-out checkboxes in patients form, medical acts recall/months columns implemented
-- `@reminders-page.js` and `@acts-page.js` scripts (June), single-page app structure with `sms.js` (June)
+- Reminders page with SMS preferences, test patient dropdown, manual SMS, and medical acts management page with search and pagination (20 per page)
+- SMS preferences table paginated (50 per patient per page, loads all 1000+ patients)
 
 **Phases completed**:
 - 0 + 1: Backend/DB hardening, reference counter, Sheets mirroring via waitUntil, trimmed deps, shared CORS, atomic counter
 - 2: Frontend split into 12 script files (js/config, utils, acts, auth, nav, appointments, patients, invoice-list, invoice-form, invoice-print, invoice-email, reports) + main.js auto-login
 - 3: UI redesign via `css/theme.css` override (sidebar/top-bar, KPI cards, appointment cards, patient detail pane), split-pane fix F15
 - 4: Reports page + `/api/reports` endpoint with invoice activity-log rewrite (one row per invoice event), checkmark icons, print & email amount-paid fix, rep-procedures text wrap on mobile
-- 5: SMS expansion (NOT FULLY INTEGRATED): `api/sms.js` endpoint exists (manual SMS + cron triggers birthday/holiday/review/followup), SMS workflows exist (8:00 UTC each), schema additions present (`patients.sms_optouts`, `medical_acts.recall_months`, `holidays` pending DDL), opt-out checkboxes UI implemented in patients form, `@reminders-page.js` and `@acts-page.js` scripts exist but are side-modules (not in main page routing yet)
+- 5: SMS expansion (FULLY INTEGRATED as of 14 Nov 2026): `api/sms.js` endpoint (manual SMS + cron triggers), SMS workflows (8:00 UTC each), schema additions (`patients.sms_optout_*` columns, `medical_acts.review_months`), opt-out checkboxes in patients form, reminders page with SMS preferences (paginated 50/page), acts management page (searchable, paginated 20/page), patient dropdown for test SMS, medical acts support recall months on POST/PUT/GET
 
 **Pending fixes applied**:
 - F13: `.split-drag-handle` fix (forced in `theme.css`)

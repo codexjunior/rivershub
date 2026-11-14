@@ -341,7 +341,7 @@
     <header class="im-head">
       <div class="im-head-main">
         <h2 id="imTitle">New invoice</h2>
-        <p class="im-sub"><span class="im-patient" id="invPatientDisplay">Patient</span><span class="im-ref" id="invNumberDisplay">-</span></p>
+        <p class="im-sub"><span class="im-patient" id="invPatientDisplay">Patient</span><span class="im-ref" id="invNumberDisplay">-</span><span class="im-code" id="invCodeDisplay">-</span></p>
       </div>
       <button type="button" class="im-close" id="imClose" aria-label="Close invoice">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -354,6 +354,7 @@
         <input type="hidden" id="editingInvoiceId">
         <input type="hidden" id="invPatientName">
         <input type="hidden" id="invNumber">
+        <input type="hidden" id="invCode">
 
         <div class="im-meta">
           <div class="form-field im-date">

@@ -2,6 +2,7 @@
 function invPrint(){
   const pName=document.getElementById("invPatientName").value;
   const invNum=document.getElementById("invNumber").value||"-";
+  const invCode=document.getElementById("invCode").value||"";
   const date=document.getElementById("invDate").value;
   const dateStr=date?new Date(date).toLocaleDateString("en-GH",{day:"numeric",month:"long",year:"numeric"}):"";
   const discAmt=parseFloat(document.getElementById("invDiscountAmt").value)||0;
@@ -46,6 +47,7 @@ function invPrint(){
           <div class="print-inv-num-label">Invoice No.</div>
           <div class="print-inv-num-val">${escHtml(invNum)}</div>
         </div>
+        ${invCode?`<div class="print-inv-numbox"><div class="print-inv-num-label">Code</div><div class="print-inv-num-val">#${escHtml(invCode)}</div></div>`:""}
         <div class="print-inv-date">${dateStr}</div>
       </div>
     </div>
