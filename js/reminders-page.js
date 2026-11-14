@@ -3,7 +3,8 @@
 // ═══════════════════════════════════════════════════════════════
 
 let allSMSPatients = []; // Store all patients for filtering
-let smsFilterState = { search: '', filterType: null }; // Current filter state
+let smsFilterState = { search: '', filterType: null, currentPage: 1 }; // Current filter state
+const SMS_PAGE_SIZE = 50;
 
 // Test trigger: manually run a cron job for testing
 async function testSMSTrigger(trigger){
@@ -83,7 +84,7 @@ async function loadSMSOptOuts(){
   }
 }
 
-// Render SMS preferences table with current filter
+// Render SMS preferences table with current filter and pagination
 function renderSMSPreferencesTable(){
   const container=document.getElementById("smsOptOutList");
   let filtered=allSMSPatients;
@@ -101,6 +102,15 @@ function renderSMSPreferencesTable(){
     filtered=filtered.filter(p=>!p.sms_optout_birthday&&!p.sms_optout_holiday&&!p.sms_optout_review&&!p.sms_optout_followup);
   }
 
+  // Pagination
+  const totalPages=Math.ceil(filtered.length/SMS_PAGE_SIZE);
+  if(smsFilterState.currentPage>totalPages&&totalPages>0)smsFilterState.currentPage=totalPages;
+  if(smsFilterState.currentPage<1)smsFilterState.currentPage=1;
+
+  const start=(smsFilterState.currentPage-1)*SMS_PAGE_SIZE;
+  const end=start+SMS_PAGE_SIZE;
+  const pageData=filtered.slice(start,end);
+
   let html=`<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
     <thead><tr>
       <th style="padding:0.5rem 0.85rem;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Patient</th>
@@ -110,7 +120,7 @@ function renderSMSPreferencesTable(){
       <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Followup</th>
     </tr></thead><tbody>`;
 
-  filtered.forEach(p=>{
+  pageData.forEach(p=>{
     const birth = p.sms_optout_birthday ? 'checked' : '';
     const hol = p.sms_optout_holiday ? 'checked' : '';
     const rev = p.sms_optout_review ? 'checked' : '';
@@ -132,26 +142,51 @@ function renderSMSPreferencesTable(){
     </tr>`;
   });
   html+=`</tbody></table>`;
-  html+=`<div style="padding:0.75rem 1rem;background:var(--surface);border-top:1px solid var(--border);font-size:0.8rem;color:var(--muted)">Showing ${filtered.length} of ${allSMSPatients.length} patient(s)</div>`;
-  container.innerHTML=html;
+
+  // Pagination footer
+  let paginationHtml=`<div style="padding:1rem;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;font-size:0.8rem;color:var(--muted)">`;
+  paginationHtml+=`<div>Showing ${pageData.length>0?start+1:0}–${Math.min(end,filtered.length)} of ${filtered.length} patient(s)</div>`;
+
+  if(totalPages>1){
+    paginationHtml+=`<div style="display:flex;gap:0.3rem">`;
+    if(smsFilterState.currentPage>1){
+      paginationHtml+=`<button class="btn-ghost btn-sm" onclick="changeSMSPage(${smsFilterState.currentPage-1})">← Prev</button>`;
+    }
+    paginationHtml+=`<span style="padding:0.3rem 0.6rem;background:white;border:1px solid var(--border);border-radius:4px">${smsFilterState.currentPage}/${totalPages}</span>`;
+    if(smsFilterState.currentPage<totalPages){
+      paginationHtml+=`<button class="btn-ghost btn-sm" onclick="changeSMSPage(${smsFilterState.currentPage+1})">Next →</button>`;
+    }
+    paginationHtml+=`</div>`;
+  }
+  paginationHtml+=`</div>`;
+
+  container.innerHTML=html+paginationHtml;
 }
 
 // Filter SMS preferences by search term
 function filterSMSPreferences(){
   const input=document.getElementById("smsFilterInput")?.value||"";
   smsFilterState.search=input;
+  smsFilterState.currentPage=1;
+  renderSMSPreferencesTable();
+}
+
+// Change SMS page
+function changeSMSPage(page){
+  smsFilterState.currentPage=page;
   renderSMSPreferencesTable();
 }
 
 // Toggle filter button (opted-out / opted-in)
 function toggleSMSFilter(filterType){
   smsFilterState.filterType=smsFilterState.filterType===filterType?null:filterType;
+  smsFilterState.currentPage=1;
   renderSMSPreferencesTable();
 }
 
 // Clear all filters
 function clearSMSFilters(){
-  smsFilterState={search:'',filterType:null};
+  smsFilterState={search:'',filterType:null,currentPage:1};
   document.getElementById("smsFilterInput").value="";
   renderSMSPreferencesTable();
 }
