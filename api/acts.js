@@ -43,9 +43,10 @@ module.exports = async function handler(req, res) {
   if (req.method === "POST") {
     const name = (body.name || "").trim().toUpperCase();
     const price = parseFloat(body.price) || 0;
+    const review_months = body.review_months !== undefined && body.review_months !== null ? parseInt(body.review_months) : null;
     if (!name) return res.status(400).json({ error: "name is required" });
     const { data, error } = await supabase
-      .from("medical_acts").insert({ name, price }).select().single();
+      .from("medical_acts").insert({ name, price, review_months }).select().single();
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ success: true, act: data });
   }
