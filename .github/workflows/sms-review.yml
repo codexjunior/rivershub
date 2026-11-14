@@ -1,0 +1,20 @@
+name: SMS — Review/Recall Reminders
+
+on:
+  schedule:
+    # Every day at 08:00 UTC (08:00 Ghana time)
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  send-review-sms:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Send Review Reminders
+        run: |
+          curl -X POST https://rivershub.vercel.app/api/sms \
+            -H "Authorization: Bearer ${{ secrets.DASHBOARD_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"trigger":"review"}' \
+            --fail

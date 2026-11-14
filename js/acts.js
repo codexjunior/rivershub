@@ -46,9 +46,11 @@ async function renderActsList(){
       <thead><tr>
         <th style="padding:0.5rem 0.85rem;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Procedure</th>
         <th style="padding:0.5rem 0.85rem;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Price (GHS)</th>
+        <th style="padding:0.5rem 0.85rem;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Recall (months)</th>
         <th style="padding:0.5rem 0.85rem;background:var(--surface);border-bottom:1px solid var(--border);width:120px"></th>
       </tr></thead><tbody>`;
     acts.forEach(a=>{
+      const recallVal = a.review_months !== null && a.review_months !== undefined ? a.review_months : '';
       html+=`<tr style="border-bottom:1px solid var(--border)">
         <td style="padding:0.45rem 0.85rem">
           <input type="text" value="${escAttr(a.name)}" id="act-name-${a.id}"
@@ -56,6 +58,10 @@ async function renderActsList(){
         </td>
         <td style="padding:0.45rem 0.85rem">
           <input type="number" value="${a.price}" id="act-price-${a.id}" min="0" step="0.01"
+            style="border:1px solid var(--border);border-radius:6px;padding:0.28rem 0.5rem;font-size:0.79rem;font-family:'Plus Jakarta Sans',sans-serif;width:80px;text-align:right">
+        </td>
+        <td style="padding:0.45rem 0.85rem">
+          <input type="number" value="${recallVal}" id="act-recall-${a.id}" min="0" step="1" placeholder="—"
             style="border:1px solid var(--border);border-radius:6px;padding:0.28rem 0.5rem;font-size:0.79rem;font-family:'Plus Jakarta Sans',sans-serif;width:80px;text-align:right">
         </td>
         <td style="padding:0.45rem 0.85rem">
@@ -74,14 +80,17 @@ async function renderActsList(){
 async function saveNewAct(){
   const name=(document.getElementById("newActName").value||"").trim().toUpperCase();
   const price=parseFloat(document.getElementById("newActPrice").value)||0;
+  const reviewMonthsVal=document.getElementById("newActRecall")?.value;
+  const reviewMonths=reviewMonthsVal?parseInt(reviewMonthsVal):null;
   if(!name){showToast("Please enter a procedure name",true);return;}
   try{
-    const res=await fetch(`${API_BASE}/api/acts`,{method:"POST",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({name,price})});
+    const res=await fetch(`${API_BASE}/api/acts`,{method:"POST",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({name,price,review_months:reviewMonths})});
     const data=await res.json();
     if(res.ok){
       showToast("✅ Act added");
       document.getElementById("newActName").value="";
       document.getElementById("newActPrice").value="";
+      document.getElementById("newActRecall").value="";
       await loadMedicalActs();   // refresh the in-memory list for dropdowns
       await renderActsList();
     }else showToast(data.error||"Failed",true);
@@ -91,9 +100,11 @@ async function saveNewAct(){
 async function updateAct(id){
   const name=(document.getElementById(`act-name-${id}`)?.value||"").trim().toUpperCase();
   const price=parseFloat(document.getElementById(`act-price-${id}`)?.value)||0;
+  const reviewMonthsVal=document.getElementById(`act-recall-${id}`)?.value;
+  const reviewMonths=reviewMonthsVal?parseInt(reviewMonthsVal):null;
   if(!name){showToast("Name cannot be empty",true);return;}
   try{
-    const res=await fetch(`${API_BASE}/api/acts`,{method:"PUT",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({id,name,price})});
+    const res=await fetch(`${API_BASE}/api/acts`,{method:"PUT",headers:{"Content-Type":"application/json",...authHeader()},body:JSON.stringify({id,name,price,review_months:reviewMonths})});
     const data=await res.json();
     if(res.ok){showToast("✅ Act updated");await loadMedicalActs();await renderActsList();}
     else showToast(data.error||"Failed",true);

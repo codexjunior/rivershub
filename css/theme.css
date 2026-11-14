@@ -162,6 +162,8 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
   .patients-right{min-height:0}
   .split-drag-handle{height:26px}
   .split-drag-bar{width:48px;height:5px}
+  /* Enable text wrap for procedure fields on small screens */
+  .rep-procedures{text-wrap: wrap !important}
 }
 
 /* Patient detail: header card + section cards */
@@ -263,7 +265,6 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
   .rep-table td:nth-child(7){grid-area:status;text-align:right}
   .rep-table td.num{text-align:left}
   .rep-table td.num::before{content:attr(data-label);display:block;font-size:.68rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-  .rep-procedures{text-wrap:warp}
 }
 
 /* ═══ Checkmark icon styles for Mark Paid buttons (invoice list + modal) ═══ */

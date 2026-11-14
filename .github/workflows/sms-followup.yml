@@ -1,0 +1,20 @@
+name: SMS — Follow-up / Retention
+
+on:
+  schedule:
+    # Every day at 08:00 UTC (08:00 Ghana time)
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  send-followup-sms:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Send Follow-up SMS
+        run: |
+          curl -X POST https://rivershub.vercel.app/api/sms \
+            -H "Authorization: Bearer ${{ secrets.DASHBOARD_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"trigger":"followup"}' \
+            --fail

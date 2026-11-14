@@ -54,6 +54,8 @@
     <div class="nav-links">
       <button class="nav-link active" data-page="appointments"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Appointments</button>
 <button class="nav-link" data-page="patients"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .6 3.3 2.3 3.5 5.2"/></svg>Patients</button>
+<button class="nav-link" data-page="acts"><svg viewBox="0 0 24 24"><path d="M3 3h6v6H3V3zm0 9h6v6H3v-6zm9-9h6v6h-6V3zm0 9h6v6h-6v-6z"/></svg>Acts</button>
+<button class="nav-link" data-page="reminders"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5s-5 2.24-5 5v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6-2c1.66 0 3 1.34 3 3v2h-6V6c0-1.66 1.34-3 3-3z"/></svg>Reminders</button>
 <button class="nav-link" data-page="reports"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6"/></svg>Reports</button>
       <div class="nav-divider"></div>
       <button class="logout-btn" id="logoutBtn">Sign Out</button>
@@ -76,6 +78,8 @@
     <div class="drawer-nav">
       <button class="drawer-link active" data-page="appointments"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Appointments</button>
       <button class="drawer-link" data-page="patients"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .6 3.3 2.3 3.5 5.2"/></svg>Patients</button>
+      <button class="drawer-link" data-page="acts"><svg viewBox="0 0 24 24"><path d="M3 3h6v6H3V3zm0 9h6v6H3v-6zm9-9h6v6h-6V3zm0 9h6v6h-6v-6z"/></svg>Acts</button>
+      <button class="drawer-link" data-page="reminders"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5s-5 2.24-5 5v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6-2c1.66 0 3 1.34 3 3v2h-6V6c0-1.66 1.34-3 3-3z"/></svg>Reminders</button>
       <button class="drawer-link" data-page="reports"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3z"/><path d="M9 8h6M9 12h6"/></svg>Reports</button>
     </div>
     <div class="drawer-footer">
@@ -194,6 +198,142 @@
       <div id="repContent"></div>
       <div class="pagination" id="repPagination"></div>
 
+    </div>
+  </div>
+
+  <!-- ═══ ACTS MANAGEMENT PAGE (Phase 5) ═══ -->
+  <div class="page" id="page-acts">
+    <div class="acts-wrap">
+      <div class="controls">
+        <h1 style="margin:0;font-size:1.35rem;color:var(--text)">Medical Acts & Recall Intervals</h1>
+        <p style="margin:0.25rem 0 0 0;font-size:0.85rem;color:var(--muted)">Manage procedures, prices, and recall reminders</p>
+      </div>
+
+      <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)">
+        <div style="padding:1.5rem;border-bottom:1px solid var(--border)">
+          <h2 style="margin:0 0 1rem 0;font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text)">Add New Procedure</h2>
+          <div style="display:flex;gap:0.65rem;flex-wrap:wrap;align-items:flex-end">
+            <div class="form-field" style="margin-bottom:0;flex:1;min-width:160px">
+              <label>Procedure Name</label>
+              <input type="text" id="newActName" placeholder="e.g. SCALING AND POLISHING" style="text-transform:uppercase">
+            </div>
+            <div class="form-field" style="margin-bottom:0;width:110px">
+              <label>Price (GHS)</label>
+              <input type="number" id="newActPrice" placeholder="0.00" min="0" step="0.01">
+            </div>
+            <div class="form-field" style="margin-bottom:0;width:110px">
+              <label>Recall (months)</label>
+              <input type="number" id="newActRecall" placeholder="—" min="0" step="1">
+            </div>
+            <button class="btn-primary btn-sm" onclick="saveNewAct()">+ Add Act</button>
+          </div>
+        </div>
+        <div id="actsList" style="max-height:600px;overflow-y:auto">
+          <div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading acts…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ REMINDERS PAGE (Phase 5 SMS) ═══ -->
+  <div class="page" id="page-reminders">
+    <div class="reminders-wrap">
+      <div class="controls">
+        <h1 style="margin:0;font-size:1.35rem;color:var(--text)">SMS Reminders & Follow-ups</h1>
+        <p style="margin:0.25rem 0 0 0;font-size:0.85rem;color:var(--muted)">Appointment, birthday, holiday, review, and follow-up SMS campaigns</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem">
+        <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:1.25rem">
+          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Appointment Reminders</div>
+          <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:0.25rem">13:00 & 18:00 UTC</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Daily cron: upcoming appointments</div>
+          <button class="btn-primary btn-sm" onclick="testSMSTrigger('cron')" style="width:100%">Send Test</button>
+        </div>
+
+        <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:1.25rem">
+          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Birthday SMS</div>
+          <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:0.25rem">08:00 UTC Daily</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Personalized birthday wishes</div>
+          <button class="btn-primary btn-sm" onclick="testSMSTrigger('birthday')" style="width:100%">Send Test</button>
+        </div>
+
+        <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:1.25rem">
+          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Holiday Greetings</div>
+          <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:0.25rem">08:00 UTC Daily</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Ghana public holidays</div>
+          <button class="btn-primary btn-sm" onclick="testSMSTrigger('holiday')" style="width:100%">Send Test</button>
+        </div>
+
+        <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:1.25rem">
+          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Review Reminders</div>
+          <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:0.25rem">08:00 UTC Daily</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Recall intervals per procedure</div>
+          <button class="btn-primary btn-sm" onclick="testSMSTrigger('review')" style="width:100%">Send Test</button>
+        </div>
+
+        <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:1.25rem">
+          <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Follow-up SMS</div>
+          <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:0.25rem">08:00 UTC 4x/year</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Customer retention messages</div>
+          <button class="btn-primary btn-sm" onclick="testSMSTrigger('followup')" style="width:100%">Send Test</button>
+        </div>
+      </div>
+
+      <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)">
+        <div style="padding:1.5rem;border-bottom:1px solid var(--border)">
+          <h2 style="margin:0 0 0.5rem 0;font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text)">Test All SMS Types to One Patient</h2>
+          <p style="margin:0;font-size:0.8rem;color:var(--muted)">Send all 5 SMS message types to a single patient to verify messaging (bypasses opt-out checks)</p>
+        </div>
+        <div style="padding:1.5rem;display:flex;gap:0.65rem;flex-wrap:wrap;align-items:flex-end">
+          <div class="form-field" style="margin-bottom:0;flex:1;min-width:250px">
+            <label>Select Patient</label>
+            <select id="testPatientRef" style="border:1px solid var(--border);border-radius:6px;padding:0.5rem;font-size:0.85rem;font-family:'Plus Jakarta Sans',sans-serif;width:100%">
+              <option value="">-- Choose a patient --</option>
+            </select>
+          </div>
+          <button class="btn-primary btn-sm" onclick="sendTestToPatient()" style="min-width:150px">Send All Test SMS</button>
+        </div>
+      </div>
+
+      <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)">
+        <div style="padding:1.5rem;border-bottom:1px solid var(--border)">
+          <h2 style="margin:0 0 0.5rem 0;font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text)">Send Manual SMS</h2>
+          <p style="margin:0;font-size:0.8rem;color:var(--muted)">Send a one-off message to a patient</p>
+        </div>
+        <div style="padding:1.5rem;display:flex;gap:0.65rem;flex-wrap:wrap;align-items:flex-end">
+          <div class="form-field" style="margin-bottom:0;flex:1;min-width:200px">
+            <label>Phone Number</label>
+            <input type="tel" id="manualSMSPhone" placeholder="0244 123 456 or 233244123456">
+          </div>
+          <div class="form-field" style="margin-bottom:0;flex:1;min-width:300px">
+            <label>Message</label>
+            <input type="text" id="manualSMSMessage" placeholder="Type your message here…">
+          </div>
+          <button class="btn-primary btn-sm" onclick="sendManualSMS()">Send SMS</button>
+        </div>
+      </div>
+
+      <div id="smsLogArea" style="margin-top:1.5rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+          <h2 style="font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text);margin:0">Patient SMS Preferences</h2>
+          <div class="patient-search-wrap" style="flex:0 0 250px">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="smsFilterInput" placeholder="Search patient name…" oninput="filterSMSPreferences()">
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap">
+          <button class="btn-ghost btn-sm" onclick="toggleSMSFilter('opted-out')">Show Opted Out</button>
+          <button class="btn-ghost btn-sm" onclick="toggleSMSFilter('opted-in')">Show Opted In</button>
+          <button class="btn-ghost btn-sm" onclick="clearSMSFilters()">Clear Filters</button>
+        </div>
+        <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)">
+          <div style="padding:1rem;max-height:600px;overflow-y:auto" id="smsOptOutList">
+            <div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading…</div>
+          </div>
+        </div>
+        <p style="font-size:0.75rem;color:var(--muted);margin-top:0.75rem;font-style:italic">Checked = opted out (will NOT receive that SMS type). Uncheck to enable.</p>
+      </div>
     </div>
   </div>
 
@@ -345,6 +485,8 @@
 <script src="js/invoice-print.js"></script>
 <script src="js/invoice-email.js"></script>
 <script src="js/reports.js"></script>
+<script src="js/acts-page.js"></script>
+<script src="js/reminders-page.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

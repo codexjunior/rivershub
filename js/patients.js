@@ -145,6 +145,10 @@ async function viewPatient(ref){
               <label>Price (GHS)</label>
               <input type="number" id="newActPrice" placeholder="0.00" min="0" step="0.01">
             </div>
+            <div class="form-field" style="margin-bottom:0;width:110px">
+              <label>Recall (months)</label>
+              <input type="number" id="newActRecall" placeholder="—" min="0" step="1">
+            </div>
             <button class="btn-primary btn-sm" onclick="saveNewAct()">+ Add Act</button>
           </div>
           <div id="actsList" style="max-height:320px;overflow-y:auto">
