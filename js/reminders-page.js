@@ -56,31 +56,54 @@ async function loadSMSOptOuts(){
   if(!container)return;
   container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading…</div>`;
   try{
-    // Load ALL patients with pagination
-    let allPatients = [];
+    /* Load first page only (100 patients), render it, load more in background */
     let page = 1;
-    let hasMore = true;
-    while(hasMore){
-      const url=`${API_BASE}/api/patients?page=${page}&limit=100${authQuery()}`;
+    let firstPageLoaded = false;
+
+    const loadPage = async (pageNum) => {
+      const url=`${API_BASE}/api/patients?page=${pageNum}&limit=100${authQuery()}`;
       const res=await fetch(url,{headers:authHeader()});
       if(!res.ok){
-        console.error(`Failed to fetch patients page ${page}:`,res.status,res.statusText);
-        container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients (${res.status}).</div>`;
-        return;
+        if(pageNum === 1){
+          console.error(`Failed to fetch patients page ${pageNum}:`,res.status);
+          container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients (${res.status}).</div>`;
+        }
+        return null;
       }
-      const data=await res.json();
-      const patients=data.patients||[];
-      if(patients.length===0){hasMore=false;break;}
-      allPatients=allPatients.concat(patients);
-      if(patients.length<100){hasMore=false;}
+      return await res.json();
+    };
+
+    // Load first page immediately
+    const firstData = await loadPage(1);
+    if(!firstData) return;
+    const firstPatients = firstData.patients || [];
+    allSMSPatients = [...firstPatients];
+    firstPageLoaded = true;
+
+    if(allSMSPatients.length===0){
+      container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:#b0bec8;font-style:italic">No patients found.</div>`;
+      return;
+    }
+
+    renderSMSPreferencesTable();
+
+    // Load remaining pages in background (don't block render)
+    page = 2;
+    while(true){
+      const data = await loadPage(page);
+      if(!data) break;
+      const patients = data.patients || [];
+      if(patients.length === 0) break;
+      allSMSPatients = allSMSPatients.concat(patients);
+      if(patients.length < 100) break;
       page++;
     }
-    allSMSPatients=allPatients;
-    if(allSMSPatients.length===0){container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:#b0bec8;font-style:italic">No patients found.</div>`;return;}
-    renderSMSPreferencesTable();
+
   }catch(e){
     console.error("Error loading SMS opt-outs:",e);
-    container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients.</div>`;
+    if(allSMSPatients.length === 0){
+      container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients.</div>`;
+    }
   }
 }
 
@@ -111,53 +134,15 @@ function renderSMSPreferencesTable(){
   const end=start+SMS_PAGE_SIZE;
   const pageData=filtered.slice(start,end);
 
-  let html=`<div style="margin-bottom:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap">
-    <strong style="flex:0 0 auto;margin-top:0.25rem;self:baseline">Check all:</strong>
-    <button class="btn-ghost btn-sm" onclick="checkAllSMS('birthday')">Birthday</button>
-    <button class="btn-ghost btn-sm" onclick="checkAllSMS('holiday')">Holiday</button>
-    <button class="btn-ghost btn-sm" onclick="checkAllSMS('review')">Review</button>
-    <button class="btn-ghost btn-sm" onclick="checkAllSMS('followup')">Followup</button>
-    <strong style="flex:0 0 auto;margin-top:0.25rem;self:baseline">Uncheck all:</strong>
-    <button class="btn-ghost btn-sm" onclick="uncheckAllSMS('birthday')">Birthday</button>
-    <button class="btn-ghost btn-sm" onclick="uncheckAllSMS('holiday')">Holiday</button>
-    <button class="btn-ghost btn-sm" onclick="uncheckAllSMS('review')">Review</button>
-    <button class="btn-ghost btn-sm" onclick="uncheckAllSMS('followup')">Followup</button>
-  </div>
-  <table style="width:100%;border-collapse:collapse;font-size:0.8rem">
-    <thead><tr>
-      <th style="padding:0.5rem 0.85rem;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Patient</th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Birthday <span style="font-size:0.55rem">(opted-out)</span></th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Holiday <span style="font-size:0.55rem">(opted-out)</span></th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Review <span style="font-size:0.55rem">(opted-out)</span></th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Followup <span style="font-size:0.55rem">(opted-out)</span></th>
-    </tr></thead><tbody>`;
+  let html=`<div style="margin-bottom:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap"><strong style="flex:0 0 auto;margin-top:0.25rem">Check all:</strong><button class="btn-ghost btn-sm" onclick="checkAllSMS('birthday')">Birthday</button><button class="btn-ghost btn-sm" onclick="checkAllSMS('holiday')">Holiday</button><button class="btn-ghost btn-sm" onclick="checkAllSMS('review')">Review</button><button class="btn-ghost btn-sm" onclick="checkAllSMS('followup')">Followup</button><strong style="flex:0 0 auto;margin-top:0.25rem">Uncheck all:</strong><button class="btn-ghost btn-sm" onclick="uncheckAllSMS('birthday')">Birthday</button><button class="btn-ghost btn-sm" onclick="uncheckAllSMS('holiday')">Holiday</button><button class="btn-ghost btn-sm" onclick="uncheckAllSMS('review')">Review</button><button class="btn-ghost btn-sm" onclick="uncheckAllSMS('followup')">Followup</button></div><table style="width:100%;border-collapse:collapse;font-size:0.8rem"><thead><tr><th style="padding:0.5rem 0.85rem;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Patient</th><th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Birthday <span style="font-size:0.55rem">(opted-out)</span></th><th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Holiday <span style="font-size:0.55rem">(opted-out)</span></th><th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Review <span style="font-size:0.55rem">(opted-out)</span></th><th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Followup <span style="font-size:0.55rem">(opted-out)</span></th></tr></thead><tbody>`;
 
   pageData.forEach(p=>{
-    const birth = p.sms_optout_birthday ? 'checked' : '';
-    const hol = p.sms_optout_holiday ? 'checked' : '';
-    const rev = p.sms_optout_review ? 'checked' : '';
-    const fup = p.sms_optout_followup ? 'checked' : '';
-    html+=`<tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:0.45rem 0.85rem"><strong>${escHtml(p.name)}</strong><br><span style="font-size:0.7rem;color:var(--muted)">${escHtml(p.reference_number)}</span></td>
-      <td style="padding:0.45rem 0.85rem;text-align:center">
-        <input type="checkbox" id="optout-birth-${p.reference_number}" ${birth} onchange="updateSMSOptOut('${p.reference_number}','birthday',this.checked)">
-      </td>
-      <td style="padding:0.45rem 0.85rem;text-align:center">
-        <input type="checkbox" id="optout-hol-${p.reference_number}" ${hol} onchange="updateSMSOptOut('${p.reference_number}','holiday',this.checked)">
-      </td>
-      <td style="padding:0.45rem 0.85rem;text-align:center">
-        <input type="checkbox" id="optout-rev-${p.reference_number}" ${rev} onchange="updateSMSOptOut('${p.reference_number}','review',this.checked)">
-      </td>
-      <td style="padding:0.45rem 0.85rem;text-align:center">
-        <input type="checkbox" id="optout-fup-${p.reference_number}" ${fup} onchange="updateSMSOptOut('${p.reference_number}','followup',this.checked)">
-      </td>
-    </tr>`;
+    html+=`<tr style="border-bottom:1px solid var(--border)"><td style="padding:0.45rem 0.85rem"><strong>${escHtml(p.name)}</strong><br><span style="font-size:0.7rem;color:var(--muted)">${escHtml(p.reference_number)}</span></td><td style="padding:0.45rem 0.85rem;text-align:center"><input type="checkbox" id="optout-birth-${p.reference_number}" ${p.sms_optout_birthday?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','birthday',this.checked)"></td><td style="padding:0.45rem 0.85rem;text-align:center"><input type="checkbox" id="optout-hol-${p.reference_number}" ${p.sms_optout_holiday?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','holiday',this.checked)"></td><td style="padding:0.45rem 0.85rem;text-align:center"><input type="checkbox" id="optout-rev-${p.reference_number}" ${p.sms_optout_review?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','review',this.checked)"></td><td style="padding:0.45rem 0.85rem;text-align:center"><input type="checkbox" id="optout-fup-${p.reference_number}" ${p.sms_optout_followup?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','followup',this.checked)"></td></tr>`;
   });
   html+=`</tbody></table>`;
 
   // Pagination footer
-  let paginationHtml=`<div style="padding:1rem;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;font-size:0.8rem;color:var(--muted)">`;
-  paginationHtml+=`<div>Showing ${pageData.length>0?start+1:0}–${Math.min(end,filtered.length)} of ${filtered.length} patient(s)</div>`;
+  let paginationHtml=`<div style="padding:1rem;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;font-size:0.8rem;color:var(--muted)"><div>Showing ${pageData.length>0?start+1:0}–${Math.min(end,filtered.length)} of ${filtered.length} patient(s)</div>`;
 
   if(totalPages>1){
     paginationHtml+=`<div style="display:flex;gap:0.3rem">`;
@@ -191,12 +176,15 @@ function changeSMSPage(page){
 
 // Check all checkboxes for a specific SMS type (visible page only)
 function checkAllSMS(type){
-  const checkboxes = document.querySelectorAll(`input[type="checkbox"][id^="optout-${type}-"]`);
+  const checkboxes = document.querySelectorAll(`input[type="checkbox"][id*="optout-${type}-"]`);
   let count = 0;
   checkboxes.forEach(cb => {
     if(!cb.checked){
       cb.checked = true;
       count++;
+      /* Trigger update for each checkbox */
+      const ref = cb.id.replace(`optout-${type}-`, '');
+      updateSMSOptOut(ref, type, true);
     }
   });
   if(count > 0) showToast(`Checked ${count} ${type} opt-outs`);
@@ -204,12 +192,15 @@ function checkAllSMS(type){
 
 // Uncheck all checkboxes for a specific SMS type (visible page only)
 function uncheckAllSMS(type){
-  const checkboxes = document.querySelectorAll(`input[type="checkbox"][id^="optout-${type}-"]`);
+  const checkboxes = document.querySelectorAll(`input[type="checkbox"][id*="optout-${type}-"]`);
   let count = 0;
   checkboxes.forEach(cb => {
     if(cb.checked){
       cb.checked = false;
       count++;
+      /* Trigger update for each checkbox */
+      const ref = cb.id.replace(`optout-${type}-`, '');
+      updateSMSOptOut(ref, type, false);
     }
   });
   if(count > 0) showToast(`Unchecked ${count} ${type} opt-outs`);
@@ -248,18 +239,13 @@ async function updateSMSOptOut(ref, type, isOptedOut){
 let remindersPageInitialized = false;
 
 // Override showPage to initialize pages when switched (only if not already wrapped)
-if(!window.originalShowPageReminders){
-  window.originalShowPageReminders = window.showPage;
-  const prevShowPage = window.showPage;
-  window.showPage = function(pageId){
-    prevShowPage(pageId);
-    if(pageId === "reminders" && !remindersPageInitialized){
-      loadSMSOptOuts();
-      populateTestPatientDropdown();
-      remindersPageInitialized = true;
-    }
-  };
-}
+if(!window.pageInitializers){window.pageInitializers={};}
+window.pageInitializers.reminders=function(){
+  if(remindersPageInitialized)return;
+  loadSMSOptOuts();
+  populateTestPatientDropdown();
+  remindersPageInitialized = true;
+};
 
 // Populate patient dropdown for testing
 async function populateTestPatientDropdown(){

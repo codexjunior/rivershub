@@ -47,6 +47,10 @@ function showPage(pageId){
   const navKey=pageId.startsWith("patient")?"patients":pageId;
   document.querySelectorAll(`[data-page="${navKey}"]`).forEach(b=>b.classList.add("active"));
   closeDrawer();
+  // Trigger page initializers (acts, reminders, etc.)
+  if(window.pageInitializers && window.pageInitializers[pageId]){
+    window.pageInitializers[pageId]();
+  }
 }
 document.querySelectorAll("[data-page]").forEach(btn=>{
   btn.addEventListener("click",()=>{
