@@ -111,13 +111,25 @@ function renderSMSPreferencesTable(){
   const end=start+SMS_PAGE_SIZE;
   const pageData=filtered.slice(start,end);
 
-  let html=`<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+  let html=`<div style="margin-bottom:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap">
+    <strong style="flex:0 0 auto;margin-top:0.25rem;self:baseline">Check all:</strong>
+    <button class="btn-ghost btn-sm" onclick="checkAllSMS('birthday')">Birthday</button>
+    <button class="btn-ghost btn-sm" onclick="checkAllSMS('holiday')">Holiday</button>
+    <button class="btn-ghost btn-sm" onclick="checkAllSMS('review')">Review</button>
+    <button class="btn-ghost btn-sm" onclick="checkAllSMS('followup')">Followup</button>
+    <strong style="flex:0 0 auto;margin-top:0.25rem;self:baseline">Uncheck all:</strong>
+    <button class="btn-ghost btn-sm" onclick="uncheckAllSMS('birthday')">Birthday</button>
+    <button class="btn-ghost btn-sm" onclick="uncheckAllSMS('holiday')">Holiday</button>
+    <button class="btn-ghost btn-sm" onclick="uncheckAllSMS('review')">Review</button>
+    <button class="btn-ghost btn-sm" onclick="uncheckAllSMS('followup')">Followup</button>
+  </div>
+  <table style="width:100%;border-collapse:collapse;font-size:0.8rem">
     <thead><tr>
       <th style="padding:0.5rem 0.85rem;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Patient</th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Birthday</th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Holiday</th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Review</th>
-      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Followup</th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Birthday <span style="font-size:0.55rem">(opted-out)</span></th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Holiday <span style="font-size:0.55rem">(opted-out)</span></th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Review <span style="font-size:0.55rem">(opted-out)</span></th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Followup <span style="font-size:0.55rem">(opted-out)</span></th>
     </tr></thead><tbody>`;
 
   pageData.forEach(p=>{
@@ -175,6 +187,32 @@ function filterSMSPreferences(){
 function changeSMSPage(page){
   smsFilterState.currentPage=page;
   renderSMSPreferencesTable();
+}
+
+// Check all checkboxes for a specific SMS type (visible page only)
+function checkAllSMS(type){
+  const checkboxes = document.querySelectorAll(`input[type="checkbox"][id^="optout-${type}-"]`);
+  let count = 0;
+  checkboxes.forEach(cb => {
+    if(!cb.checked){
+      cb.checked = true;
+      count++;
+    }
+  });
+  if(count > 0) showToast(`Checked ${count} ${type} opt-outs`);
+}
+
+// Uncheck all checkboxes for a specific SMS type (visible page only)
+function uncheckAllSMS(type){
+  const checkboxes = document.querySelectorAll(`input[type="checkbox"][id^="optout-${type}-"]`);
+  let count = 0;
+  checkboxes.forEach(cb => {
+    if(cb.checked){
+      cb.checked = false;
+      count++;
+    }
+  });
+  if(count > 0) showToast(`Unchecked ${count} ${type} opt-outs`);
 }
 
 // Toggle filter button (opted-out / opted-in)

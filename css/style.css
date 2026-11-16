@@ -67,9 +67,9 @@ button:disabled{cursor:not-allowed}
 .btn-primary:hover,.save-btn:hover,.modal-submit:hover,.login-btn:hover{background:var(--teal-ink-hover);border-color:var(--teal-ink-hover)}
 .btn-ghost,.cancel-edit-btn,.edit-btn,.remind-btn,.page-btn{background:#fff;color:var(--text-mid);border:1px solid var(--border-strong);font-weight:500}
 .btn-ghost:hover,.cancel-edit-btn:hover,.edit-btn:hover,.remind-btn:hover,.page-btn:hover:not(:disabled){border-color:var(--teal-ink);color:var(--teal-ink)}
-.btn-sm{min-height:32px;padding:0 .75rem;font-size:.85rem}
+.btn-sm{min-height:36px;padding:0 .75rem;font-size:.85rem}
 .btn-primary:disabled,.save-btn:disabled,.modal-submit:disabled{opacity:.55}
-.edit-btn,.remind-btn,.cancel-edit-btn,.save-btn{min-height:32px;padding:0 .75rem;font-size:.85rem}
+.edit-btn,.remind-btn,.cancel-edit-btn,.save-btn{min-height:36px;padding:0 .75rem;font-size:.85rem}
 
 /* ── Login ────────────────────────────────────────────────────── */
 .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:var(--blue)}
@@ -99,7 +99,7 @@ button:disabled{cursor:not-allowed}
 .nav-link:hover{color:#fff;background:rgba(255,255,255,.08)}
 .nav-link.active{color:#fff;font-weight:600;box-shadow:inset 0 -3px 0 var(--teal)}
 .nav-divider{width:1px;align-self:center;height:20px;background:rgba(255,255,255,.18);margin:0 .5rem}
-.logout-btn{align-self:center;font-size:.9rem;color:rgba(255,255,255,.78);background:none;border:1px solid rgba(255,255,255,.28);padding:0 .85rem;min-height:34px;border-radius:var(--radius);transition:color .15s,border-color .15s}
+.logout-btn{align-self:center;font-size:.9rem;color:rgba(255,255,255,.78);background:none;border:1px solid rgba(255,255,255,.28);padding:0 .85rem;min-height:44px;border-radius:var(--radius);transition:color .15s,border-color .15s}
 .logout-btn:hover{color:#fff;border-color:rgba(255,255,255,.6)}
 .hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:44px;height:44px;margin-right:-.5rem;background:none;border:none}
 .hamburger span{width:22px;height:2px;background:#fff;border-radius:1px}
@@ -176,7 +176,7 @@ button:disabled{cursor:not-allowed}
 
 /* Pagination (appointments + patient list) */
 .pagination{display:flex;align-items:center;justify-content:center;gap:.3rem;margin-top:1.5rem;padding-top:1rem}
-.page-btn{min-width:36px;min-height:36px;padding:0 .7rem;font-size:.9rem}
+.page-btn{border-radius:var(--radius-sm);min-width:44px;min-height:44px;padding:0 .7rem;font-size:.9rem}
 .page-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
 .page-btn:disabled{opacity:.4}
 .page-ellipsis{color:var(--muted);padding:0 .15rem}
@@ -185,6 +185,7 @@ button:disabled{cursor:not-allowed}
 .patients-split{display:flex;height:calc(100vh - var(--nav-h));height:calc(100dvh - var(--nav-h));overflow:hidden}
 .patients-left{width:340px;flex-shrink:0;display:flex;flex-direction:column;background:#fff;border-right:1px solid var(--border)}
 .patients-left-header{padding:.85rem 1rem;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:.6rem}
+.patients-left-footer{display:flex;align-items:center;justify-content:space-between;margin-top:.5rem}
 .patients-left-controls{display:flex;gap:.45rem;align-items:center}
 .patients-list-scroll{flex:1;overflow-y:auto}
 .pt-row{display:flex;align-items:center;padding:.6rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background-color .12s}

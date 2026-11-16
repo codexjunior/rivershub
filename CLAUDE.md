@@ -19,15 +19,17 @@ The codebase is at **Phase 5** (November 2026), confirmed by files present:
 - `.github/workflows/` has `reconcile.yml`, `reminders.yml`, and all five SMS workflows (birthday, holiday, review, followup)
 - `api/sms.js` endpoint exists for manual SMS and cron triggers
 - SMS opt-out checkboxes in patients form, medical acts recall/months columns implemented
-- Reminders page with SMS preferences, test patient dropdown, manual SMS, and medical acts management page with search and pagination (20 per page)
-- SMS preferences table paginated (50 per patient per page, loads all 1000+ patients)
+- Reminders page with SMS preferences (paginated 50/patient, loads all 1000+), test patient dropdown, manual SMS
+- Medical acts management page (searchable, paginated 20/act)
+- Invoice codes: unique 6-char alphanumeric codes generated client-side for each invoice (displayed in modal header, print, and email; not persisted in DB)
+- API patient endpoint allows 500/page (was capped at 50)
 
 **Phases completed**:
 - 0 + 1: Backend/DB hardening, reference counter, Sheets mirroring via waitUntil, trimmed deps, shared CORS, atomic counter
 - 2: Frontend split into 12 script files (js/config, utils, acts, auth, nav, appointments, patients, invoice-list, invoice-form, invoice-print, invoice-email, reports) + main.js auto-login
 - 3: UI redesign via `css/theme.css` override (sidebar/top-bar, KPI cards, appointment cards, patient detail pane), split-pane fix F15
 - 4: Reports page + `/api/reports` endpoint with invoice activity-log rewrite (one row per invoice event), checkmark icons, print & email amount-paid fix, rep-procedures text wrap on mobile
-- 5: SMS expansion (FULLY INTEGRATED as of 14 Nov 2026): `api/sms.js` endpoint (manual SMS + cron triggers), SMS workflows (8:00 UTC each), schema additions (`patients.sms_optout_*` columns, `medical_acts.review_months`), opt-out checkboxes in patients form, reminders page with SMS preferences (paginated 50/page), acts management page (searchable, paginated 20/page), patient dropdown for test SMS, medical acts support recall months on POST/PUT/GET
+- 5: SMS expansion (FULLY INTEGRATED as of 14 Nov 2026): `api/sms.js` endpoint (manual SMS + cron triggers), SMS workflows (8:00 UTC each), schema additions (`patients.sms_optout_*` columns, `medical_acts.review_months`), opt-out checkboxes in patients form, reminders page with SMS preferences (paginated 50/patient, loads all 1000+), acts management page (searchable, paginated 20/act), patient dropdown for test SMS, medical acts support recall months on POST/PUT/GET, invoice codes (client-side generated, ephemeral)
 
 **Pending fixes applied**:
 - F13: `.split-drag-handle` fix (forced in `theme.css`)

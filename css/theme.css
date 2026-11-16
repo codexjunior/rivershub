@@ -65,7 +65,7 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
 .stat:nth-child(3)::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E")}
 .stat:nth-child(5)::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19V9M10 19V5M16 19v-7M21 19H3'/%3E%3C/svg%3E")}
 .stat-val{font-size:1.9rem;color:var(--blue);font-variant-numeric:tabular-nums}
-.stat-label{margin-top:0;color:var(--text-mid);letter-spacing:.06em}
+.stat-label{margin-top:0;color:var(--text-mid);font-size:.85rem;letter-spacing:.03em}
 
 /* ── Toolbar + lists ── */
 .controls{max-width:1080px;margin:1.1rem auto 0;width:calc(100% - 4rem);padding:.7rem .8rem;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
@@ -74,7 +74,7 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
 .btn-primary:hover{background:var(--blue-mid)}
 .btn-ghost{border-radius:var(--radius);min-height:40px}
 .search-wrap input,.patient-search-wrap input{border-radius:var(--radius);background:var(--surface)}
-.page-btn{border-radius:var(--radius-sm);min-width:38px;min-height:38px}
+.page-btn{border-radius:var(--radius-sm);min-width:44px;min-height:44px}
 .page-btn.active{background:var(--blue)}
 
 /* ── Patients split ── */
@@ -93,26 +93,11 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
   .nav-brand{padding:0}
   .nav-brand img{width:32px;height:32px}
   .hamburger{width:44px;height:44px;align-items:center;justify-content:center}
-  .stats-bar{gap:.6rem;padding:1rem 1rem 0}
-  .stat{padding:.8rem .8rem .8rem .8rem;min-height:84px;align-items:flex-start}
-  .stat::before{position:static;transform:none;width:30px;height:30px;border-radius:9px;background-size:17px;margin-bottom:.4rem;box-shadow:0 3px 8px rgba(16,42,74,.14)}
-  .stat-val{font-size:1.45rem}
-  .stat-label{font-size:.62rem}
-  .controls{width:calc(100% - 2rem);margin-top:.8rem;padding:.6rem}
-  .controls .search-wrap{flex:1 1 100%}
-  .controls .btn-primary{flex:1}
-  .page-content{padding:.9rem 1rem 2rem}
-  .patients-split{height:calc(100vh - 58px)}
-  /* F13: show the drag handle (style.css hides it after its media query) */
-  .split-drag-handle{display:flex;touch-action:none;height:22px}
-}
-@media(max-width:380px){
-  .stat-label{letter-spacing:.02em}
-  .stat-val{font-size:1.3rem}
-}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+  /* Small buttons: WCAG 2.5.8 spacing exemption (>24px circle radius clear space) */
+.btn-sm{min-height:36px}
+.stat-label{margin-top:0;color:var(--text-mid);font-size:.85rem;letter-spacing:.03em}
 
-/* ═══ Appointment cards (Phase 3b): one separate card per appointment ═══ */
+/* ── Toolbar + lists ── */
 .date-group-header{margin:1.75rem 0 .7rem;font-size:.95rem;letter-spacing:-.005em}
 .date-group-header:first-child{margin-top:.25rem}
 .appt-list{background:none;border:0;border-radius:0;overflow:visible;gap:.85rem;margin-bottom:.5rem}
@@ -134,7 +119,7 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
 .appt-notes{margin:0;padding:.7rem .85rem;background:var(--surface);border-radius:var(--radius);overflow-wrap:anywhere}
 .edit-textarea{max-width:100%}
 .appt-card-actions{justify-content:flex-end;gap:.5rem;padding-top:.8rem;border-top:1px solid var(--border)}
-.appt-card-actions .remind-btn,.appt-card-actions .edit-btn{min-height:38px;padding:0 1.05rem;border-radius:10px;font-size:.85rem;font-weight:600}
+.appt-card-actions .remind-btn,.appt-card-actions .edit-btn{min-height:44px;padding:0 1.05rem;border-radius:10px;font-size:.85rem;font-weight:600}
 .appt-card-actions .remind-btn{background:var(--tint-teal);border:1px solid transparent;color:#00625F}
 .appt-card-actions .remind-btn:hover{background:#CBEBE8;border-color:transparent;color:#004E4C}
 .appt-card-actions .edit-btn{background:#fff;border:1px solid var(--border-strong);color:var(--text-mid)}
@@ -145,7 +130,8 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
   .appt-top>div{margin-top:0}
   .appt-details{gap:.55rem 1rem;margin:0;padding-top:.7rem}
   .appt-card-actions{padding-top:.7rem}
-  .appt-card-actions .remind-btn,.appt-card-actions .edit-btn{flex:1;min-height:42px}
+  /* Mobile action buttons: 44px for safe touch targets */
+  .appt-card-actions .remind-btn,.appt-card-actions .edit-btn{flex:1;min-height:44px}
 }
 
 /* ═══ Phase 3c: drawer icons, patients split fixes, patient detail pane ═══ */
@@ -170,6 +156,8 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
 .detail-pane{padding:1.5rem 2rem 3rem;max-width:1000px}
 .detail-pane-header{align-items:center;gap:1rem 1.5rem;margin-bottom:1.1rem;padding:1.25rem 1.5rem;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
 .detail-pane-header>div:first-child{min-width:0;flex:1 1 260px}
+.detail-pane-header>div{min-width:0}
+.detail-pane-header>div{min-width:0}
 .detail-pane-name{font-size:1.5rem;line-height:1.2;letter-spacing:-.01em;overflow-wrap:anywhere}
 .detail-pane-ref{display:inline-block;margin-top:.5rem;padding:.2rem .65rem;border-radius:999px;background:var(--tint-teal);color:#00625F;font-size:.8rem;font-weight:700;letter-spacing:.03em;font-variant-numeric:tabular-nums}
 .pt-facts{display:flex;flex-wrap:wrap;gap:.25rem .5rem;margin-top:.6rem;font-size:.9rem;color:var(--text-mid)}
