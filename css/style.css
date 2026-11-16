@@ -194,8 +194,8 @@ button:disabled {
 .login-card {
   background: #fff;
   border-radius: var(--radius-lg);
-  padding: 2.5rem 2.25rem;
-  max-width: 400px;
+  padding: 3rem 2.75rem;
+  max-width: 460px;
   width: 100%;
   box-shadow: var(--shadow-lg);
 }
@@ -203,54 +203,96 @@ button:disabled {
 .login-logo {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 2rem;
+  gap: 1rem;
+  margin-bottom: 3rem;
 }
 
 .login-logo img {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
 }
 
 .login-logo-name {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--blue);
+  letter-spacing: -0.015em;
+  line-height: 1.1;
 }
 
 .login-logo-sub {
   font-size: 0.8rem;
   color: var(--muted);
   display: block;
+  margin-top: 0.3rem;
+  font-weight: 500;
 }
 
 .login-card h1 {
-  font-size: 1.65rem;
+  font-size: 1.95rem;
   font-weight: 700;
   color: var(--blue);
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.01em;
+  margin-bottom: 0.85rem;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 
 .login-card p {
   font-size: 0.95rem;
   color: var(--text-mid);
-  margin-bottom: 1.75rem;
-  line-height: 1.6;
+  margin-bottom: 2.25rem;
+  line-height: 1.7;
+  font-weight: 400;
 }
 
 .login-field {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 1.25rem;
+  gap: 0.55rem;
+  margin-bottom: 1.75rem;
 }
 
 .login-field label {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: var(--text-mid);
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.login-field input {
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  background: #fff;
+}
+
+.login-field input:focus {
+  border-color: var(--teal);
+  outline: 2px solid var(--teal);
+  outline-offset: -1px;
+}
+
+.login-btn {
+  width: 100%;
+  min-height: 46px;
+  font-size: 1rem;
+  margin-top: 1.25rem;
+}
+
+.login-error {
+  background: var(--red-light);
+  border: 1px solid #F5C4BD;
+  color: var(--red);
+  padding: 0.95rem 1.15rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  margin-bottom: 1.75rem;
+  display: none;
+  font-weight: 500;
 }
 
 .login-field input {
@@ -913,7 +955,8 @@ button:disabled {
   flex: 1;
   display: flex;
   flex-wrap: wrap;
-  column-gap: 0.8rem;
+  column-gap: 1.2rem;
+  row-gap: 0.2rem;
   align-items: baseline;
 }
 
@@ -1201,10 +1244,10 @@ button:disabled {
 
 .inv-actions-cell {
   display: flex;
-  gap: 0.3rem;
+  gap: 0.5rem;
   align-items: center;
   flex-wrap: nowrap;
-  justify-content: space-evenly;
+  justify-content: flex-end;
 }
 
 .inv-action-btn {
@@ -1212,8 +1255,12 @@ button:disabled {
   font-weight: 500;
   background: none;
   border: none !important;
-  padding: 0.15rem 0.3rem !important;
-  min-height: 32px;
+  padding: 0 !important;
+  min-height: 36px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: var(--radius-sm);
   color: var(--teal-ink);
   white-space: nowrap;

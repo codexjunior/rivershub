@@ -1,11 +1,12 @@
 // ── Resizable split pane (phone layout only) ────────────
-// Pointer Events (mouse + touch + pen in one path). The list can expand from 0% to 100%
-// of the split area. Leaving the phone layout clears the dragged height (F15).
+// Pointer Events (mouse + touch + pen in one path). The list expands from 0% to 100%
+// of the split area. When dragged up, left pane takes full height and hides right pane.
 (function() {
   const handle = document.getElementById('splitDragHandle');
   const leftPane = handle && handle.previousElementSibling;
+  const rightPane = handle && handle.nextElementSibling;
   const split = leftPane && leftPane.parentElement;
-  if (!handle || !leftPane || !split) return;
+  if (!handle || !leftPane || !rightPane || !split) return;
 
   const MOBILE = window.matchMedia('(max-width: 860px)');
   const MIN_H = 0;  /* Allow dragging all the way up */
@@ -25,6 +26,8 @@
     if (!dragging) return;
     const h = Math.min(Math.max(startH + (e.clientY - startY), MIN_H), maxH());
     leftPane.style.height = h + 'px';
+    /* Hide right pane when left pane takes up most of the space */
+    rightPane.style.display = h > (maxH() * 0.7) ? 'none' : 'block';
   });
   const stop = e => {
     dragging = false;
@@ -33,7 +36,12 @@
   handle.addEventListener('pointerup', stop);
   handle.addEventListener('pointercancel', stop);
 
-  MOBILE.addEventListener('change', e => { if (!e.matches) leftPane.style.height = ''; });
+  MOBILE.addEventListener('change', e => {
+    if (!e.matches) {
+      leftPane.style.height = '';
+      rightPane.style.display = 'block';
+    }
+  });
 })();
 
 // ═══════════════════════════════════════════════════════════════
