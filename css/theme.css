@@ -255,7 +255,40 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
   .rep-table td.num::before{content:attr(data-label);display:block;font-size:.68rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 }
 
-/* ═══ Checkmark icon styles for Mark Paid buttons (invoice list + modal) ═══ */
+/* ═══ Phase 5c: Reminders page redesign (search-first, card-based) ═══ */
+.reminders-wrap{max-width:1240px;margin:0 auto;padding:1.5rem 2rem 3rem}
+.reminders-wrap .controls{margin-bottom:1.5rem}
+.reminders-wrap .info-card{margin-bottom:1.5rem}
+
+/* SMS patient search results */
+#smsPatientResults{border:1px solid var(--border);border-radius:var(--radius-lg);background:#fff}
+#smsPatientResults>div:first-child{padding:1rem}
+#smsPatientResults .form-field{margin-bottom:0}
+
+/* Patient result card inside search results */
+#smsPatientResults>div:first-child>div{padding:1rem;border:1px solid var(--border);border-radius:6px;margin-bottom:0.75rem;background:var(--surface)}
+#smsPatientResults>div:first-child>div:last-child{margin-bottom:0}
+
+/* Toggle switch styling */
+#smsPatientResults label{display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;cursor:pointer;margin:0}
+#smsPatientResults input[type="checkbox"]{margin:0;cursor:pointer}
+
+/* Pagination in results */
+#smsPatientResults>div>div:last-of-type{padding:0.75rem 1rem;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;color:var(--muted)}
+
+/* Form fields in reminders */
+.reminders-wrap .form-field input,.reminders-wrap .form-field select{min-height:44px;padding:0.5rem 0.75rem}
+
+/* Button sizing in reminders */
+.reminders-wrap .btn-primary{min-height:40px}
+.reminders-wrap .btn-sm{min-height:36px}
+
+@media(max-width:860px){
+  .reminders-wrap{padding:1rem 1rem 2.5rem}
+  .reminders-wrap .controls{margin-bottom:1.25rem}
+  .reminders-wrap .info-card{margin-bottom:1.25rem}
+  #smsPatientResults{font-size:0.9rem}
+}
 .im-payfull .inv-action-btn.toggle {
   display: inline-flex;
   align-items: center;

@@ -322,6 +322,20 @@ button:disabled{cursor:not-allowed}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.error{background:var(--red)}
 
+/* ── Reminders page (search-first card layout) ────────── */
+.reminders-wrap{display:block;flex:1}
+.reminders-wrap .controls{padding:0;margin-bottom:1.5rem;border:none;box-shadow:none}
+.reminders-wrap .info-card{margin-bottom:1.5rem;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:visible}
+
+.reminders-wrap .form-field{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.9rem}
+.reminders-wrap .form-field:last-child{margin-bottom:0}
+.reminders-wrap .form-field label{font-size:.9rem;font-weight:600;color:var(--text-mid)}
+.reminders-wrap .form-field input,.reminders-wrap .form-field select{min-height:42px;padding:.5rem .75rem;border:1px solid var(--border-strong);border-radius:var(--radius);font-size:1rem;background:#fff;width:100%}
+.reminders-wrap .form-field input:focus,.reminders-wrap .form-field select:focus{border-color:var(--teal);outline:2px solid var(--teal);outline-offset:-1px}
+
+#smsPatientResults{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);min-height:200px}
+#smsPatientResults>div{max-height:600px;overflow-y:auto}
+
 /* ── Responsive ───────────────────────────────────────────────── */
 .split-drag-handle{display:none}
 
