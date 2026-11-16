@@ -1,7 +1,6 @@
 // ── Resizable split pane (phone layout only) ────────────
-// Pointer Events (mouse + touch + pen in one path). The list can grow to 85% of the
-// split area, never below 220px. Leaving the phone layout clears the dragged height
-// so the desktop 3-column CSS rules again (F15).
+// Pointer Events (mouse + touch + pen in one path). The list can expand from 0% to 100%
+// of the split area. Leaving the phone layout clears the dragged height (F15).
 (function() {
   const handle = document.getElementById('splitDragHandle');
   const leftPane = handle && handle.previousElementSibling;
@@ -9,10 +8,10 @@
   if (!handle || !leftPane || !split) return;
 
   const MOBILE = window.matchMedia('(max-width: 860px)');
-  const MIN_H = 220;
+  const MIN_H = 0;  /* Allow dragging all the way up */
   let dragging = false, startY = 0, startH = 0;
 
-  const maxH = () => Math.round(split.getBoundingClientRect().height * 0.85);
+  const maxH = () => split.getBoundingClientRect().height;  /* Allow full height */
 
   handle.addEventListener('pointerdown', e => {
     if (!MOBILE.matches) return;
