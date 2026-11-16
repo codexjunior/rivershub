@@ -70,36 +70,35 @@ function renderSMSPatientResults(){
   const end=start+SMS_PAGE_SIZE;
   const pageData=filtered.slice(start,end);
 
-  let html=`<div style="padding:1rem">`;
+  let html=``;
   pageData.forEach(p=>{
-    html+=`<div style="padding:1rem;border:1px solid var(--border);border-radius:6px;margin-bottom:0.75rem;background:var(--surface)">
-      <div style="font-weight:600;color:var(--text);margin-bottom:0.5rem">${escHtml(p.name)}</div>
-      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem">${escHtml(p.reference_number)}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
-        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;cursor:pointer">
-          <input type="checkbox" ${p.sms_optout_birthday?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','birthday',this.checked)">
+    html+=`<div class="sms-patient-result">
+      <div class="sms-patient-name">${escHtml(p.name)}</div>
+      <div class="sms-patient-ref">${escHtml(p.reference_number)}</div>
+      <div class="sms-toggle-group">
+        <label class="sms-toggle-label">
+          <input type="checkbox" ${p.sms_optout_birthday?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','birthday',this.checked)" aria-label="Opted out: Birthday SMS">
           <span>Birthday</span>
         </label>
-        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;cursor:pointer">
-          <input type="checkbox" ${p.sms_optout_holiday?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','holiday',this.checked)">
+        <label class="sms-toggle-label">
+          <input type="checkbox" ${p.sms_optout_holiday?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','holiday',this.checked)" aria-label="Opted out: Holiday SMS">
           <span>Holiday</span>
         </label>
-        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;cursor:pointer">
-          <input type="checkbox" ${p.sms_optout_review?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','review',this.checked)">
+        <label class="sms-toggle-label">
+          <input type="checkbox" ${p.sms_optout_review?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','review',this.checked)" aria-label="Opted out: Review SMS">
           <span>Review</span>
         </label>
-        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;cursor:pointer">
-          <input type="checkbox" ${p.sms_optout_followup?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','followup',this.checked)">
+        <label class="sms-toggle-label">
+          <input type="checkbox" ${p.sms_optout_followup?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','followup',this.checked)" aria-label="Opted out: Followup SMS">
           <span>Followup</span>
         </label>
       </div>
     </div>`;
   });
-  html+=`</div>`;
 
   // Pagination footer
   if(totalPages>1){
-    html+=`<div style="padding:0.75rem 1rem;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;color:var(--muted)">
+    html+=`<div class="sms-results-pagination">
       <div>Page ${smsSearchState.currentPage}/${totalPages}</div>
       <div style="display:flex;gap:0.3rem">`;
     if(smsSearchState.currentPage>1){

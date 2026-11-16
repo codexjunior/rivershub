@@ -67,9 +67,9 @@ button:disabled{cursor:not-allowed}
 .btn-primary:hover,.save-btn:hover,.modal-submit:hover,.login-btn:hover{background:var(--teal-ink-hover);border-color:var(--teal-ink-hover)}
 .btn-ghost,.cancel-edit-btn,.edit-btn,.remind-btn,.page-btn{background:#fff;color:var(--text-mid);border:1px solid var(--border-strong);font-weight:500}
 .btn-ghost:hover,.cancel-edit-btn:hover,.edit-btn:hover,.remind-btn:hover,.page-btn:hover:not(:disabled){border-color:var(--teal-ink);color:var(--teal-ink)}
-.btn-sm{min-height:36px;padding:0 .75rem;font-size:.85rem}
+.btn-sm{min-height:44px;padding:0 .75rem;font-size:.85rem}
 .btn-primary:disabled,.save-btn:disabled,.modal-submit:disabled{opacity:.55}
-.edit-btn,.remind-btn,.cancel-edit-btn,.save-btn{min-height:36px;padding:0 .75rem;font-size:.85rem}
+.edit-btn,.remind-btn,.cancel-edit-btn,.save-btn{min-height:44px;padding:0 .75rem;font-size:.85rem}
 
 /* ── Login ────────────────────────────────────────────────────── */
 .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:var(--blue)}
@@ -336,7 +336,31 @@ button:disabled{cursor:not-allowed}
 #smsPatientResults{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);min-height:200px}
 #smsPatientResults>div{max-height:600px;overflow-y:auto}
 
-/* ── Responsive ───────────────────────────────────────────────── */
+/* ── Reminders page (search-first, card-based) ────────── */
+.reminders-wrap{display:block;flex:1}
+.reminders-wrap .controls{padding:0;margin-bottom:1.5rem;border:none;box-shadow:none}
+.reminders-wrap .info-card{margin-bottom:1.5rem;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:visible}
+
+/* SMS patient search results */
+#smsPatientResults{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);min-height:200px}
+
+/* Patient result card inside search results */
+#smsPatientResults>div:first-child>div{padding:1rem;border:1px solid var(--border);border-radius:6px;margin-bottom:0.75rem;background:var(--surface)}
+
+/* Toggle switch styling */
+#smsPatientResults label{display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;cursor:pointer;margin:0}
+#smsPatientResults input[type="checkbox"]{margin:0;cursor:pointer}
+
+/* Pagination in results */
+#smsPatientResults>div>div:last-of-type{padding:0.75rem 1rem;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;color:var(--muted)}
+
+/* Form fields in reminders */
+.reminders-wrap .form-field input,.reminders-wrap .form-field select{min-height:44px;padding:0.5rem 0.75rem;border:1px solid var(--border-strong);border-radius:var(--radius);font-size:1rem;background:white;width:100%}
+.reminders-wrap .form-field input:focus,.reminders-wrap .form-field select:focus{border-color:var(--teal);outline:2px solid var(--teal);outline-offset:-1px}
+
+/* Button sizing in reminders */
+.reminders-wrap .btn-primary{min-height:40px}
+.reminders-wrap .btn-sm{min-height:44px}
 .split-drag-handle{display:none}
 
 @media(max-width:860px){

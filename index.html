@@ -251,16 +251,16 @@
 
       <!-- Card 1: Manual SMS Sender -->
       <div class="info-card">
-        <div style="padding:1.5rem;border-bottom:1px solid var(--border)">
-          <h2 style="margin:0 0 0.5rem 0;font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text)">Send SMS</h2>
-          <p style="margin:0;font-size:0.8rem;color:var(--muted)">Send a one-off message to a patient</p>
+        <div class="sms-card-header">
+          <h2>Send SMS</h2>
+          <p>Send a one-off message to a patient</p>
         </div>
-        <div style="padding:1.5rem;display:flex;flex-direction:column;gap:1rem">
-          <div class="form-field" style="margin-bottom:0">
+        <div class="sms-card-body">
+          <div class="sms-form-field">
             <label>Phone Number</label>
             <input type="tel" id="manualSMSPhone" placeholder="0244 123 456 or 233244123456">
           </div>
-          <div class="form-field" style="margin-bottom:0">
+          <div class="sms-form-field">
             <label>Message</label>
             <input type="text" id="manualSMSMessage" placeholder="Type your message here…">
           </div>
@@ -270,32 +270,36 @@
 
       <!-- Card 2: Patient Search + Preferences -->
       <div class="info-card">
+        <div class="sms-card-header">
+          <h2>Manage Preferences</h2>
+          <p>Search for a patient and control which SMS types they receive</p>
+        </div>
         <div style="padding:1.5rem;border-bottom:1px solid var(--border)">
-          <h2 style="margin:0 0 0.5rem 0;font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text)">Manage Preferences</h2>
-          <p style="margin:0;font-size:0.8rem;color:var(--muted)">Search for a patient and control which SMS types they receive</p>
-        </div>
-        <div style="padding:1.5rem;display:flex;gap:0.65rem;margin-bottom:1rem;align-items:center;flex-wrap:wrap">
-          <div class="patient-search-wrap" style="flex:1;min-width:200px">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" id="smsPatientSearch" placeholder="Search patient name or reference…" oninput="filterSMSPatients()">
+          <div class="sms-controls">
+            <div class="patient-search-wrap" style="flex:1;min-width:200px">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="smsPatientSearch" placeholder="Search patient name or reference…" oninput="filterSMSPatients()">
+            </div>
+            <button class="btn-ghost btn-sm" onclick="clearSMSSearch()">Clear</button>
           </div>
-          <button class="btn-ghost btn-sm" onclick="clearSMSSearch()">Clear</button>
         </div>
-        <div id="smsPatientResults" style="max-height:600px;overflow-y:auto;border:1px solid var(--border);border-radius:6px">
-          <div style="padding:1rem;font-size:0.82rem;color:var(--muted);text-align:center">Type to search patients</div>
+        <div class="sms-results-container">
+          <div class="sms-results-inner" id="smsPatientResults">
+            <div style="padding:1rem;font-size:0.82rem;color:var(--muted);text-align:center">Type to search patients</div>
+          </div>
         </div>
       </div>
 
       <!-- Card 3: Test SMS -->
       <div class="info-card">
-        <div style="padding:1.5rem;border-bottom:1px solid var(--border)">
-          <h2 style="margin:0 0 0.5rem 0;font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text)">Test SMS</h2>
-          <p style="margin:0;font-size:0.8rem;color:var(--muted)">Send all SMS types to verify messaging (bypasses opt-out checks)</p>
+        <div class="sms-card-header">
+          <h2>Test SMS</h2>
+          <p>Send all SMS types to verify messaging (bypasses opt-out checks)</p>
         </div>
-        <div style="padding:1.5rem;display:flex;gap:0.65rem;flex-wrap:wrap;align-items:flex-end">
-          <div class="form-field" style="margin-bottom:0;flex:1;min-width:250px">
+        <div class="sms-card-body" style="gap:0.65rem;flex-wrap:wrap;flex-direction:row;align-items:flex-end">
+          <div class="sms-form-field" style="margin-bottom:0;flex:1;min-width:250px">
             <label>Select Patient</label>
-            <select id="testPatientRef" style="border:1px solid var(--border);border-radius:6px;padding:0.5rem;font-size:0.85rem;font-family:inherit;width:100%">
+            <select id="testPatientRef">
               <option value="">-- Choose a patient --</option>
             </select>
           </div>
