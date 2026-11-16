@@ -11,14 +11,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="RDC Staff">
 <meta name="theme-color" content="#ffffff">
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/invoice-modal.css">
 </head>
 <body>
 
-<!-- ═══════════════════════════════════ LOGIN ═══ -->
+<!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="login-logo">
@@ -30,19 +29,19 @@
     </div>
     <h1>Staff Dashboard</h1>
     <p>Enter your password to access the patient management portal.</p>
-    <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
+    <div class="login-error" id="loginError">Invalid password.</div>
     <div class="login-field">
       <label>Password</label>
-      <input type="password" id="passwordInput" placeholder="Enter dashboard password">
+      <input type="password" id="passwordInput" placeholder="Dashboard password">
     </div>
     <button class="login-btn" id="loginBtn">Access Dashboard</button>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════ APP ═══ -->
+<!-- APP -->
 <div class="app" id="app">
 
-  <!-- TOPNAV -->
+  <!-- Navigation -->
   <nav class="nav">
     <div class="nav-brand">
       <img src="/imgs/rivers_dental_logo.png" alt="RDC">
@@ -65,7 +64,7 @@
     </button>
   </nav>
 
-  <!-- MOBILE DRAWER -->
+  <!-- Mobile drawer -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
   <div class="drawer" id="drawer">
     <div class="drawer-header">
@@ -87,7 +86,7 @@
     </div>
   </div>
 
-  <!-- ═══ APPOINTMENTS PAGE ═══ -->
+  <!-- Appointments page -->
   <div class="page active" id="page-appointments">
     <div class="stats-bar">
       <div class="stat"><span class="stat-val" id="statTotal">-</span><span class="stat-label">Upcoming</span></div>
@@ -99,28 +98,26 @@
     <div class="controls">
       <div class="search-wrap">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="searchInput" placeholder="Search by patient name…">
+        <input type="text" id="searchInput" placeholder="Search by name">
       </div>
       <span class="result-count" id="resultCount"></span>
       <button class="btn-ghost" id="refreshBtn" style="padding: 0.48rem 0.8rem;">↻</button>
       <button class="btn-primary" id="newApptBtn">+ New Appointment</button>
     </div>
     <div class="page-content" id="apptContent">
-      <div class="state-msg"><div class="icon">📅</div><p>Loading appointments…</p></div>
+      <div class="state-msg"><div class="icon">📅</div><p>Loading appointments</p></div>
     </div>
   </div>
 
-  <!-- ═══ PATIENTS SPLIT PAGE ═══ -->
+  <!-- Patients page -->
   <div class="page" id="page-patients">
     <div class="patients-split">
-
-      <!-- LEFT: list panel -->
       <div class="patients-left">
         <div class="patients-left-header">
           <div class="patients-left-controls">
             <div class="patient-search-wrap" style="flex:1">
               <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" id="patientSearch" placeholder="Search patients…">
+              <input type="text" id="patientSearch" placeholder="Search">
             </div>
             <button class="btn-ghost btn-sm" id="refreshPatientsBtn" title="Refresh">↻</button>
           </div>
@@ -130,33 +127,28 @@
           </div>
         </div>
         <div class="patients-list-scroll" id="patientListScroll">
-          <div class="state-msg" style="padding:2rem 1rem"><div class="icon" style="font-size:1.8rem">👤</div><p style="font-size:0.8rem">Loading…</p></div>
+          <div class="state-msg" style="padding:2rem 1rem"><div class="icon" style="font-size:1.8rem">👤</div><p style="font-size:0.8rem">Loading</p></div>
         </div>
-        <!-- left pagination -->
         <div id="patientListPagination" style="padding:0.5rem 0.6rem;border-top:1px solid var(--border);background:white"></div>
       </div>
 
-      <!-- DRAG HANDLE (mobile only) -->
       <div class="split-drag-handle" id="splitDragHandle">
         <div class="split-drag-bar"></div>
       </div>
 
-      <!-- RIGHT: detail/edit panel -->
       <div class="patients-right" id="patientsRight">
         <div class="right-empty">
           <div class="empty-icon">👤</div>
           <h3>No patient selected</h3>
-          <p>Click a patient from the list on the left to view their details.</p>
+          <p>Click a patient from the list to view their details.</p>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- ═══ REPORTS PAGE (Phase 4): read-only invoice log ═══ -->
+  <!-- Reports page -->
   <div class="page" id="page-reports">
     <div class="rep-wrap">
-
       <div class="stats-bar rep-stats">
         <div class="stat"><span class="stat-val" id="repBilled">-</span><span class="stat-label">Billed (GHS)</span></div>
         <div class="stats-divider"></div>
@@ -197,25 +189,24 @@
       <div class="rep-summary" id="repSummary"></div>
       <div id="repContent"></div>
       <div class="pagination" id="repPagination"></div>
-
     </div>
   </div>
 
-  <!-- ═══ ACTS MANAGEMENT PAGE (Phase 5) ═══ -->
+  <!-- Acts management page -->
   <div class="page" id="page-acts">
     <div class="acts-wrap">
       <div class="controls">
-        <h1 style="margin:0;font-size:1.35rem;color:var(--text)">Medical Acts & Recall Intervals</h1>
-        <p style="margin:0.25rem 0 0 0;font-size:0.85rem;color:var(--muted)">Manage procedures, prices, and recall reminders</p>
+        <h1 style="margin:0;font-size:1.35rem;color:var(--text)">Medical Acts</h1>
+        <p style="margin:0.25rem 0 0 0;font-size:0.85rem;color:var(--muted)">Manage procedures, prices, and recall intervals</p>
       </div>
 
       <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)">
         <div style="padding:1.5rem;border-bottom:1px solid var(--border)">
-          <h2 style="margin:0 0 1rem 0;font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text)">Add New Procedure</h2>
+          <h2 style="margin:0 0 1rem 0;font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text)">Add Procedure</h2>
           <div style="display:flex;gap:0.65rem;flex-wrap:wrap;align-items:flex-end">
             <div class="form-field" style="margin-bottom:0;flex:1;min-width:160px">
               <label>Procedure Name</label>
-              <input type="text" id="newActName" placeholder="e.g. SCALING AND POLISHING" style="text-transform:uppercase">
+              <input type="text" id="newActName" placeholder="SCALING AND POLISHING" style="text-transform:uppercase">
             </div>
             <div class="form-field" style="margin-bottom:0;width:110px">
               <label>Price (GHS)</label>
@@ -223,33 +214,32 @@
             </div>
             <div class="form-field" style="margin-bottom:0;width:110px">
               <label>Recall (months)</label>
-              <input type="number" id="newActRecall" placeholder="—" min="0" step="1">
+              <input type="number" id="newActRecall" min="0" step="1">
             </div>
-            <button class="btn-primary btn-sm" onclick="saveNewAct()">+ Add Act</button>
+            <button class="btn-primary btn-sm" onclick="saveNewAct()">+ Add</button>
           </div>
         </div>
         <div style="display:flex;gap:0.65rem;margin-bottom:1rem;align-items:center">
           <div class="patient-search-wrap" style="flex:1;max-width:300px">
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" id="actsSearchInput" placeholder="Search procedure name…" oninput="searchActs()">
+            <input type="text" id="actsSearchInput" placeholder="Search procedures" oninput="searchActs()">
           </div>
         </div>
         <div id="actsList" style="max-height:600px;overflow-y:auto">
-          <div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading acts…</div>
+          <div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ═══ REMINDERS PAGE (Phase 5 SMS) ═══ -->
+  <!-- Reminders page -->
   <div class="page" id="page-reminders">
     <div class="reminders-wrap">
       <div class="controls">
         <h1 style="margin:0;font-size:1.35rem;color:var(--text)">SMS Reminders</h1>
-        <p style="margin:0.5rem 0 0 0;font-size:0.85rem;color:var(--muted)">Send SMS and manage patient opt-out preferences</p>
+        <p style="margin:0.5rem 0 0 0;font-size:0.85rem;color:var(--muted)">Send SMS and manage patient preferences</p>
       </div>
 
-      <!-- Card 1: Manual SMS Sender -->
       <div class="info-card">
         <div class="sms-card-header">
           <h2>Send SMS</h2>
@@ -258,17 +248,16 @@
         <div class="sms-card-body">
           <div class="sms-form-field">
             <label>Phone Number</label>
-            <input type="tel" id="manualSMSPhone" placeholder="0244 123 456 or 233244123456">
+            <input type="tel" id="manualSMSPhone" placeholder="0244 123 456">
           </div>
           <div class="sms-form-field">
             <label>Message</label>
-            <input type="text" id="manualSMSMessage" placeholder="Type your message here…">
+            <input type="text" id="manualSMSMessage" placeholder="Enter message">
           </div>
           <button class="btn-primary" onclick="sendManualSMS()" style="align-self:flex-start">Send SMS</button>
         </div>
       </div>
 
-      <!-- Card 2: Patient Search + Preferences -->
       <div class="info-card">
         <div class="sms-card-header">
           <h2>Manage Preferences</h2>
@@ -278,44 +267,42 @@
           <div class="sms-controls">
             <div class="patient-search-wrap" style="flex:1;min-width:200px">
               <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" id="smsPatientSearch" placeholder="Search patient name or reference…" oninput="filterSMSPatients()">
+              <input type="text" id="smsPatientSearch" placeholder="Search by name or reference" oninput="filterSMSPatients()">
             </div>
             <button class="btn-ghost btn-sm" onclick="clearSMSSearch()">Clear</button>
           </div>
         </div>
         <div class="sms-results-container">
           <div class="sms-results-inner" id="smsPatientResults">
-            <div style="padding:1rem;font-size:0.82rem;color:var(--muted);text-align:center">Type to search patients</div>
+            <div style="padding:1rem;font-size:0.82rem;color:var(--muted);text-align:center">Search for a patient</div>
           </div>
         </div>
       </div>
 
-      <!-- Card 3: Test SMS -->
       <div class="info-card">
         <div class="sms-card-header">
           <h2>Test SMS</h2>
-          <p>Send all SMS types to verify messaging (bypasses opt-out checks)</p>
+          <p>Send all SMS types to verify messaging</p>
         </div>
         <div class="sms-card-body" style="gap:0.65rem;flex-wrap:wrap;flex-direction:row;align-items:flex-end">
           <div class="sms-form-field" style="margin-bottom:0;flex:1;min-width:250px">
             <label>Select Patient</label>
             <select id="testPatientRef">
-              <option value="">-- Choose a patient --</option>
+              <option value="">Choose a patient</option>
             </select>
           </div>
-          <button class="btn-primary btn-sm" onclick="sendTestToPatient()" style="min-width:150px">Send All Test SMS</button>
+          <button class="btn-primary btn-sm" onclick="sendTestToPatient()" style="min-width:150px">Send Test SMS</button>
         </div>
       </div>
-
     </div>
   </div>
 
-</div><!-- end .app -->
+</div><!-- app -->
 
-<!-- ═══ PRINT INVOICE AREA (hidden, shown only on print) ═══ -->
+<!-- Print invoice area -->
 <div id="printInvoiceArea"></div>
 
-<!-- ═══ NEW APPOINTMENT MODAL ═══ -->
+<!-- New appointment modal -->
 <div class="modal-overlay" id="newApptModal">
   <div class="modal-panel">
     <div class="modal-header">
@@ -324,24 +311,23 @@
     </div>
     <div class="form-error" id="apptFormError"></div>
     <div class="form-row">
-      <div class="form-field"><label>Patient Name *</label><input type="text" id="apptName" placeholder="e.g. Kofi Mensah"></div>
-      <div class="form-field"><label>Phone Number *</label><input type="tel" id="apptPhone" placeholder="e.g. 0244 123 456"></div>
+      <div class="form-field"><label>Patient Name *</label><input type="text" id="apptName" placeholder="Kofi Mensah"></div>
+      <div class="form-field"><label>Phone Number *</label><input type="tel" id="apptPhone" placeholder="0244 123 456"></div>
     </div>
     <div class="form-field"><label>Email Address</label><input type="email" id="apptEmail" placeholder="kofi@example.com"></div>
     <div class="form-row">
       <div class="form-field"><label>Date *</label><input type="date" id="apptDate"></div>
       <div class="form-field"><label>Time *</label><input type="time" id="apptTime"></div>
-      <div class="form-field"><label>Duration</label><input type="text" id="apptDuration" placeholder="e.g. 30, 1:30"></div>
+      <div class="form-field"><label>Duration</label><input type="text" id="apptDuration" placeholder="30 min"></div>
     </div>
-    <div class="form-field"><label>Notes / Description</label><textarea id="apptDescription" placeholder="Procedure details, special instructions…"></textarea></div>
+    <div class="form-field"><label>Notes</label><textarea id="apptDescription" placeholder="Procedure details, special instructions"></textarea></div>
     <button class="modal-submit" id="submitNewAppt">Create Appointment</button>
   </div>
 </div>
 
-<!-- ═══ INVOICE MODAL ═══ -->
+<!-- Invoice modal -->
 <div class="modal-overlay" id="invoiceModal" role="dialog" aria-modal="true" aria-labelledby="imTitle">
   <div class="modal-panel im-panel">
-
     <header class="im-head">
       <div class="im-head-main">
         <h2 id="imTitle">New invoice</h2>
@@ -413,7 +399,6 @@
             <dd><span class="im-money"><span>GHS</span><input type="number" id="invPaymentNow" value="0" min="0" step="0.01" inputmode="decimal" placeholder="0.00" autocomplete="off" oninput="invRecalcTotals()"></span></dd>
           </div>
         </dl>
-        <!-- invAmountPaid = everything paid so far (before + now). Save, print and email read it; it is computed, never typed. -->
         <input type="hidden" id="invAmountPaid" value="0">
         <input type="hidden" id="invPriorPaid" value="0">
         <button type="button" class="im-payfull" id="imPayFull" aria-label="Mark as paid in full">
@@ -441,12 +426,12 @@
       <button type="button" class="btn-ghost im-cancel" onclick="document.getElementById('invoiceModal').classList.remove('open')">Cancel</button>
       <button type="button" class="btn-primary im-save" id="submitInvoice">Save Invoice</button>
     </footer>
-
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- Toast notification -->
 <div class="toast" id="toast"></div>
+
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/acts.js"></script>
