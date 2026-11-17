@@ -302,6 +302,8 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
   .reminders-wrap{padding:1rem 1rem 2.5rem}
   .reminders-wrap .controls{margin-bottom:1.25rem}
   .reminders-wrap .info-card{margin-bottom:1.25rem}
+  .sms-card-header{padding:1.25rem 1.5rem}
+  .sms-card-body{padding:1.5rem}
   .sms-results-inner{font-size:0.9rem}
 }
 .im-payfull .inv-action-btn.toggle {
