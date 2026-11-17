@@ -1,25 +1,27 @@
-// Attach debounced search listener
-const debouncedPatientSearch = debounce((e) => {
-  loadPatients(1, e.target.value.trim());
-}, 300);
-
-document.addEventListener("DOMContentLoaded", () => {
-  const searchInput = document.getElementById("patientSearch");
-  if (searchInput) {
-    searchInput.addEventListener("input", debouncedPatientSearch);
-  }
-});
-
 async function loadPatients(page=1,search=""){
-  document.getElementById("patientListScroll").innerHTML=`<div class="state-msg" style="padding:2rem 1rem"><div class="icon" style="font-size:1.8rem">👤</div><p style="font-size:0.8rem">Loading…</p></div>`;
+  const scrollEl = document.getElementById("patientListScroll");
+  if(scrollEl) scrollEl.innerHTML=`<div class="state-msg" style="padding:2rem 1rem"><div class="icon" style="font-size:1.8rem">👤</div><p style="font-size:0.8rem">Loading…</p></div>`;
   try{
     const params=new URLSearchParams({page,limit:PATIENT_LIMIT,search});
     const res=await fetch(`${API_BASE}/api/patients?${params}`,{headers:authHeader()});
     const data=await res.json();
     allPatients=data.patients||[];patientTotal=data.total||0;patientPage=page;
     renderPatientList();
-  }catch{document.getElementById("patientListScroll").innerHTML=`<div class="state-msg" style="padding:2rem 1rem"><div class="icon">⚠️</div><p style="font-size:0.8rem">Failed to load.</p></div>`;}
+  }catch(e){
+    console.error("Failed to load patients:", e);
+    if(scrollEl) scrollEl.innerHTML=`<div class="state-msg" style="padding:2rem 1rem"><div class="icon">⚠️</div><p style="font-size:0.8rem">Failed to load.</p></div>`;
+  }
 }
+
+// Attach debounced search listener after DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("patientSearch");
+  if (searchInput) {
+    searchInput.addEventListener("input", debounce((e) => {
+      loadPatients(1, e.target.value.trim());
+    }, 300));
+  }
+});
 
 function renderPatientList(){
   const search=document.getElementById("patientSearch").value.trim();

@@ -51,7 +51,7 @@ function showPage(pageId){
 document.querySelectorAll("[data-page]").forEach(btn=>{
   btn.addEventListener("click",()=>{
     const p=btn.dataset.page;showPage(p);
-    if(p==="patients"&&allPatients.length===0)loadPatients();
+    if(p==="patients") loadPatients();
   });
 });
 
