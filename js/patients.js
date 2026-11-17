@@ -4,7 +4,7 @@
 let allPatients=[],patientPage=1,patientTotal=0;
 let viewingPatient=null,editingPatient=null;
 const PATIENT_LIMIT=20;
-/* Service-role key means auth handled; fetch sets token but not in headers */
+
 async function loadPatients(page=1,search=""){
   document.getElementById("patientListScroll").innerHTML=`<div class="state-msg" style="padding:2rem 1rem"><div class="icon" style="font-size:1.8rem">👤</div><p style="font-size:0.8rem">Loading…</p></div>`;
   try{

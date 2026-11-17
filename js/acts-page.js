@@ -12,16 +12,10 @@ async function renderActsList(){
   if(!container)return;
   container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading…</div>`;
   try{
-    /* Load acts once, cache in allActs, render incrementally */
-    if(allActs.length === 0){
-      const res=await fetch(`${API_BASE}/api/acts`,{headers:authHeader()});
-      const data=await res.json();
-      allActs=data.acts||[];
-    }
-    if(allActs.length===0){
-      container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:#b0bec8;font-style:italic">No acts found.</div>`;
-      return;
-    }
+    const res=await fetch(`${API_BASE}/api/acts`,{headers:authHeader()});
+    const data=await res.json();
+    allActs=data.acts||[];
+    if(allActs.length===0){container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:#b0bec8;font-style:italic">No acts found.</div>`;return;}
     renderActsTable();
   }catch(e){
     console.error("Failed to load acts:",e);
@@ -115,9 +109,14 @@ function changeActsPage(page){
 }
 
 // Hook into showPage to load acts when Acts page is viewed (only if not already wrapped)
-if(!window.pageInitializers){window.pageInitializers={};}
-window.pageInitializers.acts=function(){
-  if(actsPageInitialized)return;
-  setTimeout(() => renderActsList(), 100);
-  actsPageInitialized = true;
-};
+if(!window.originalShowPageActs){
+  window.originalShowPageActs = window.showPage;
+  const prevShowPage = window.showPage;
+  window.showPage = function(pageId){
+    prevShowPage(pageId);
+    if(pageId === "acts" && !actsPageInitialized){
+      setTimeout(() => renderActsList(), 100);
+      actsPageInitialized = true;
+    }
+  };
+}

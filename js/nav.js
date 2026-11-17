@@ -1,18 +1,18 @@
 // ── Resizable split pane (phone layout only) ────────────
-// Pointer Events (mouse + touch + pen in one path). The list expands from 0% to 100%
-// of the split area. When dragged up, left pane takes full height and hides right pane.
+// Pointer Events (mouse + touch + pen in one path). The list can grow to 85% of the
+// split area, never below 220px. Leaving the phone layout clears the dragged height
+// so the desktop 3-column CSS rules again (F15).
 (function() {
   const handle = document.getElementById('splitDragHandle');
   const leftPane = handle && handle.previousElementSibling;
-  const rightPane = handle && handle.nextElementSibling;
   const split = leftPane && leftPane.parentElement;
-  if (!handle || !leftPane || !rightPane || !split) return;
+  if (!handle || !leftPane || !split) return;
 
   const MOBILE = window.matchMedia('(max-width: 860px)');
-  const MIN_H = 0;  /* Allow dragging all the way up */
+  const MIN_H = 220;
   let dragging = false, startY = 0, startH = 0;
 
-  const maxH = () => split.getBoundingClientRect().height;  /* Allow full height */
+  const maxH = () => Math.round(split.getBoundingClientRect().height * 0.85);
 
   handle.addEventListener('pointerdown', e => {
     if (!MOBILE.matches) return;
@@ -26,8 +26,6 @@
     if (!dragging) return;
     const h = Math.min(Math.max(startH + (e.clientY - startY), MIN_H), maxH());
     leftPane.style.height = h + 'px';
-    /* Hide right pane when left pane takes up most of the space */
-    rightPane.style.display = h > (maxH() * 0.7) ? 'none' : 'block';
   });
   const stop = e => {
     dragging = false;
@@ -36,12 +34,7 @@
   handle.addEventListener('pointerup', stop);
   handle.addEventListener('pointercancel', stop);
 
-  MOBILE.addEventListener('change', e => {
-    if (!e.matches) {
-      leftPane.style.height = '';
-      rightPane.style.display = 'block';
-    }
-  });
+  MOBILE.addEventListener('change', e => { if (!e.matches) leftPane.style.height = ''; });
 })();
 
 // ═══════════════════════════════════════════════════════════════
@@ -54,10 +47,6 @@ function showPage(pageId){
   const navKey=pageId.startsWith("patient")?"patients":pageId;
   document.querySelectorAll(`[data-page="${navKey}"]`).forEach(b=>b.classList.add("active"));
   closeDrawer();
-  // Trigger page initializers (acts, reminders, etc.)
-  if(window.pageInitializers && window.pageInitializers[pageId]){
-    window.pageInitializers[pageId]();
-  }
 }
 document.querySelectorAll("[data-page]").forEach(btn=>{
   btn.addEventListener("click",()=>{

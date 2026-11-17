@@ -1,10 +1,33 @@
 // ═══════════════════════════════════════════════════════════════
-//  REMINDERS PAGE (Phase 5 SMS) - Redesigned
+//  REMINDERS PAGE (Phase 5 SMS)
 // ═══════════════════════════════════════════════════════════════
 
-let allSMSPatients = [];
-let smsSearchState = { query: '', currentPage: 1 };
+let allSMSPatients = []; // Store all patients for filtering
+let smsFilterState = { search: '', filterType: null, currentPage: 1 }; // Current filter state
 const SMS_PAGE_SIZE = 50;
+
+// Test trigger: manually run a cron job for testing
+async function testSMSTrigger(trigger){
+  const triggerNames={
+    "cron":"Appointment Reminders",
+    "birthday":"Birthday SMS",
+    "holiday":"Holiday Greetings",
+    "review":"Review Reminders",
+    "followup":"Follow-up SMS"
+  };
+  if(!confirm(`Send test ${triggerNames[trigger] || trigger}? This will send real SMS to matching patients.`))return;
+  try{
+    const res=await fetch(`${API_BASE}/api/sms`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json",...authHeader()},
+      body:JSON.stringify({trigger})
+    });
+    const data=await res.json();
+    if(res.ok){
+      showToast(`✅ Sent: ${data.sent}, Skipped: ${data.skipped}, Failed: ${data.failed}`);
+    }else showToast(data.error||"Failed",true);
+  }catch{showToast("Network error",true);}
+}
 
 // Manual SMS send
 async function sendManualSMS(){
@@ -27,96 +50,165 @@ async function sendManualSMS(){
   }catch{showToast("Network error",true);}
 }
 
-// Filter SMS patients by search
-function filterSMSPatients(){
-  const query=document.getElementById("smsPatientSearch")?.value||"";
-  smsSearchState.query=query.toLowerCase();
-  smsSearchState.currentPage=1;
-  renderSMSPatientResults();
+// Load patient SMS opt-outs
+async function loadSMSOptOuts(){
+  const container=document.getElementById("smsOptOutList");
+  if(!container)return;
+  container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading…</div>`;
+  try{
+    // Load ALL patients with pagination
+    let allPatients = [];
+    let page = 1;
+    let hasMore = true;
+    while(hasMore){
+      const url=`${API_BASE}/api/patients?page=${page}&limit=100${authQuery()}`;
+      const res=await fetch(url,{headers:authHeader()});
+      if(!res.ok){
+        console.error(`Failed to fetch patients page ${page}:`,res.status,res.statusText);
+        container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients (${res.status}).</div>`;
+        return;
+      }
+      const data=await res.json();
+      const patients=data.patients||[];
+      if(patients.length===0){hasMore=false;break;}
+      allPatients=allPatients.concat(patients);
+      if(patients.length<100){hasMore=false;}
+      page++;
+    }
+    allSMSPatients=allPatients;
+    if(allSMSPatients.length===0){container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:#b0bec8;font-style:italic">No patients found.</div>`;return;}
+    renderSMSPreferencesTable();
+  }catch(e){
+    console.error("Error loading SMS opt-outs:",e);
+    container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients.</div>`;
+  }
 }
 
-// Clear search
-function clearSMSSearch(){
-  document.getElementById("smsPatientSearch").value="";
-  smsSearchState.query="";
-  smsSearchState.currentPage=1;
-  renderSMSPatientResults();
-}
+// Render SMS preferences table with current filter and pagination
+function renderSMSPreferencesTable(){
+  const container=document.getElementById("smsOptOutList");
+  let filtered=allSMSPatients;
 
-// Render patient search results with toggles
-function renderSMSPatientResults(){
-  const container=document.getElementById("smsPatientResults");
-  if(!smsSearchState.query){
-    container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--muted);text-align:center">Type to search patients</div>`;
-    return;
+  // Apply search filter
+  if(smsFilterState.search){
+    const q=smsFilterState.search.toLowerCase();
+    filtered=filtered.filter(p=>p.name.toLowerCase().includes(q)||p.reference_number.toLowerCase().includes(q));
   }
 
-  let filtered=allSMSPatients.filter(p=>
-    p.name.toLowerCase().includes(smsSearchState.query)||
-    p.reference_number.toLowerCase().includes(smsSearchState.query)
-  );
-
-  if(filtered.length===0){
-    container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--muted);text-align:center">No patients found</div>`;
-    return;
+  // Apply opted-in/out filter
+  if(smsFilterState.filterType==='opted-out'){
+    filtered=filtered.filter(p=>p.sms_optout_birthday||p.sms_optout_holiday||p.sms_optout_review||p.sms_optout_followup);
+  }else if(smsFilterState.filterType==='opted-in'){
+    filtered=filtered.filter(p=>!p.sms_optout_birthday&&!p.sms_optout_holiday&&!p.sms_optout_review&&!p.sms_optout_followup);
   }
 
   // Pagination
   const totalPages=Math.ceil(filtered.length/SMS_PAGE_SIZE);
-  if(smsSearchState.currentPage>totalPages)smsSearchState.currentPage=totalPages;
-  if(smsSearchState.currentPage<1)smsSearchState.currentPage=1;
+  if(smsFilterState.currentPage>totalPages&&totalPages>0)smsFilterState.currentPage=totalPages;
+  if(smsFilterState.currentPage<1)smsFilterState.currentPage=1;
 
-  const start=(smsSearchState.currentPage-1)*SMS_PAGE_SIZE;
+  const start=(smsFilterState.currentPage-1)*SMS_PAGE_SIZE;
   const end=start+SMS_PAGE_SIZE;
   const pageData=filtered.slice(start,end);
 
-  let html=``;
+  let html=`<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+    <thead><tr>
+      <th style="padding:0.5rem 0.85rem;text-align:left;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Patient</th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Birthday</th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Holiday</th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Review</th>
+      <th style="padding:0.5rem 0.85rem;text-align:center;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--border)">Followup</th>
+    </tr></thead><tbody>`;
+
   pageData.forEach(p=>{
-    html+=`<div class="sms-patient-result">
-      <div class="sms-patient-name">${escHtml(p.name)}</div>
-      <div class="sms-patient-ref">${escHtml(p.reference_number)}</div>
-      <div class="sms-toggle-group">
-        <label class="sms-toggle-label">
-          <input type="checkbox" ${p.sms_optout_birthday?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','birthday',this.checked)" aria-label="Opted out: Birthday SMS">
-          <span>Birthday</span>
-        </label>
-        <label class="sms-toggle-label">
-          <input type="checkbox" ${p.sms_optout_holiday?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','holiday',this.checked)" aria-label="Opted out: Holiday SMS">
-          <span>Holiday</span>
-        </label>
-        <label class="sms-toggle-label">
-          <input type="checkbox" ${p.sms_optout_review?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','review',this.checked)" aria-label="Opted out: Review SMS">
-          <span>Review</span>
-        </label>
-        <label class="sms-toggle-label">
-          <input type="checkbox" ${p.sms_optout_followup?'checked':''} onchange="updateSMSOptOut('${p.reference_number}','followup',this.checked)" aria-label="Opted out: Followup SMS">
-          <span>Followup</span>
-        </label>
-      </div>
-    </div>`;
+    const birth = p.sms_optout_birthday ? 'checked' : '';
+    const hol = p.sms_optout_holiday ? 'checked' : '';
+    const rev = p.sms_optout_review ? 'checked' : '';
+    const fup = p.sms_optout_followup ? 'checked' : '';
+    html+=`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:0.45rem 0.85rem"><strong>${escHtml(p.name)}</strong><br><span style="font-size:0.7rem;color:var(--muted)">${escHtml(p.reference_number)}</span></td>
+      <td style="padding:0.45rem 0.85rem;text-align:center">
+        <input type="checkbox" id="optout-birth-${p.reference_number}" ${birth} onchange="updateSMSOptOut('${p.reference_number}','birthday',this.checked)">
+      </td>
+      <td style="padding:0.45rem 0.85rem;text-align:center">
+        <input type="checkbox" id="optout-hol-${p.reference_number}" ${hol} onchange="updateSMSOptOut('${p.reference_number}','holiday',this.checked)">
+      </td>
+      <td style="padding:0.45rem 0.85rem;text-align:center">
+        <input type="checkbox" id="optout-rev-${p.reference_number}" ${rev} onchange="updateSMSOptOut('${p.reference_number}','review',this.checked)">
+      </td>
+      <td style="padding:0.45rem 0.85rem;text-align:center">
+        <input type="checkbox" id="optout-fup-${p.reference_number}" ${fup} onchange="updateSMSOptOut('${p.reference_number}','followup',this.checked)">
+      </td>
+    </tr>`;
   });
+  html+=`</tbody></table>`;
 
   // Pagination footer
-  if(totalPages>1){
-    html+=`<div class="sms-results-pagination">
-      <div>Page ${smsSearchState.currentPage}/${totalPages}</div>
-      <div style="display:flex;gap:0.3rem">`;
-    if(smsSearchState.currentPage>1){
-      html+=`<button class="btn-ghost btn-sm" onclick="changeSMSPage(${smsSearchState.currentPage-1})">← Prev</button>`;
-    }
-    if(smsSearchState.currentPage<totalPages){
-      html+=`<button class="btn-ghost btn-sm" onclick="changeSMSPage(${smsSearchState.currentPage+1})">Next →</button>`;
-    }
-    html+=`</div></div>`;
-  }
+  let paginationHtml=`<div style="padding:1rem;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;font-size:0.8rem;color:var(--muted)">`;
+  paginationHtml+=`<div>Showing ${pageData.length>0?start+1:0}–${Math.min(end,filtered.length)} of ${filtered.length} patient(s)</div>`;
 
-  container.innerHTML=html;
+  if(totalPages>1){
+    paginationHtml+=`<div style="display:flex;gap:0.3rem">`;
+    if(smsFilterState.currentPage>1){
+      paginationHtml+=`<button class="btn-ghost btn-sm" onclick="changeSMSPage(${smsFilterState.currentPage-1})">← Prev</button>`;
+    }
+    paginationHtml+=`<span style="padding:0.3rem 0.6rem;background:white;border:1px solid var(--border);border-radius:4px">${smsFilterState.currentPage}/${totalPages}</span>`;
+    if(smsFilterState.currentPage<totalPages){
+      paginationHtml+=`<button class="btn-ghost btn-sm" onclick="changeSMSPage(${smsFilterState.currentPage+1})">Next →</button>`;
+    }
+    paginationHtml+=`</div>`;
+  }
+  paginationHtml+=`</div>`;
+
+  container.innerHTML=html+paginationHtml;
 }
 
-// Change page
+// Filter SMS preferences by search term
+function filterSMSPreferences(){
+  const input=document.getElementById("smsFilterInput")?.value||"";
+  smsFilterState.search=input;
+  smsFilterState.currentPage=1;
+  renderSMSPreferencesTable();
+}
+
+// Change SMS page
 function changeSMSPage(page){
-  smsSearchState.currentPage=page;
-  renderSMSPatientResults();
+  smsFilterState.currentPage=page;
+  renderSMSPreferencesTable();
+}
+
+// Toggle filter button (opted-out / opted-in)
+function toggleSMSFilter(filterType){
+  smsFilterState.filterType=smsFilterState.filterType===filterType?null:filterType;
+  smsFilterState.currentPage=1;
+  renderSMSPreferencesTable();
+}
+
+// Clear all filters
+function clearSMSFilters(){
+  smsFilterState={search:'',filterType:null,currentPage:1};
+  document.getElementById("smsFilterInput").value="";
+  renderSMSPreferencesTable();
+}
+
+// Bulk update all displayed SMS preferences
+async function bulkSMSOptOut(isOptedOut){
+  if(!confirm(`Are you sure you want to ${isOptedOut ? 'opt out' : 'opt in'} all currently filtered patients for all SMS types?`))return;
+  showToast("Updating preferences…");
+  try{
+    const container=document.getElementById("smsOptOutList");
+    // Update local state and DOM checkboxes
+    allSMSPatients.forEach(p=>{
+      p.sms_optout_birthday=isOptedOut;
+      p.sms_optout_holiday=isOptedOut;
+      p.sms_optout_review=isOptedOut;
+      p.sms_optout_followup=isOptedOut;
+    });
+    renderSMSPreferencesTable();
+    showToast("✅ Updated successfully");
+  }catch(e){
+    showToast("Failed to bulk update",true);
+  }
 }
 
 // Update SMS opt-out preference
@@ -130,63 +222,55 @@ async function updateSMSOptOut(ref, type, isOptedOut){
       body:JSON.stringify({reference_number:ref,[col]:isOptedOut})
     });
     const data=await res.json();
-    if(res.ok){
-      /* Update local cache */
-      const patient=allSMSPatients.find(p=>p.reference_number===ref);
-      if(patient)patient[col]=isOptedOut;
-      showToast(isOptedOut?`✅ ${type} opt-out enabled`:`✅ ${type} opt-out disabled`);
-    }else showToast(data.error||"Failed to update",true);
+    if(!res.ok)showToast(data.error||"Failed to update",true);
   }catch{showToast("Network error",true);}
 }
 
-// Load SMS patients (first page only, rest in background)
-async function loadSMSPatients(){
-  try{
-    const loadPage = async (pageNum) => {
-      const url=`${API_BASE}/api/patients?page=${pageNum}&limit=100${authQuery()}`;
-      const res=await fetch(url,{headers:authHeader()});
-      if(!res.ok) return null;
-      return await res.json();
-    };
+// Load on page switch to Reminders
+let remindersPageInitialized = false;
 
-    // Load first page immediately
-    const firstData = await loadPage(1);
-    if(!firstData) return;
-    const firstPatients = firstData.patients || [];
-    allSMSPatients = [...firstPatients];
-
-    // Load remaining pages in background (non-blocking)
-    let page = 2;
-    while(true){
-      const data = await loadPage(page);
-      if(!data) break;
-      const patients = data.patients || [];
-      if(patients.length === 0) break;
-      allSMSPatients = allSMSPatients.concat(patients);
-      if(patients.length < 100) break;
-      page++;
+// Override showPage to initialize pages when switched (only if not already wrapped)
+if(!window.originalShowPageReminders){
+  window.originalShowPageReminders = window.showPage;
+  const prevShowPage = window.showPage;
+  window.showPage = function(pageId){
+    prevShowPage(pageId);
+    if(pageId === "reminders" && !remindersPageInitialized){
+      loadSMSOptOuts();
+      populateTestPatientDropdown();
+      remindersPageInitialized = true;
     }
-
-  }catch(e){
-    console.error("Error loading SMS patients:",e);
-  }
+  };
 }
 
-// Populate test patient dropdown
+// Populate patient dropdown for testing
 async function populateTestPatientDropdown(){
   const select=document.getElementById("testPatientRef");
   if(!select)return;
   try{
-    if(allSMSPatients.length === 0){
-      await loadSMSPatients();
+    // Load ALL patients with pagination
+    let page = 1;
+    let hasMore = true;
+    while(hasMore){
+      const url=`${API_BASE}/api/patients?page=${page}&limit=100${authQuery()}`;
+      const res=await fetch(url,{headers:authHeader()});
+      if(!res.ok){
+        console.error(`Failed to fetch patients page ${page}:`,res.status);
+        break;
+      }
+      const data=await res.json();
+      const patients=data.patients||[];
+      if(patients.length===0){hasMore=false;break;}
+      patients.forEach(p=>{
+        const opt=document.createElement("option");
+        opt.value=p.reference_number;
+        opt.textContent=`${p.name} (${p.reference_number})`;
+        select.appendChild(opt);
+      });
+      if(patients.length<100){hasMore=false;}
+      page++;
     }
-    allSMSPatients.forEach(p=>{
-      const opt=document.createElement("option");
-      opt.value=p.reference_number;
-      opt.textContent=`${p.name} (${p.reference_number})`;
-      select.appendChild(opt);
-    });
-  }catch(e){console.error("Failed to populate test patient dropdown:",e);}
+  }catch(e){console.error("Failed to load patients for dropdown:",e);}
 }
 
 // Send all 5 SMS types to a single patient for testing
@@ -208,13 +292,3 @@ async function sendTestToPatient(){
   }catch{showToast("Network error",true);}
 }
 
-// Load on page switch to Reminders
-let remindersPageInitialized = false;
-
-if(!window.pageInitializers){window.pageInitializers={};}
-window.pageInitializers.reminders=function(){
-  if(remindersPageInitialized)return;
-  loadSMSPatients();
-  populateTestPatientDropdown();
-  remindersPageInitialized = true;
-};
