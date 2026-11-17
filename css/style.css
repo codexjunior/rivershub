@@ -336,7 +336,7 @@ button:disabled{cursor:not-allowed}
   #newApptBtn{position:fixed;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:150;min-height:48px;padding:0 1.25rem;box-shadow:var(--shadow-lg);font-size:1rem}
 
   .patients-split{flex-direction:column}
-  .patients-left{width:100%;border-right:none;border-bottom:1px solid var(--border);height:42vh;min-height:220px;flex-shrink:0}
+  .patients-left{width:100%;border-right:none;border-bottom:1px solid var(--border);height:42vh;min-height:120px;flex-shrink:0}
   .patients-left-header{flex-direction:row;align-items:center;padding:.6rem .75rem;gap:.5rem}
   .patients-left-controls{flex:1;min-width:0}
   #patientCount{display:none}

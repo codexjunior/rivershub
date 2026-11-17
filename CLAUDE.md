@@ -245,7 +245,9 @@ Known tables (plus Phase 4 confirm): `patients`, `invoices`, `invoice_items`, `i
 └── RIVERSHUB_CONTEXT (1).md # ORIGINAL SPEC DOCUMENT — Phase 5 design notes, not in repo codebase
 ```
 
-## Gotchas
+## Performance & Search Optimization
+- **Search Debouncing**: Frontend search inputs (e.g. patients search) use a 300ms `debounce()` helper in `js/utils.js` to prevent excessive API requests while typing.
+- **Database Indexing**: Large-scale database searches (200k+ rows) use GIN Trigram indexes (`pg_trgm`) in Supabase on `patients(name)`, `patients(phone)`, and `patients(reference_number)` for sub-millisecond substring queries (`ilike`).
 
 - **No build step** — changes to `index.html`, `css/`, `js/` are live on deploy
 - **Vercel function timeout**: 30s max

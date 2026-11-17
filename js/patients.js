@@ -1,9 +1,14 @@
-// ═══════════════════════════════════════════════════════════════
-//  PATIENTS
-// ═══════════════════════════════════════════════════════════════
-let allPatients=[],patientPage=1,patientTotal=0;
-let viewingPatient=null,editingPatient=null;
-const PATIENT_LIMIT=20;
+// Attach debounced search listener
+const debouncedPatientSearch = debounce((e) => {
+  loadPatients(1, e.target.value.trim());
+}, 300);
+
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("patientSearch");
+  if (searchInput) {
+    searchInput.addEventListener("input", debouncedPatientSearch);
+  }
+});
 
 async function loadPatients(page=1,search=""){
   document.getElementById("patientListScroll").innerHTML=`<div class="state-msg" style="padding:2rem 1rem"><div class="icon" style="font-size:1.8rem">👤</div><p style="font-size:0.8rem">Loading…</p></div>`;

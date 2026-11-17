@@ -5,6 +5,14 @@ const genderLabel = v => v===0?"Male":v===1?"Female":null;
 const ageCatLabel = v => v===0?"Child":v===1?"Teenager":v===2?"Adult":v===3?"Senior":null;
 const dateLabel   = v => v?new Date(v).toLocaleDateString("en-GH",{day:"2-digit",month:"short",year:"2-digit",timeZone:"Africa/Accra"}):null;
 
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
 function showToast(msg,isError=false){
   const t=document.getElementById("toast");
   t.textContent=msg;t.className="toast"+(isError?" error":"");
