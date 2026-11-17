@@ -15,6 +15,7 @@ function authQuery(pw) {
 }
 const PAGE_SIZE = 10;
 let allAppointments = [];
+let allPatients = [];
 let currentPassword = "";
 let currentPage = 1;
 
