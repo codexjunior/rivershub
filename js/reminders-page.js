@@ -61,7 +61,7 @@ async function loadSMSOptOuts(){
     let page = 1;
     let hasMore = true;
     while(hasMore){
-      const url=`${API_BASE}/api/patients?page=${page}&limit=100${authQuery()}`;
+      const url=`${API_BASE}/api/patients?page=${page}&limit=100`;
       const res=await fetch(url,{headers:authHeader()});
       if(!res.ok){
         console.error(`Failed to fetch patients page ${page}:`,res.status,res.statusText);
@@ -196,7 +196,6 @@ async function bulkSMSOptOut(isOptedOut){
   if(!confirm(`Are you sure you want to ${isOptedOut ? 'opt out' : 'opt in'} all currently filtered patients for all SMS types?`))return;
   showToast("Updating preferences in database…");
   try{
-    const targetPatients = [];
     const search = smsFilterState.search ? smsFilterState.search.toLowerCase() : "";
     let filtered = allSMSPatients;
     if(search){
@@ -208,24 +207,31 @@ async function bulkSMSOptOut(isOptedOut){
       filtered=filtered.filter(p=>!p.sms_optout_birthday&&!p.sms_optout_holiday&&!p.sms_optout_review&&!p.sms_optout_followup);
     }
 
-    for(const p of filtered){
-      p.sms_optout_birthday=isOptedOut;
-      p.sms_optout_holiday=isOptedOut;
-      p.sms_optout_review=isOptedOut;
-      p.sms_optout_followup=isOptedOut;
+    // Prepare items array for bulk request
+    const items = filtered.map(p => {
+      p.sms_optout_birthday = isOptedOut;
+      p.sms_optout_holiday = isOptedOut;
+      p.sms_optout_review = isOptedOut;
+      p.sms_optout_followup = isOptedOut;
+      return {
+        reference_number: p.reference_number,
+        sms_optout_birthday: isOptedOut,
+        sms_optout_holiday: isOptedOut,
+        sms_optout_review: isOptedOut,
+        sms_optout_followup: isOptedOut
+      };
+    });
 
+    // Send in chunks of 150 to avoid request body limits
+    for(let i=0; i<items.length; i+=150){
+      const chunk = items.slice(i, i+150);
       await fetch(`${API_BASE}/api/patients`,{
         method:"PUT",
         headers:{"Content-Type":"application/json",...authHeader()},
-        body:JSON.stringify({
-          reference_number: p.reference_number,
-          sms_optout_birthday: isOptedOut,
-          sms_optout_holiday: isOptedOut,
-          sms_optout_review: isOptedOut,
-          sms_optout_followup: isOptedOut
-        })
+        body:JSON.stringify({ bulk: true, items: chunk })
       });
     }
+
     renderSMSPreferencesTable();
     showToast("✅ Bulk update completed successfully");
   }catch(e){
@@ -275,7 +281,7 @@ async function populateTestPatientDropdown(){
     let page = 1;
     let hasMore = true;
     while(hasMore){
-      const url=`${API_BASE}/api/patients?page=${page}&limit=100${authQuery()}`;
+      const url=`${API_BASE}/api/patients?page=${page}&limit=100`;
       const res=await fetch(url,{headers:authHeader()});
       if(!res.ok){
         console.error(`Failed to fetch patients page ${page}:`,res.status);

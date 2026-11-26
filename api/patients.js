@@ -302,12 +302,42 @@ module.exports = async function handler(req, res) {
     return res.status(409).json({ error: "Could not assign a unique reference number. Please try again." });
   }
 
-  // ── PUT — update patient ──────────────────────────────────────────────────
+  // ── PUT — update patient ────────────────────────────────________________──
   if (req.method === "PUT") {
     let body;
     try { body = typeof req.body === "string" ? JSON.parse(req.body) : req.body; }
     catch { return res.status(400).json({ error: "Invalid JSON" }); }
     if (!authRequest(req)) return res.status(401).json({ error: "Unauthorized" });
+
+    // Support bulk update if body is an array or has action=bulk
+    if (Array.isArray(body) || body.bulk) {
+      const items = Array.isArray(body) ? body : body.items;
+      if (!Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ error: "items array is required for bulk update" });
+      }
+      if (items.length > 200) {
+        return res.status(400).json({ error: "Max 200 items per bulk request" });
+      }
+
+      let updatedCount = 0;
+      for (const item of items) {
+        if (!item.reference_number) continue;
+        const { token, password, reference_number, ...rawFields } = item;
+        rawFields.reference_number = reference_number;
+        const { valid, cleaned } = validatePatient(rawFields);
+        if (!valid) continue;
+        const { reference_number: _ref, ...updateFields } = cleaned;
+
+        const { error } = await supabase
+          .from("patients")
+          .update(updateFields)
+          .eq("reference_number", reference_number);
+
+        if (!error) updatedCount++;
+      }
+      return res.status(200).json({ success: true, updated: updatedCount });
+    }
+
     if (!body.reference_number) return res.status(400).json({ error: "reference_number is required" });
 
     const { token, password, reference_number, ...rawFields } = body;
