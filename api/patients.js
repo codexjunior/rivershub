@@ -311,6 +311,24 @@ module.exports = async function handler(req, res) {
 
     // Support bulk update if body is an array or has action=bulk
     if (Array.isArray(body) || body.bulk) {
+      if (body.references && Array.isArray(body.references)) {
+        const refs = body.references;
+        if (refs.length === 0) return res.status(400).json({ error: "references array is required" });
+
+        const updateFields = {};
+        ['sms_optout_birthday', 'sms_optout_holiday', 'sms_optout_review', 'sms_optout_followup'].forEach(k => {
+          if (body[k] !== undefined) updateFields[k] = Boolean(body[k]);
+        });
+
+        const { error } = await supabase
+          .from("patients")
+          .update(updateFields)
+          .in("reference_number", refs);
+
+        if (error) return res.status(500).json({ error: error.message });
+        return res.status(200).json({ success: true, updated: refs.length });
+      }
+
       const items = Array.isArray(body) ? body : body.items;
       if (!Array.isArray(items) || items.length === 0) {
         return res.status(400).json({ error: "items array is required for bulk update" });

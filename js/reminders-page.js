@@ -196,7 +196,7 @@ async function bulkSMSOptOut(isOptedOut){
   const progressBar = document.getElementById("smsProgressBar");
   if(progressBar){
     progressBar.style.display = "block";
-    progressBar.style.width = "10%";
+    progressBar.style.width = "40%";
   }
   showToast("Updating preferences in database…");
   try{
@@ -211,42 +211,34 @@ async function bulkSMSOptOut(isOptedOut){
       filtered=filtered.filter(p=>!p.sms_optout_birthday&&!p.sms_optout_holiday&&!p.sms_optout_review&&!p.sms_optout_followup);
     }
 
-    const totalFiltered = filtered.length;
-    let completed = 0;
-
-    // Prepare items array for bulk request
-    const items = filtered.map(p => {
+    filtered.forEach(p => {
       p.sms_optout_birthday = isOptedOut;
       p.sms_optout_holiday = isOptedOut;
       p.sms_optout_review = isOptedOut;
       p.sms_optout_followup = isOptedOut;
-      return {
-        reference_number: p.reference_number,
+    });
+
+    const references = filtered.map(p => p.reference_number);
+
+    if(progressBar) progressBar.style.width = "75%";
+
+    // Send 1 single bulk request
+    await fetch(`${API_BASE}/api/patients`,{
+      method:"PUT",
+      headers:{"Content-Type":"application/json",...authHeader()},
+      body:JSON.stringify({
+        bulk: true,
+        references: references,
         sms_optout_birthday: isOptedOut,
         sms_optout_holiday: isOptedOut,
         sms_optout_review: isOptedOut,
         sms_optout_followup: isOptedOut
-      };
+      })
     });
-
-    // Send in chunks of 150 to avoid request body limits
-    for(let i=0; i<items.length; i+=150){
-      const chunk = items.slice(i, i+150);
-      await fetch(`${API_BASE}/api/patients`,{
-        method:"PUT",
-        headers:{"Content-Type":"application/json",...authHeader()},
-        body:JSON.stringify({ bulk: true, items: chunk })
-      });
-      completed += chunk.length;
-      if(progressBar && totalFiltered > 0){
-        const pct = Math.round((completed / totalFiltered) * 90) + 10;
-        progressBar.style.width = `${Math.min(pct, 100)}%`;
-      }
-    }
 
     if(progressBar){
       progressBar.style.width = "100%";
-      setTimeout(() => { progressBar.style.display = "none"; progressBar.style.width = "0%"; }, 400);
+      setTimeout(() => { progressBar.style.display = "none"; progressBar.style.width = "0%"; }, 300);
     }
 
     await loadSMSOptOuts();
