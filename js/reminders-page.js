@@ -275,28 +275,16 @@ async function populateTestPatientDropdown(){
   const select=document.getElementById("testPatientRef");
   if(!select)return;
   try{
-    // Load ALL patients with pagination
-    let page = 1;
-    let hasMore = true;
-    while(hasMore){
-      const url=`${API_BASE}/api/patients?page=${page}&limit=100`;
-      const res=await fetch(url,{headers:authHeader()});
-      if(!res.ok){
-        console.error(`Failed to fetch patients page ${page}:`,res.status);
-        break;
-      }
-      const data=await res.json();
-      const patients=data.patients||[];
-      if(patients.length===0){hasMore=false;break;}
-      patients.forEach(p=>{
-        const opt=document.createElement("option");
-        opt.value=p.reference_number;
-        opt.textContent=`${p.name} (${p.reference_number})`;
-        select.appendChild(opt);
-      });
-      if(patients.length<100){hasMore=false;}
-      page++;
-    }
+    const res=await fetch(`${API_BASE}/api/patients?page=1&limit=1000`,{headers:authHeader()});
+    if(!res.ok)return;
+    const data=await res.json();
+    const patients=data.patients||[];
+    patients.forEach(p=>{
+      const opt=document.createElement("option");
+      opt.value=p.reference_number;
+      opt.textContent=`${p.name} (${p.reference_number})`;
+      select.appendChild(opt);
+    });
   }catch(e){console.error("Failed to load patients for dropdown:",e);}
 }
 
