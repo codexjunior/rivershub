@@ -282,7 +282,7 @@ module.exports = async function handler(req, res) {
     for (let attempt = 0; attempt < 3; attempt++) {
       if (autoRef) rawFields.reference_number = await getNextReference(supabase);
 
-      const { valid, errors, cleaned } = validatePatient(rawFields);
+      const { valid, errors, cleaned } = validatePatient(rawFields, false);
       if (!valid) return res.status(400).json({ error: errors.join(", ") });
 
       // True insert: never overwrites an existing patient
@@ -324,7 +324,7 @@ module.exports = async function handler(req, res) {
         if (!item.reference_number) continue;
         const { token, password, reference_number, ...rawFields } = item;
         rawFields.reference_number = reference_number;
-        const { valid, cleaned } = validatePatient(rawFields);
+        const { valid, cleaned } = validatePatient(rawFields, true);
         if (!valid) continue;
         const { reference_number: _ref, ...updateFields } = cleaned;
 
@@ -344,7 +344,7 @@ module.exports = async function handler(req, res) {
 
     // Validate and sanitise input
     rawFields.reference_number = reference_number;
-    const { valid, errors, cleaned } = validatePatient(rawFields);
+    const { valid, errors, cleaned } = validatePatient(rawFields, true);
     if (!valid) return res.status(400).json({ error: errors.join(", ") });
     const { reference_number: _ref, ...updateFields } = cleaned;
 

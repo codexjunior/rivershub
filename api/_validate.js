@@ -18,18 +18,22 @@ function sanitiseStr(val, maxLen = 500) {
 }
 
 // Validate a patient body — returns { valid, errors, cleaned }
-function validatePatient(body) {
+function validatePatient(body, isUpdate = false) {
   const errors = [];
   const cleaned = {};
 
   const strField = (key, max = 200) => {
+    if (isUpdate && body[key] === undefined) return;
     const v = sanitiseStr(body[key], max);
     cleaned[key] = v;
   };
 
   // Required
-  if (!body.reference_number) errors.push("reference_number is required");
-  else cleaned.reference_number = sanitiseStr(body.reference_number, 50);
+  if (!body.reference_number) {
+    if (!isUpdate) errors.push("reference_number is required");
+  } else {
+    cleaned.reference_number = sanitiseStr(body.reference_number, 50);
+  }
 
   // Optional strings
   strField("name", 200);
@@ -47,21 +51,30 @@ function validatePatient(body) {
   strField("birthdate", 20);
 
   // Integer fields
-  if (body.gender !== null && body.gender !== undefined) {
-    const g = parseInt(body.gender);
-    if (![0, 1].includes(g)) errors.push("gender must be 0 (Male) or 1 (Female)");
-    else cleaned.gender = g;
+  if (body.gender !== undefined) {
+    if (body.gender === null || body.gender === "") {
+      cleaned.gender = null;
+    } else {
+      const g = parseInt(body.gender);
+      if (![0, 1].includes(g)) errors.push("gender must be 0 (Male) or 1 (Female)");
+      else cleaned.gender = g;
+    }
   }
-  if (body.age_category !== null && body.age_category !== undefined) {
-    const a = parseInt(body.age_category);
-    if (![0, 1, 2, 3].includes(a)) errors.push("age_category must be 0-3");
-    else cleaned.age_category = a;
+
+  if (body.age_category !== undefined) {
+    if (body.age_category === null || body.age_category === "") {
+      cleaned.age_category = null;
+    } else {
+      const a = parseInt(body.age_category);
+      if (![0, 1, 2, 3].includes(a)) errors.push("age_category must be 0-3");
+      else cleaned.age_category = a;
+    }
   }
 
   // Boolean SMS opt-outs
   ['sms_optout_birthday', 'sms_optout_holiday', 'sms_optout_review', 'sms_optout_followup'].forEach(k => {
-    if (body[k] !== undefined && body[k] !== null) {
-      cleaned[k] = Boolean(body[k]);
+    if (body[k] !== undefined) {
+      cleaned[k] = body[k] !== null ? Boolean(body[k]) : null;
     }
   });
 
