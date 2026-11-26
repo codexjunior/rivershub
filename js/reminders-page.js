@@ -56,26 +56,13 @@ async function loadSMSOptOuts(){
   if(!container)return;
   container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading…</div>`;
   try{
-    // Load ALL patients with pagination
-    let allPatients = [];
-    let page = 1;
-    let hasMore = true;
-    while(hasMore){
-      const url=`${API_BASE}/api/patients?page=${page}&limit=100`;
-      const res=await fetch(url,{headers:authHeader()});
-      if(!res.ok){
-        console.error(`Failed to fetch patients page ${page}:`,res.status,res.statusText);
-        container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients (${res.status}).</div>`;
-        return;
-      }
-      const data=await res.json();
-      const patients=data.patients||[];
-      if(patients.length===0){hasMore=false;break;}
-      allPatients=allPatients.concat(patients);
-      if(patients.length<100){hasMore=false;}
-      page++;
+    const res=await fetch(`${API_BASE}/api/patients?page=1&limit=1000`,{headers:authHeader()});
+    if(!res.ok){
+      container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:var(--red)">Failed to load patients (${res.status}).</div>`;
+      return;
     }
-    allSMSPatients=allPatients;
+    const data=await res.json();
+    allSMSPatients=data.patients||[];
     if(allSMSPatients.length===0){container.innerHTML=`<div style="padding:1rem;font-size:0.82rem;color:#b0bec8;font-style:italic">No patients found.</div>`;return;}
     renderSMSPreferencesTable();
   }catch(e){
@@ -182,18 +169,29 @@ function toggleSMSFilter(filterType){
   smsFilterState.filterType=smsFilterState.filterType===filterType?null:filterType;
   smsFilterState.currentPage=1;
   renderSMSPreferencesTable();
+  updateSMSFilterButtonStyles();
 }
 
 // Clear all filters
 function clearSMSFilters(){
   smsFilterState={search:'',filterType:null,currentPage:1};
-  document.getElementById("smsFilterInput").value="";
+  const input=document.getElementById("smsFilterInput");
+  if(input)input.value="";
   renderSMSPreferencesTable();
+  updateSMSFilterButtonStyles();
+}
+
+function updateSMSFilterButtonStyles(){
+  const btnOut = document.getElementById("btnFilterOptedOut");
+  const btnIn = document.getElementById("btnFilterOptedIn");
+  if(btnOut) btnOut.classList.toggle("active", smsFilterState.filterType==='opted-out');
+  if(btnIn) btnIn.classList.toggle("active", smsFilterState.filterType==='opted-in');
 }
 
 // Bulk update all displayed SMS preferences
 async function bulkSMSOptOut(isOptedOut){
-  if(!confirm(`Are you sure you want to ${isOptedOut ? 'opt out' : 'opt in'} all currently filtered patients for all SMS types?`))return;
+  const actionName = isOptedOut ? 'opt in' : 'opt out';
+  if(!confirm(`Are you sure you want to ${actionName} all currently filtered patients for all SMS types?`))return;
   showToast("Updating preferences in database…");
   try{
     const search = smsFilterState.search ? smsFilterState.search.toLowerCase() : "";

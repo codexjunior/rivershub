@@ -296,6 +296,13 @@ button,input,select,textarea{-webkit-tap-highlight-color:transparent}
   stroke: currentColor;
 }
 
+.btn-ghost.active {
+  background: var(--teal-light);
+  color: var(--teal-ink);
+  border-color: var(--teal);
+  font-weight: 600;
+}
+
 /* ── Final Craft Polish: Smooth Micro-Interactions & Focus Rings ── */
 button, input, select, textarea {
   transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;

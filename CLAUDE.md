@@ -155,6 +155,7 @@ Known tables (plus Phase 4 confirm): `patients`, `invoices`, `invoice_items`, `i
 | ~~F4~~ | Medium | ~~Rotate `SYNC_TOKEN` (value was in a chat)~~ | **Deferred by owner** (still in GitHub secret and Apps Script) |
 
 **Post-Phase 4 open bugs** (to be scheduled in Phase 5 or later):
+1. ~~Patient details erasure on partial update~~ → **Fixed** (`validatePatient` updated in `api/_validate.js` to skip undefined fields on PUT updates).
 1. Appointment list only returns events from "now onward" → appointments today before API call time disappear from "Today" count (needs API change).
 2. Password with `:` still breaks `authRequest` (old sessions use `:`; new login uses `|`).
 3. `invEmail` and `editInvoice` still send credentials in URL query string (should use header).
