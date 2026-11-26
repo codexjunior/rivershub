@@ -250,7 +250,7 @@ module.exports = async function handler(req, res) {
 
     let query = supabase
       .from("patients")
-      .select("reference_number,name,phone,gender,age_category,created_at", { count: "exact" })      .order("created_at", { ascending: false })
+      .select("reference_number,name,phone,gender,age_category,created_at,sms_optout_birthday,sms_optout_holiday,sms_optout_review,sms_optout_followup", { count: "exact" })      .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (search) {

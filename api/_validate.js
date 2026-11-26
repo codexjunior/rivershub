@@ -58,7 +58,13 @@ function validatePatient(body) {
     else cleaned.age_category = a;
   }
 
+  // Boolean SMS opt-outs
+  ['sms_optout_birthday', 'sms_optout_holiday', 'sms_optout_review', 'sms_optout_followup'].forEach(k => {
+    if (body[k] !== undefined && body[k] !== null) {
+      cleaned[k] = Boolean(body[k]);
+    }
+  });
+
   return { valid: errors.length === 0, errors, cleaned };
 }
-
 module.exports = { permit, sanitiseStr, validatePatient };

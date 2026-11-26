@@ -2,7 +2,7 @@
 function invPrint(){
   const pName=document.getElementById("invPatientName").value;
   const invNum=document.getElementById("invNumber").value||"-";
-  const invCode=document.getElementById("invCode").value||"";
+  // const invCode=document.getElementById("invCode").value||"";
   const date=document.getElementById("invDate").value;
   const dateStr=date?new Date(date).toLocaleDateString("en-GH",{day:"numeric",month:"long",year:"numeric"}):"";
   const discAmt=parseFloat(document.getElementById("invDiscountAmt").value)||0;
@@ -47,7 +47,6 @@ function invPrint(){
           <div class="print-inv-num-label">Invoice No.</div>
           <div class="print-inv-num-val">${escHtml(invNum)}</div>
         </div>
-        ${invCode?`<div class="print-inv-numbox"><div class="print-inv-num-label">Code</div><div class="print-inv-num-val">#${escHtml(invCode)}</div></div>`:""}
         <div class="print-inv-date">${dateStr}</div>
       </div>
     </div>
@@ -77,7 +76,7 @@ function invPrint(){
     ${isFullyPaid?`<div style="margin-top:12pt;text-align:right;"><span style="display:inline-block;background:#E8F8F2;border:1.5pt solid #0B6B4A;border-radius:4pt;padding:3pt 10pt;font-size:8pt;font-weight:700;color:#0B6B4A;letter-spacing:0.1em;text-transform:uppercase;">✓ PAID</span></div>`:""}
     </div><!-- end z-index wrapper -->
     <div class="print-footer">
-      <span>Rivers Dental Clinic &nbsp;·&nbsp; Tantra Street, Taifa, Accra</span>
+      <span>Rivers Dental Clinic &nbsp;·&nbsp; Tantra Roundabout, Opposite Goil Filling Station, Accra</span>
       <span>Thank you for choosing Rivers Dental Clinic</span>
     </div>
   </div>`;

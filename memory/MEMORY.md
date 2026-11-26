@@ -1,0 +1,1 @@
+- [Audit Fixes and SEO Updates](audit-fixes.md) — project
