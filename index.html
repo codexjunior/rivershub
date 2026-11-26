@@ -260,10 +260,8 @@
         </div>
         <div style="padding:1.5rem;display:flex;gap:0.65rem;flex-wrap:wrap;align-items:flex-end">
           <div class="form-field" style="margin-bottom:0;flex:1;min-width:250px">
-            <label for="testPatientRef">Select Patient</label>
-            <select id="testPatientRef" style="border:1px solid var(--border);border-radius:6px;padding:0.5rem;font-size:0.85rem;font-family:'Plus Jakarta Sans',sans-serif;width:100%">
-              <option value="">-- Choose a patient --</option>
-            </select>
+            <label for="testPatientRef">Patient Reference or Name</label>
+            <input type="text" id="testPatientRef" placeholder="e.g. RDC/26/2384 or Kofi Mensah" style="border:1px solid var(--border);border-radius:6px;padding:0.5rem 0.85rem;font-size:0.85rem;font-family:'Plus Jakarta Sans',sans-serif;width:100%;background:#fff">
           </div>
           <button class="btn-primary btn-sm" onclick="sendTestToPatient()" style="min-width:150px">Send All Test SMS</button>
         </div>
@@ -306,12 +304,12 @@
             <button class="btn-ghost btn-sm" onclick="bulkSMSOptOut(false)">Opt Out All</button>
           </div>
         </div>
+        <div id="smsProgressBar" style="height:2px;background:var(--teal);width:0%;transition:width 0.2s ease;margin-bottom:0.5rem;display:none"></div>
         <div class="info-card" style="background:white;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)">
           <div style="padding:1rem;max-height:600px;overflow-y:auto" id="smsOptOutList">
             <div style="padding:1rem;font-size:0.82rem;color:var(--muted)">Loading…</div>
           </div>
         </div>
-        <p style="font-size:0.75rem;color:var(--muted);margin-top:0.75rem;font-style:italic">Checked = opted out (will NOT receive that SMS type). Uncheck to enable.</p>
       </div>
     </div>
   </div>

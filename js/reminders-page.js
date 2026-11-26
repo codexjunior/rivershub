@@ -192,6 +192,12 @@ function updateSMSFilterButtonStyles(){
 async function bulkSMSOptOut(isOptedOut){
   const actionName = isOptedOut ? 'opt in' : 'opt out';
   if(!confirm(`Are you sure you want to ${actionName} all currently filtered patients for all SMS types?`))return;
+
+  const progressBar = document.getElementById("smsProgressBar");
+  if(progressBar){
+    progressBar.style.display = "block";
+    progressBar.style.width = "10%";
+  }
   showToast("Updating preferences in database…");
   try{
     const search = smsFilterState.search ? smsFilterState.search.toLowerCase() : "";
@@ -204,6 +210,9 @@ async function bulkSMSOptOut(isOptedOut){
     }else if(smsFilterState.filterType==='opted-in'){
       filtered=filtered.filter(p=>!p.sms_optout_birthday&&!p.sms_optout_holiday&&!p.sms_optout_review&&!p.sms_optout_followup);
     }
+
+    const totalFiltered = filtered.length;
+    let completed = 0;
 
     // Prepare items array for bulk request
     const items = filtered.map(p => {
@@ -228,12 +237,23 @@ async function bulkSMSOptOut(isOptedOut){
         headers:{"Content-Type":"application/json",...authHeader()},
         body:JSON.stringify({ bulk: true, items: chunk })
       });
+      completed += chunk.length;
+      if(progressBar && totalFiltered > 0){
+        const pct = Math.round((completed / totalFiltered) * 90) + 10;
+        progressBar.style.width = `${Math.min(pct, 100)}%`;
+      }
     }
 
-    renderSMSPreferencesTable();
+    if(progressBar){
+      progressBar.style.width = "100%";
+      setTimeout(() => { progressBar.style.display = "none"; progressBar.style.width = "0%"; }, 400);
+    }
+
+    await loadSMSOptOuts();
     showToast("✅ Bulk update completed successfully");
   }catch(e){
     console.error("Bulk update error:", e);
+    if(progressBar) progressBar.style.display = "none";
     showToast("Failed to bulk update",true);
   }
 }
@@ -264,35 +284,24 @@ if(!window.originalShowPageReminders){
     prevShowPage(pageId);
     if(pageId === "reminders" && !remindersPageInitialized){
       loadSMSOptOuts();
-      populateTestPatientDropdown();
       remindersPageInitialized = true;
     }
   };
 }
 
-// Populate patient dropdown for testing
-async function populateTestPatientDropdown(){
-  const select=document.getElementById("testPatientRef");
-  if(!select)return;
-  try{
-    const res=await fetch(`${API_BASE}/api/patients?page=1&limit=1000`,{headers:authHeader()});
-    if(!res.ok)return;
-    const data=await res.json();
-    const patients=data.patients||[];
-    patients.forEach(p=>{
-      const opt=document.createElement("option");
-      opt.value=p.reference_number;
-      opt.textContent=`${p.name} (${p.reference_number})`;
-      select.appendChild(opt);
-    });
-  }catch(e){console.error("Failed to load patients for dropdown:",e);}
-}
-
 // Send all 5 SMS types to a single patient for testing
 async function sendTestToPatient(){
-  const ref=document.getElementById("testPatientRef")?.value;
-  if(!ref){showToast("Please select a patient",true);return;}
-  if(!confirm(`Send all 5 test SMS types to ${ref}?\n\nBirthday, Holiday, Review, Followup, and one Appointment reminder.\n\nThis will send real SMS to the patient's phone number.`))return;
+  const inputVal=(document.getElementById("testPatientRef")?.value||"").trim();
+  if(!inputVal){showToast("Please enter a patient reference number or name",true);return;}
+
+  // Resolve reference number if user typed a name or reference
+  let ref = inputVal;
+  const match = allSMSPatients.find(p => p.reference_number.toLowerCase() === inputVal.toLowerCase() || (p.name && p.name.toLowerCase().includes(inputVal.toLowerCase())));
+  if(match){
+    ref = match.reference_number;
+  }
+
+  if(!confirm(`Send all 5 test SMS types to patient ${ref}?\n\nBirthday, Holiday, Review, Followup, and one Appointment reminder.\n\nThis will send real SMS to the patient's phone number.`))return;
 
   try{
     const res=await fetch(`${API_BASE}/api/sms`,{
