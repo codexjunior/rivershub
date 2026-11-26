@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Rivers Dental Clinic Staff Portal for patient, appointment, and invoice management.">
 <title>Staff Dashboard - Rivers Dental Clinic</title>
 <link rel="apple-touch-icon" href="/imgs/rivers_dental_logo.png">
 <link rel="icon" type="image/png" href="/imgs/rivers_dental_logo.png">
@@ -34,7 +35,7 @@
     <p>Enter your password to access the patient management portal.</p>
     <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
     <div class="login-field">
-      <label>Password</label>
+      <label for="passwordInput">Password</label>
       <input type="password" id="passwordInput" placeholder="Enter dashboard password">
     </div>
     <button class="login-btn" id="loginBtn">Access Dashboard</button>
@@ -43,6 +44,7 @@
 
 <!-- ═══════════════════════════════════ APP ═══ -->
 <div class="app" id="app">
+<main>
 
   <!-- TOPNAV -->
   <nav class="nav">
@@ -101,10 +103,10 @@
     <div class="controls">
       <div class="search-wrap">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="searchInput" placeholder="Search by patient name…">
+        <input type="text" id="searchInput" placeholder="Search by patient name…" aria-label="Search by patient name">
       </div>
       <span class="result-count" id="resultCount"></span>
-      <button class="btn-ghost" id="refreshBtn" style="padding: 0.48rem 0.8rem;">↻</button>
+      <button class="btn-ghost" id="refreshBtn" aria-label="Refresh appointments" style="padding: 0.48rem 0.8rem;">↻</button>
       <button class="btn-primary" id="newApptBtn">+ New Appointment</button>
     </div>
     <div class="page-content" id="apptContent">
@@ -116,16 +118,15 @@
   <div class="page" id="page-patients">
     <div class="patients-split">
 
-      <!-- LEFT: li
-       st panel -->
+      <!-- LEFT: list panel -->
       <div class="patients-left">
         <div class="patients-left-header">
           <div class="patients-left-controls">
             <div class="patient-search-wrap" style="flex:1">
               <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" id="patientSearch" placeholder="Search patients…">
+              <input type="text" id="patientSearch" placeholder="Search patients…" aria-label="Search patients">
             </div>
-            <button class="btn-ghost btn-sm" id="refreshPatientsBtn" title="Refresh">↻</button>
+            <button class="btn-ghost btn-sm" id="refreshPatientsBtn" title="Refresh" aria-label="Refresh patients">↻</button>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between">
             <span class="result-count" id="patientCount"></span>
@@ -217,15 +218,15 @@
           <h2 style="margin:0 0 1rem 0;font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text)">Add New Procedure</h2>
           <div style="display:flex;gap:0.65rem;flex-wrap:wrap;align-items:flex-end">
             <div class="form-field" style="margin-bottom:0;flex:1;min-width:160px">
-              <label>Procedure Name</label>
+              <label for="newActName">Procedure Name</label>
               <input type="text" id="newActName" placeholder="e.g. SCALING AND POLISHING" style="text-transform:uppercase">
             </div>
             <div class="form-field" style="margin-bottom:0;width:110px">
-              <label>Price (GHS)</label>
+              <label for="newActPrice">Price (GHS)</label>
               <input type="number" id="newActPrice" placeholder="0.00" min="0" step="0.01">
             </div>
             <div class="form-field" style="margin-bottom:0;width:110px">
-              <label>Recall (months)</label>
+              <label for="newActRecall">Recall (months)</label>
               <input type="number" id="newActRecall" placeholder="—" min="0" step="1">
             </div>
             <button class="btn-primary btn-sm" onclick="saveNewAct()">+ Add Act</button>
@@ -234,7 +235,7 @@
         <div style="display:flex;gap:0.65rem;margin-bottom:1rem;align-items:center">
           <div class="patient-search-wrap" style="flex:1;max-width:300px">
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" id="actsSearchInput" placeholder="Search procedure name…" oninput="searchActs()">
+            <input type="text" id="actsSearchInput" placeholder="Search procedure name…" aria-label="Search procedure name" oninput="searchActs()">
           </div>
         </div>
         <div id="actsList" style="max-height:600px;overflow-y:auto">
@@ -259,7 +260,7 @@
         </div>
         <div style="padding:1.5rem;display:flex;gap:0.65rem;flex-wrap:wrap;align-items:flex-end">
           <div class="form-field" style="margin-bottom:0;flex:1;min-width:250px">
-            <label>Select Patient</label>
+            <label for="testPatientRef">Select Patient</label>
             <select id="testPatientRef" style="border:1px solid var(--border);border-radius:6px;padding:0.5rem;font-size:0.85rem;font-family:'Plus Jakarta Sans',sans-serif;width:100%">
               <option value="">-- Choose a patient --</option>
             </select>
@@ -275,11 +276,11 @@
         </div>
         <div style="padding:1.5rem;display:flex;gap:0.65rem;flex-wrap:wrap;align-items:flex-end">
           <div class="form-field" style="margin-bottom:0;flex:1;min-width:200px">
-            <label>Phone Number</label>
+            <label for="manualSMSPhone">Phone Number</label>
             <input type="tel" id="manualSMSPhone" placeholder="0244 123 456 or 233244123456">
           </div>
           <div class="form-field" style="margin-bottom:0;flex:1;min-width:300px">
-            <label>Message</label>
+            <label for="manualSMSMessage">Message</label>
             <input type="text" id="manualSMSMessage" placeholder="Type your message here…">
           </div>
           <button class="btn-primary btn-sm" onclick="sendManualSMS()">Send SMS</button>
@@ -291,7 +292,7 @@
           <h2 style="font-size:0.95rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text);margin:0">Patient SMS Preferences</h2>
           <div class="patient-search-wrap" style="flex:0 0 250px">
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" id="smsFilterInput" placeholder="Search patient name…" oninput="filterSMSPreferences()">
+            <input type="text" id="smsFilterInput" placeholder="Search patient name…" aria-label="Search patient name" oninput="filterSMSPreferences()">
           </div>
         </div>
         <div style="display:flex;gap:0.5rem;padding: 0rem 0.7rem;margin-bottom:1rem;flex-wrap:wrap;justify-content:space-between;align-items:center">
@@ -315,6 +316,7 @@
     </div>
   </div>
 
+</main>
 </div><!-- end .app -->
 
 <!-- ═══ PRINT INVOICE AREA (hidden, shown only on print) ═══ -->
@@ -325,20 +327,20 @@
   <div class="modal-panel">
     <div class="modal-header">
       <h2>New Appointment</h2>
-      <button class="modal-close" id="closeNewAppt">✕</button>
+      <button class="modal-close" id="closeNewAppt" aria-label="Close modal">✕</button>
     </div>
     <div class="form-error" id="apptFormError"></div>
     <div class="form-row">
-      <div class="form-field"><label>Patient Name *</label><input type="text" id="apptName" placeholder="e.g. Kofi Mensah"></div>
-      <div class="form-field"><label>Phone Number *</label><input type="tel" id="apptPhone" placeholder="e.g. 0244 123 456"></div>
+      <div class="form-field"><label for="apptName">Patient Name *</label><input type="text" id="apptName" placeholder="e.g. Kofi Mensah"></div>
+      <div class="form-field"><label for="apptPhone">Phone Number *</label><input type="tel" id="apptPhone" placeholder="e.g. 0244 123 456"></div>
     </div>
-    <div class="form-field"><label>Email Address</label><input type="email" id="apptEmail" placeholder="kofi@example.com"></div>
+    <div class="form-field"><label for="apptEmail">Email Address</label><input type="email" id="apptEmail" placeholder="kofi@example.com"></div>
     <div class="form-row">
-      <div class="form-field"><label>Date *</label><input type="date" id="apptDate"></div>
-      <div class="form-field"><label>Time *</label><input type="time" id="apptTime"></div>
-      <div class="form-field"><label>Duration</label><input type="text" id="apptDuration" placeholder="e.g. 30, 1:30"></div>
+      <div class="form-field"><label for="apptDate">Date *</label><input type="date" id="apptDate"></div>
+      <div class="form-field"><label>Time *</label><input type="time" id="apptTime" aria-label="Appointment time"></div>
+      <div class="form-field"><label for="apptDuration">Duration</label><input type="text" id="apptDuration" placeholder="e.g. 30, 1:30"></div>
     </div>
-    <div class="form-field"><label>Notes / Description</label><textarea id="apptDescription" placeholder="Procedure details, special instructions…"></textarea></div>
+    <div class="form-field"><label for="apptDescription">Notes / Description</label><textarea id="apptDescription" placeholder="Procedure details, special instructions…"></textarea></div>
     <button class="modal-submit" id="submitNewAppt">Create Appointment</button>
   </div>
 </div>
