@@ -33,7 +33,7 @@ The codebase is at **Phase 5** (November 2026), confirmed by files present:
 - F13: `.split-drag-handle` fix (forced in `theme.css`)
 - F14: auto-login moved to `main.js` (last script)
 - F15: Pointer Events split-pane (85% max / 220px min, clear on layout change)
-- **Performance & Accessibility Audits (Nov 2026)**: Added valid `robots.txt`, meta description, `<main>` landmark, WCAG AA color contrast fixes for `.day-count`, bulk SMS batching (`/api/patients` bulk PUT endpoint), and moved the reminders page patient list fetch from query string credentials to `authHeader()` to prevent password exposure in the DevTools Network tab.
+- **Performance & Accessibility Audits (Nov 2026)**: Added valid `robots.txt`, meta description, `<main>` landmark, WCAG AA color contrast fixes for `.day-count`, bulk SMS batching (`/api/patients` bulk PUT endpoint with single-query `.in()` update), batched reminders page loading (`limit=1000` single fetch + text input search for test SMS), and thin progress bar tracking for bulk operations. Fixed patient details erasure on partial PUT updates.
 
 ## Development Commands
 

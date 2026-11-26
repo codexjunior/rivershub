@@ -211,6 +211,21 @@ async function bulkSMSOptOut(isOptedOut){
       filtered=filtered.filter(p=>!p.sms_optout_birthday&&!p.sms_optout_holiday&&!p.sms_optout_review&&!p.sms_optout_followup);
     }
 
+    // Only update patients who don't already match the target state
+    filtered = filtered.filter(p => {
+      const b = p.sms_optout_birthday === isOptedOut;
+      const h = p.sms_optout_holiday === isOptedOut;
+      const r = p.sms_optout_review === isOptedOut;
+      const f = p.sms_optout_followup === isOptedOut;
+      return !(b && h && r && f);
+    });
+
+    if(filtered.length === 0){
+      if(progressBar) progressBar.style.display = "none";
+      showToast("All filtered patients already match this state.");
+      return;
+    }
+
     filtered.forEach(p => {
       p.sms_optout_birthday = isOptedOut;
       p.sms_optout_holiday = isOptedOut;
@@ -218,23 +233,33 @@ async function bulkSMSOptOut(isOptedOut){
       p.sms_optout_followup = isOptedOut;
     });
 
-    const references = filtered.map(p => p.reference_number);
+    const references = [...new Set(filtered.map(p => p.reference_number).filter(Boolean))];
+    const totalRefs = references.length;
+    let completedRefs = 0;
 
     if(progressBar) progressBar.style.width = "75%";
 
-    // Send 1 single bulk request
-    await fetch(`${API_BASE}/api/patients`,{
-      method:"PUT",
-      headers:{"Content-Type":"application/json",...authHeader()},
-      body:JSON.stringify({
-        bulk: true,
-        references: references,
-        sms_optout_birthday: isOptedOut,
-        sms_optout_holiday: isOptedOut,
-        sms_optout_review: isOptedOut,
-        sms_optout_followup: isOptedOut
-      })
-    });
+    // Send in safe batches of 500 references per request
+    for(let i = 0; i < references.length; i += 500){
+      const batchRefs = references.slice(i, i + 500);
+      await fetch(`${API_BASE}/api/patients`,{
+        method:"PUT",
+        headers:{"Content-Type":"application/json",...authHeader()},
+        body:JSON.stringify({
+          bulk: true,
+          references: batchRefs,
+          sms_optout_birthday: isOptedOut,
+          sms_optout_holiday: isOptedOut,
+          sms_optout_review: isOptedOut,
+          sms_optout_followup: isOptedOut
+        })
+      });
+      completedRefs += batchRefs.length;
+      if(progressBar && totalRefs > 0){
+        const pct = Math.round((completedRefs / totalRefs) * 90) + 10;
+        progressBar.style.width = `${Math.min(pct, 100)}%`;
+      }
+    }
 
     if(progressBar){
       progressBar.style.width = "100%";

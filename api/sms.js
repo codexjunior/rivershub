@@ -255,13 +255,13 @@ async function handleBirthday(req, res) {
     const supabase = getSupabaseClient();
     const todayMonthDay = getTodayMonthDay();
 
-    // Fetch all patients with birthdate matching today (ignore year) and NOT opted out
+    // Fetch all patients with birthdate matching today (ignore year) and opted in
     const { data: patients, error } = await supabase
       .from("patients")
       .select("reference_number, name, phone, birthdate, sms_optout_birthday")
       .neq("phone", null)
       .not("phone", "eq", "")
-      .eq("sms_optout_birthday", false);
+      .eq("sms_optout_birthday", true);
 
     if (error) throw error;
 
@@ -322,13 +322,13 @@ async function handleHoliday(req, res) {
 
     console.log(`[sms-holiday] Today is ${holiday.name}`);
 
-    // Fetch all patients with phone and NOT opted out of holiday SMS
+    // Fetch all patients with phone and opted in to holiday SMS
     const { data: patients, error } = await supabase
       .from("patients")
       .select("name, phone, sms_optout_holiday")
       .neq("phone", null)
       .not("phone", "eq", "")
-      .eq("sms_optout_holiday", false);
+      .eq("sms_optout_holiday", true);
 
     if (error) throw error;
 
@@ -483,13 +483,13 @@ async function handleFollowup(req, res) {
 
     console.log(`[sms-followup] Today is a follow-up SMS date (${todayMonthDay})`);
 
-    // Fetch all patients with phone and NOT opted out of followup SMS
+    // Fetch all patients with phone and opted in to followup SMS
     const { data: patients, error } = await supabase
       .from("patients")
       .select("name, phone, sms_optout_followup")
       .neq("phone", null)
       .not("phone", "eq", "")
-      .eq("sms_optout_followup", false);
+      .eq("sms_optout_followup", true);
 
     if (error) throw error;
 
