@@ -194,19 +194,42 @@ function clearSMSFilters(){
 // Bulk update all displayed SMS preferences
 async function bulkSMSOptOut(isOptedOut){
   if(!confirm(`Are you sure you want to ${isOptedOut ? 'opt out' : 'opt in'} all currently filtered patients for all SMS types?`))return;
-  showToast("Updating preferences…");
+  showToast("Updating preferences in database…");
   try{
-    const container=document.getElementById("smsOptOutList");
-    // Update local state and DOM checkboxes
-    allSMSPatients.forEach(p=>{
+    const targetPatients = [];
+    const search = smsFilterState.search ? smsFilterState.search.toLowerCase() : "";
+    let filtered = allSMSPatients;
+    if(search){
+      filtered=filtered.filter(p=>p.name.toLowerCase().includes(search)||p.reference_number.toLowerCase().includes(search));
+    }
+    if(smsFilterState.filterType==='opted-out'){
+      filtered=filtered.filter(p=>p.sms_optout_birthday||p.sms_optout_holiday||p.sms_optout_review||p.sms_optout_followup);
+    }else if(smsFilterState.filterType==='opted-in'){
+      filtered=filtered.filter(p=>!p.sms_optout_birthday&&!p.sms_optout_holiday&&!p.sms_optout_review&&!p.sms_optout_followup);
+    }
+
+    for(const p of filtered){
       p.sms_optout_birthday=isOptedOut;
       p.sms_optout_holiday=isOptedOut;
       p.sms_optout_review=isOptedOut;
       p.sms_optout_followup=isOptedOut;
-    });
+
+      await fetch(`${API_BASE}/api/patients`,{
+        method:"PUT",
+        headers:{"Content-Type":"application/json",...authHeader()},
+        body:JSON.stringify({
+          reference_number: p.reference_number,
+          sms_optout_birthday: isOptedOut,
+          sms_optout_holiday: isOptedOut,
+          sms_optout_review: isOptedOut,
+          sms_optout_followup: isOptedOut
+        })
+      });
+    }
     renderSMSPreferencesTable();
-    showToast("✅ Updated successfully");
+    showToast("✅ Bulk update completed successfully");
   }catch(e){
+    console.error("Bulk update error:", e);
     showToast("Failed to bulk update",true);
   }
 }
